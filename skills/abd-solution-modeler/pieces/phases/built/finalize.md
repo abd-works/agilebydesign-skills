@@ -228,9 +228,168 @@ AnotherConcept (qualifier):
 
 ---
 
-## Domain Model Rules (4)
+## Domain Model Rules (16)
 
 Apply these rules when producing the domain model output for this phase.
+
+---
+title: Anemia / Centralization Critique
+impact: HIGH
+---
+
+## Anemia / Centralization Critique
+
+Explicitly attack the candidate model before accepting it. This phase is mandatory.
+
+**Look for:**
+- Centralized handlers, resolvers, or managers
+- Anemic entities with no decisions
+- Objects that are just data bags
+- Config-holder pseudo-objects
+- Orphan concepts (referenced but not modeled)
+- State with no owner
+- Rules with no owner
+- Fake inheritance (shared fields, no shared semantics)
+- Type, mode, or effect switches that should be polymorphism
+- Orchestration making domain decisions
+- Relationships with no behavioral significance
+
+**AI must propose minimal corrections** for each issue found.
+
+**DO NOT** truncate. Full Model Assessment requires an explicit anemia critique table covering all issue types (centralized handlers, anemic entities, data bags, orphan concepts, state with no owner, rules with no owner, fake inheritance, type switches, orchestration making domain decisions). Persist the full assessment in run-N-ooad.md. A one-line note is insufficient.
+
+
+---
+
+---
+title: Domain Model — Wirfs-Brock Role Stereotypes
+impact: MEDIUM
+---
+
+## Concept Roles (Optional)
+
+When clarifying how a concept participates in interactions, you may assign a **role**:
+
+| Role | Responsibility | Example |
+|------|----------------|---------|
+| **Information Holder** | Knows and provides information | Customer, Order, Product |
+| **Structurer** | Maintains relationships between objects | Cart (holds line items) |
+| **Service Provider** | Performs work; often stateless | TaxCalculator, Validator |
+| **Coordinator** | Delegates to others | CheckoutController |
+| **Controller** | Handles system events; represents use case | ProcessOrderHandler |
+| **Interfacer** | Connects to outside world | PaymentGateway, EmailSender |
+
+
+---
+
+---
+title: Domain Model — Domain Language
+impact: HIGH
+---
+
+## Use Domain Language from Source
+
+**DO** use domain language from stories and acceptance criteria. Mine vocabulary from source material.
+
+**DO** use standard types (String, Number, Boolean, List, Dictionary, UniqueID, Instant) for Properties; prefer domain concepts over scattering primitives. See domain-ooa-property-types.
+
+**DO** write Operation names in natural English (Calculates total, Validates inventory, Is exhausted when fully redeemed).
+
+**DO NOT** use Hold, Get, Has as defaults — find domain-specific verbs (Is identified by, Defines, Starts valid at, Expires at).
+
+**DO NOT** use Manager, Service, Handler, Factory suffixes for concept names.
+
+**DO NOT** use abbreviations or technical jargon when simple English works.
+
+
+---
+
+---
+title: Domain Model — Integrate Concepts
+impact: HIGH
+---
+
+## Nest Related Capabilities Under Parent
+
+**DO** integrate related capabilities under a parent concept (e.g. Portfolio with multiple Operations, not separate PortfolioValue, PortfolioRisk concepts).
+
+**DO** group concepts by business domain, not technical layers (Data Layer, Business Logic Layer).
+
+**DO NOT** create separate concepts with the same noun when they should be one (PortfolioValue, PortfolioRisk, PortfolioAllocation → Portfolio).
+
+**DO NOT** split related capabilities into separate sibling concepts (PortfolioValue, PortfolioRisk as separate concepts when they belong under Portfolio).
+
+**DO NOT** group by technical layers or implementation patterns (Factories, Builders, Repositories).
+
+
+---
+
+---
+title: Domain Model — Module Folder Mapping
+impact: LOW
+---
+
+## When Mapping to Code
+
+**DO** when mapping to code, use Module = folder path in dot notation (e.g. `actions.render`, `repl_cli.cli_bot`).
+
+**DO NOT** use `src/` prefix or slashes — use dots for nesting (e.g. `repl_cli.cli_bot`, not `src/repl_cli` or `repl_cli/cli_bot`).
+
+**Note:** Applies when the synthesizer output is mapped to existing or planned code structure. Synthesizer may run before code exists — rule is optional when applicable.
+
+
+---
+
+---
+title: Domain Model — Resource Concept Naming
+impact: HIGH
+---
+
+## Concepts as Resources
+
+**DO** name concepts as nouns (resources): Order, Portfolio, Voucher, not OrderManager, InstructionPreparer.
+
+**DO** give concepts both Properties and Operations where behavior exists — no anemic concepts (only Properties, no Operations).
+
+**DO NOT** use Manager/Service/Handler/Preparer/Builder suffixes. Name after the resource itself.
+
+**DO NOT** create concepts that are only data carriers with no Operations.
+
+**DO NOT** pass another concept's data to it — concepts own their data. Encapsulation: don't pass another concept's Properties as parameters to its Operations.
+
+
+---
+
+---
+title: Scenario / Message Walkthrough Validation
+impact: HIGH
+---
+
+## Scenario / Message Walkthrough
+
+Make sure the model can actually behave. A model that looks elegant but fails in message flow is not good OOAD.
+
+**Run walkthroughs for:**
+- Happy path
+- Error path
+- Edge case
+- Exception path
+- Stateful repetition
+- Alternate variation mode
+- Recovery, retry, or cancellation where relevant
+
+**Validate at two levels:**
+
+**Scenario flow:** What happens in the domain?
+
+**Message flow:** Which object sends what message to whom? Does the receiver know enough to act? Is the sender delegating a decision or making it centrally?
+
+**This step exposes:** missing objects, misplaced behavior, centralization, fake relationships, state with no owner.
+
+**DO NOT** truncate. Full Model Assessment requires multiple scenario walkthroughs with message flow (happy path, error path, edge case, stateful repetition, alternate variation, recovery where relevant). Persist the full assessment in run-N-ooad.md. A one-line note is insufficient.
+
+
+---
 
 ---
 title: Derive from context
@@ -293,39 +452,145 @@ impact: HIGH
 ---
 
 ---
-title: Scenario / Message Walkthrough Validation
+title: Hierarchy from evidence, not invention
 impact: HIGH
 ---
 
-## Scenario / Message Walkthrough
+## Build concept_hierarchy from evidence
 
-Make sure the model can actually behave. A model that looks elegant but fails in message flow is not good OOAD.
+**DO** derive parent-child relationships from evidence in `registries.actions` and concept `performs`/`receives`:
+- **Shared mechanics** — concepts that share the same resolution, cost, or validation role (e.g. Wire Transfer, ACH, Card Payment all resolve as Payment; Checking, Savings, Money Market → Account) → Child → Parent
+- **Shared protocol** — concepts that participate in the same workflow, lifecycle, or parent's collection → introduce a common base
+- **Subtype patterns** — when evidence describes different rules, formulas, or state transitions for variants → model as Child : Parent
 
-**Run walkthroughs for:**
-- Happy path
-- Error path
-- Edge case
-- Exception path
-- Stateful repetition
-- Alternate variation mode
-- Recovery, retry, or cancellation where relevant
+**DO** scan actions for each concept: subject, object, predicate, raw. Look for:
+- Co-occurrence (concepts that appear together as subject/object)
+- Shared terminology (term_ids, chunk_ids overlap)
+- Domain language (e.g. "Transaction", "Account", "Payment", "Fee", "Product", "Order" in raw text)
 
-**Validate at two levels:**
+**DO** build a **comprehensive** hierarchy. With hundreds of concepts, expect many parent types: Transaction, Account, Payment, Fee, Product, Order, Customer, etc. Each parent should have all its subtypes listed.
 
-**Scenario flow:** What happens in the domain?
+**DO NOT** infer hierarchy from chapter titles, section headers, or ToC alone. Read the raw action text to confirm different mechanics.
 
-**Message flow:** Which object sends what message to whom? Does the receiver know enough to act? Is the sender delegating a decision or making it centrally?
+**DO NOT** leave hierarchy sparse. If you have 10+ concepts that share mechanics (e.g. Wire Transfer, ACH, Card Payment → Payment; Checking, Savings → Account), add them. If you have Transaction subtypes beyond Purchase/Refund/Chargeback, add them.
 
-**This step exposes:** missing objects, misplaced behavior, centralization, fake relationships, state with no owner.
+**Related rules:** [concept-model-subtypes-first-class](concept-model-subtypes-first-class.md), [variation-base-inheritance](variation-base-inheritance.md), [domain-mechanics-not-toc](domain-mechanics-not-toc.md), [refined-integrate-concepts](refined-integrate-concepts.md).
 
-**DO NOT** truncate. Full Model Assessment requires multiple scenario walkthroughs with message flow (happy path, error path, edge case, stateful repetition, alternate variation, recovery where relevant). Persist the full assessment in run-N-ooad.md. A one-line note is insufficient.
+
+---
+
+---
+title: Model Instances, Not Smashed Properties
+impact: HIGH
+---
+
+## Model Instances, Not Smashed Properties
+
+**DO** consider when a concept is best represented as instances/examples (objects in diagram) vs smashing it into a property or method.
+
+**DO** model context with tables as one or more concepts with relationships.
+
+**DO** model instances and examples explicitly when structure matters.
+
+**DO NOT** smash complex objects with multiple concepts into a single property or method.
+
+
+---
+
+---
+title: Domain Model — Standard Types for Properties
+impact: HIGH
+---
+
+## Standard Types for Properties
+
+**DO** use standard types for Properties when defining concepts:
+
+| Type | Use when | Example |
+|------|----------|---------|
+| **String** | Text, names, labels | `Customer.name`, `Product.sku` |
+| **Number** | Quantities, amounts, counts | `Cart.total`, `LineItem.quantity` |
+| **Boolean** | Yes/no, flags | `Order.isPaid`, `Cart.isEmpty` |
+| **List** | Ordered collection | `Cart.lineItems` (List of LineItem) |
+| **Dictionary** | Key-value mapping | `Product.attributes`, `Config.settings` |
+| **UniqueID** | Identifier, reference | `Order.customerId`, `LineItem.productId` |
+| **Instant** | Point in time (ISO 8601) | `Order.createdAt`, `Payment.processedAt` |
+
+| **EnumType** | Fixed set of valid values | `ModifierType type {bonus, penalty}`, `ActionType action_type {standard, move, free, reaction}` |
+
+Use `List<T>` or `Dictionary<K,V>` when element types matter.
+
+**DO** use a named enum type when a property has a constrained set of valid values. Format: `EnumType property_name {value1, value2, value3}`.
+
+**DO NOT** use `String` with parenthetical options (e.g., `String type (bonus/penalty)`). Strings imply free-form text; constrained options are a distinct type.
+
+- Example (wrong): `String type (bonus/penalty)`, `String attack_type (close/ranged)`.
+- Example (right): `ModifierType type {bonus, penalty}`, `AttackType attack_type {close, ranged}`.
+
+
+---
+
+---
+title: Speculation and assumptions
+impact: HIGH
+---
+
+## Speculation and assumptions
+
+**DO** state an assumption when something is unclear.
+- Example (right): "Assumption: Shipping Address is provided before checkout"; "Assumption: Loyalty points not in scope".
+
+**DO NOT** speculate beyond the provided material or invent mechanics when unclear.
+- Example (wrong): Story "Apply loyalty points at checkout" when context never mentions loyalty. Right: Omit, or state "Assumption: Loyalty points not in scope."
+
+
+---
+
+---
+title: Subtypes as first-class concepts
+impact: HIGH
+---
+
+## Subtypes as first-class concepts
+
+**DO** give each subtype its own `### **SubtypeName** : Parent` section with its own properties, operations, collaborators, and composition. Subtypes inherit from parent but have distinct mechanics — model those mechanics explicitly.
+
+**DO** ground each subtype's definition in evidence. Scan `actions.json` and `terms.json` for the subtype name (e.g. Purchase, Refund, Chargeback) and derive properties/operations from what the evidence says that subtype does.
+
+**DO NOT** list subtypes only in a parent's `Subtypes:` line without creating first-class sections for them.
+
+**DO NOT** collapse subtypes that have distinct rules (e.g. Purchase vs Refund vs Chargeback each have different validation, settlement, reversal) into a single parent definition.
+
+- Example (wrong): `### **Transaction**` with `Subtypes: Purchase, Refund, Chargeback` and no separate sections for Purchase, Refund, Chargeback.
+- Example (right): `### **Transaction**` plus `### **Purchase** : Transaction`, `### **Refund** : Transaction`, `### **Chargeback** : Transaction`, etc., each with its own properties, operations, and collaborators.
+
+
+---
+
+---
+title: Subtypes vs enum — verify before modeling
+impact: HIGH
+---
+
+## Subtypes vs enum — verify before modeling
+
+**DO** before creating a subtype section: verify actions.json and terms.json show different mechanics for that subtype. Different properties, operations, or resolution paths = subtype. Same logic, different label = enum on parent.
+
+**DO** use `EnumType property_name {value1, value2}` when the evidence shows same behavior across variants. Do not create subtype sections for enum-like variation.
+
+**DO NOT** create subtype sections from concept_hierarchy without evidence check. If concept_guidance listed Purchase, Refund, Chargeback as Transaction subtypes but the evidence treats them identically (same validation, same settlement flow), convert to `TransactionType type {purchase, refund, chargeback}` on Transaction.
+
+**DO NOT** have both a type enum and mirroring subtypes. If Transaction has `TransactionType type {purchase, refund, chargeback}`, do not also create Purchase, Refund, Chargeback as subtypes.
+
+- Example (right): Transaction has Purchase, Refund, Chargeback as subtypes — evidence shows Purchase has forward-payment validation, Refund has reversal rules and original-required check, Chargeback has issuer workflow. Each has distinct mechanics.
+- Example (wrong): Transaction has Purchase, Return, Exchange as subtypes when the rules only categorize by label. Right: Transaction with `TransactionType type {purchase, return, exchange}`.
 
 
 ---
 
 
 
-## Interaction Tree Rules (6)
+## Interaction Tree Rules (9)
 
 Apply these rules when producing the interaction tree output for this phase.
 
@@ -379,6 +644,27 @@ Use outcome-oriented language over mechanism-oriented language. Focus on what is
 ---
 
 ---
+title: Hierarchy — approximately 4 to 9 children
+impact: MEDIUM
+order: 3
+---
+
+## Hierarchy — approximately 4 to 9 children
+
+Any node (epic, story, scenario) has approximately 4–9 children. Does not apply to steps. For stories, count **steps** as children (not scenarios).
+**DO** keep child count in the 4–9 range for manageable granularity.
+- Epic: ~4–9 sub-epics or stories.
+- Story: ~4–9 steps (total across scenarios; scenarios are containers, not counted).
+- Scenario: ~4–9 steps.
+
+**DO NOT** create nodes with many more than 9 children — split or regroup.
+- Wrong: Epic with 15 stories (split into sub-epics).
+- Wrong: Story with 12 steps (consider splitting story or grouping steps into scenarios).
+
+
+---
+
+---
 title: Story granularity
 impact: MEDIUM-HIGH
 order: 4
@@ -418,6 +704,48 @@ Stories must be testable as complete interactions and deliverable independently.
 ---
 
 ---
+title: Background vs scenario setup
+impact: MEDIUM
+---
+
+## Shared setup as Pre-Condition with Examples at story level
+
+**Background** (BDD) = **Pre-Condition with Examples at the story level**. Scenarios below inherit that Pre-Condition and Examples. No separate Background section — use the interaction hierarchy.
+
+**DO** put shared setup as Pre-Condition with Examples on the story (or epic). Use Given/And only — state, not actions. Use **Concept** notation. Scenarios show inherited Pre-Condition and Examples in brackets.
+
+**Example (right):**
+
+```
+#### Story: User Triggers Country-Specific PaymentType
+- Pre-Condition: Given **User** is logged in; And **User** has an active **Session**; And **User** has access to **PaymentType** in **Country** (see **UserPaymentAccess**)
+- Examples:
+  Logged In User:
+  | scenario   | user_name | user_role |
+  |------------|-----------|-----------|
+  | success    | Jane Doe  | Payer     |
+  ===
+  Active User Session:
+  | scenario   | user_name | session_id | expires_at |
+  |------------|-----------|------------|------------|
+  | success    | Jane Doe  | sess-001   | 2025-03-08 |
+
+##### Scenario: Success — payment validated and confirmed
+- Pre-Condition: [Given **User** is logged in; And **User** has an active **Session**; And **User** has access to **PaymentType** in **Country** (see **UserPaymentAccess**)]
+- Examples: [Logged In User, Active User Session]
+
+###### Steps
+- Step 1: Browse Country for Payment ...
+```
+
+**DO NOT** repeat setup in each scenario when it applies to all. Do not put actions in Pre-Condition — only state (Given/And). Do not use a separate "Background" block; use story-level Pre-Condition + Examples and inheritance.
+
+**Example (wrong):** Each scenario repeats full Given/And and example tables. **Right:** Story holds Pre-Condition + Examples; scenarios show `[inherited]` or list names.
+
+
+---
+
+---
 title: Example tables match Domain Model
 impact: HIGH
 ---
@@ -440,6 +768,22 @@ impact: HIGH
 
 **DO NOT** flatten related concepts into one table or use lookup-style tables with ID columns for joining. Each concept gets its own table; relationships are expressed through ordering and qualifiers.
 - Example (wrong): `| enterprise_id | recipient_id | account_id |` — flat table loses relationship structure. Right: separate tables for Enterprise, Recipient, Account in domain relationship order.
+
+
+---
+
+---
+title: Failure modes
+impact: MEDIUM
+---
+
+## Failure modes
+
+**DO** limit failure modes to a maximum of 3 per interaction; derive from domain rules, state conditions, or authorization.
+- Example (right): "Insufficient balance"; "Account suspended"; "Cart is empty"; "Payment type not available for country".
+
+**DO NOT** include infrastructure or technical failures.
+- Example (wrong): "Database timeout"; "Network unreachable"; "Server crash". Right: "Insufficient balance"; "Account suspended".
 
 
 ---

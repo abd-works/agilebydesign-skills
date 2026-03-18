@@ -89,7 +89,7 @@ def evidence_dir() -> Path:
 
 
 def concept_signals_dir() -> Path:
-    """Concept signal outputs from Phase 3: term_candidates.json, definition_candidates.json, etc."""
+    """Concept signal outputs from Phase 3: concept_signals.json (combined)."""
     return output_dir() / "concept_signals"
 
 

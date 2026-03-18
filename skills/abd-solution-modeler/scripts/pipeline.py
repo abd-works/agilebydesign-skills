@@ -28,73 +28,34 @@ _PIECES_DIR = _SKILL_DIR / "pieces"
 _RULES_DIR = _SKILL_DIR / "rules"
 _SCANNERS_DIR = _SCRIPTS_DIR / "scanners"
 
-# Concept-anchored pipeline: 12 phases per docs/concept-anchored-pipeline-overview.md
+# Concept-anchored pipeline: 13 phases
 _PHASES = [
-    "normalize",           # 1: Code - context_chunks.json
-    "configure_extraction",  # 2: AI - extraction_config.json
-    "extract_concepts",    # 3: Code - concept signals
-    "concept_synthesis",   # 4: AI - hypothesis.json
-    "extract_evidence",    # 5: Code - evidence/*.json
-    "index",               # 6: Code - evidence_index.json
-    "structure",           # 7: AI - solution_model.json v1
-    "behavior",            # 8: AI - solution_model.json v2
-    "variation",           # 9: AI - solution_model.json v3
-    "consolidate",         # 10: AI - solution_model.json v4
-    "assess",              # 11: AI+Human - assessment.json
-    "finalize",            # 12: AI - solution_model.json final
+    "normalize",                             # 1: Code - context_chunks.json
+    "configure_concept_extraction_parameters", # 2: AI - extraction_config.json (calibration)
+    "concept_extraction",                    # 3: AI+Code loop - run extraction, evaluate, loop to 2 if fail
+    "concept_index",                         # 4: Code - hypothesis.json (concept index with chunk_ids)
+    "concept_synthesis",                     # 5: AI - refined hypothesis.json (merge/split/kill, hierarchy)
+    "evidence_extraction",                   # 6: Code - evidence/*.json
+    "evidence_index",                       # 7: Code - evidence_index.json
+    "structure",                             # 8: AI - solution_model.json v1
+    "behavior",                              # 9: AI - solution_model.json v2
+    "variation",                             # 10: AI - solution_model.json v3
+    "consolidate",                           # 11: AI - solution_model.json v4
+    "assess",                                # 12: AI+Human - assessment.json
+    "finalize",                              # 13: AI - solution_model.json final
 ]
 
-_CODE_PHASES = {"normalize", "extract_concepts", "extract_evidence", "index"}
+# Code phases: pipeline runs a script. AI phases (synthesis, structure, behavior, etc.)
+# MUST NOT be listed here — they print the spec; the AI performs the work. Do NOT add runners.
+_CODE_PHASES = {"normalize", "concept_index", "evidence_extraction", "evidence_index"}
 
-_PHASE_PREFIXES = [
-    "concept-guidance", "concept-model", "structural",
-    "behavior", "variation", "refined", "validated",
-]
-
-_PHASE_TO_PREFIX = {
-    "configure_extraction": "concept-guidance",
-    "concept_synthesis": "concept-guidance",
-    "structure": "structural",
-    "behavior": "behavior",
-    "variation": "variation",
-    "consolidate": "refined",
-    "assess": "validated",
-    "finalize": "validated",
-}
-
-
-def _rules_for_phase(phase_name: str) -> list[Path]:
-    """Collect only cross-phase rules (no prefix) and rules for this exact phase.
-
-    No accumulation — each phase gets its own rules plus cross-phase rules only.
-    Skips interaction-tree rules when no_tree is enabled.
-    """
-    prefix = _PHASE_TO_PREFIX.get(phase_name)
-    if prefix is None:
-        return []
-    artifact_dirs = [_RULES_DIR / "domain", _RULES_DIR / "generated"]
-    if not _no_tree_fn():
-        artifact_dirs.append(_RULES_DIR / "interaction-tree")
-    rules: list[Path] = []
-    for artifact_dir in artifact_dirs:
-        if not artifact_dir.exists():
-            continue
-        for rule_file in sorted(artifact_dir.glob("*.md")):
-            has_prefix = False
-            for known in _PHASE_PREFIXES:
-                if rule_file.stem.startswith(known + "-"):
-                    has_prefix = True
-                    if known == prefix:
-                        rules.append(rule_file)
-                    break
-            if not has_prefix:
-                rules.append(rule_file)
-    return rules
+from _rules import rules_for_phase as _rules_for_phase
 
 
 _PHASE_OUTPUT_FILES: dict[str, dict[str, list[str]]] = {
-    "configure_extraction": {"generated": ["extraction_config.json"]},
+    "extract_concepts": {"generated": ["extraction_config.json"]},
     "concept_synthesis": {"generated": ["hypothesis.json"]},
+    "synthesis": {"generated": ["hypothesis.json"]},
     "structure": {"generated": ["solution_model.json"]},
     "behavior": {"generated": ["solution_model.json"]},
     "variation": {"generated": ["solution_model.json"]},
@@ -179,12 +140,26 @@ def _run_normalize_context() -> bool:
     return subprocess.run(args, cwd=str(_SKILL_DIR)).returncode == 0
 
 
+def _run_concept_index() -> bool:
+    signals = _concept_signals_dir_fn()
+    hypothesis = _hypothesis_path_fn()
+    if not signals.exists():
+        print("concept_index requires concept_signals — run concept_extraction first.", file=sys.stderr)
+        return False
+    args = [
+        sys.executable, str(_SCRIPTS_DIR / "build_hypothesis_from_signals.py"),
+        "-i", str(signals),
+        "-o", str(hypothesis),
+    ]
+    return subprocess.run(args, cwd=str(_SKILL_DIR)).returncode == 0
+
+
 def _run_extract_concepts() -> bool:
     ctx = _context_dir_fn()
     signals = _concept_signals_dir_fn()
     chunks_path = ctx / "context_chunks.json"
     if not chunks_path.exists():
-        print("extract_concepts requires context_chunks.json — run normalize first.", file=sys.stderr)
+        print("concept_extraction requires context_chunks.json — run normalize first.", file=sys.stderr)
         return False
     config_path = _extraction_config_path_fn()
     args = [
@@ -197,14 +172,14 @@ def _run_extract_concepts() -> bool:
     return subprocess.run(args, cwd=str(_SKILL_DIR)).returncode == 0
 
 
-def _run_extract_evidence() -> bool:
+def _run_evidence_extraction() -> bool:
     ctx = _context_dir_fn()
     evidence = _evidence_dir_fn()
     hypothesis = _hypothesis_path_fn()
     guidance = _domain_dir_fn() / "concept_guidance.json"
     guidance_path = hypothesis if hypothesis.exists() else guidance
     if not guidance_path.exists():
-        print("extract_evidence requires hypothesis.json — run concept_synthesis first.", file=sys.stderr)
+        print("evidence_extraction requires hypothesis.json — run concept_index first (or concept_synthesis to refine).", file=sys.stderr)
         return False
     args = [
         sys.executable, str(_SCRIPTS_DIR / "evidence_extraction_guided.py"),
@@ -227,9 +202,9 @@ def _run_index() -> bool:
 
 _CODE_RUNNERS = {
     "normalize": _run_normalize_context,
-    "extract_concepts": _run_extract_concepts,
-    "extract_evidence": _run_extract_evidence,
-    "index": _run_index,
+    "concept_index": _run_concept_index,
+    "evidence_extraction": _run_evidence_extraction,
+    "evidence_index": _run_index,
 }
 
 
@@ -295,7 +270,7 @@ def _cmd_scan(name: str) -> None:
         sys.exit(1)
 
     _ensure_workspace_dirs()
-    rules = _rules_for_phase(name)
+    rules = _rules_for_phase(name, skip_tree=_no_tree_fn())
     violations: list = []
     scanners_run = 0
 

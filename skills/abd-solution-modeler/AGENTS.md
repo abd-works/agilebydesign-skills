@@ -20,7 +20,7 @@ Use **abd-context-to-memory** before Phase 1 if source is documents:
 
 Pipeline: Context → Model → Assess. `pipeline.py` orchestrates all phases.
 
-- Code phases — run scripts directly (normalize, extract_concepts, extract_evidence, index)
+- Code phases — run scripts directly (normalize, concept_index, evidence_extraction, evidence_index)
 - `generate <phase>` — prints built phase spec from `phases/built/` (phase instructions + baked-in rules)
 - `scan <phase>` — runs programmatic scanners against generated output
 - `validate <phase>` — prints rules for adversarial AI validation pass
@@ -28,9 +28,9 @@ Pipeline: Context → Model → Assess. `pipeline.py` orchestrates all phases.
 **Workspace layout** (relative to `output_dir`):
 
 - `context/` — context_chunks.json
-- `concept_signals/` — term_candidates.json, definition_candidates.json, dependency_actions.json, cooccurrence_graph.json, table_vocabularies.json
+- `concept_signals/` — concept_signals.json, concept_signals.md (12-signal output + markdown render)
 - `evidence/` — terms.json, actions.json, decisions.json, states.json, relationships.json, modifiers.json, evidence_index.json
-- `generated/` — extraction_config.json, hypothesis.json, solution_model.json, assessment.json
+- `generated/` — extraction_config.json, hypothesis.json, hypothesis.md, solution_model.json, assessment.json
 - `generated/domain/` — legacy .md outputs, solution_model.drawio
 
 **Match user phrase to phase Trigger** — each phase file has a `## Trigger` section; run that phase when the user says one of those phrases.
@@ -39,41 +39,44 @@ Pipeline: Context → Model → Assess. `pipeline.py` orchestrates all phases.
 
 ---
 
-## Stage 1: Context and Evidence (Phases 1–6)
+## Stage 1: Context and Evidence (Phases 1–7)
 
-| Phase | Actor            | Ref                                                                 | Outputs                                                                                                                       |
-| ----- | ---------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| 1     | Code             | [normalize.md](phases/built/normalize.md)                           | context_chunks.json                                                                                                            |
-| 2     | AI               | [configure_extraction.md](phases/built/configure_extraction.md)       | extraction_config.json                                                                                                        |
-| 3     | Code             | [extract_concepts.md](phases/built/extract_concepts.md)              | concept_signals/*.json (term_candidates, definition_candidates, dependency_actions, cooccurrence_graph, table_vocabularies)   |
-| 4     | AI               | [concept_synthesis.md](phases/built/concept_synthesis.md)            | hypothesis.json, interaction tree skeleton (epics only)                                                                      |
-| —     | **Checkpoint 1** | Verify concept framing and interaction skeleton                   | —                                                                                                                             |
-| 5     | Code             | [extract_evidence.md](phases/built/extract_evidence.md)              | evidence/*.json (terms, actions, decisions, states, relationships, modifiers)                                                |
-| 6     | Code             | [index.md](phases/built/index.md)                                   | evidence_index.json                                                                                                            |
-| —     | **Checkpoint 2** | Verify evidence coverage                                           | —                                                                                                                             |
 
----
+| #   | Phase                                       | Actor | What it does                                                                                                      | Ref                                                                                                   | Outputs                                                                       |
+| --- | ------------------------------------------- | ----- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| 1   | **Normalize**                               | Code  | Chunk and clean raw source into uniform text segments.                                                            | [normalize.md](phases/built/normalize.md)                                                             | context_chunks.json                                                           |
+| 2   | **Configure concept extraction parameters** | AI    | Calibrate weights, patterns, thresholds for 12 evidence-signal techniques (3 scans: structure, behavior, tuning). | [configure_concept_extraction_parameters.md](phases/built/configure_concept_extraction_parameters.md) | extraction_config.json                                                        |
+| 3   | **Concept Extraction**                      | Code  | Run extraction using config; produce concept signals. Loop to Phase 2 if signals fail.                            | [concept_extraction.md](phases/built/concept_extraction.md)                                           | concept_signals.json, concept_signals.md                                      |
+| 4   | **Concept Index**                           | Code  | Merge signals into hypothesis (concept index) with chunk_ids per concept.                                         | [concept_index.md](phases/built/concept_index.md)                                                     | hypothesis.json, hypothesis.md                                                |
+| 5   | **Concept Synthesis**                       | AI    | Curate concepts (merge/split/kill), build hierarchy, allocate evidence.                                           | [concept_synthesis.md](phases/built/concept_synthesis.md)                                             | hypothesis.json (refined)                                                     |
+| 6   | **Evidence extraction**                     | Code  | Mine chunks for actions, decisions, states, relationships, terms; guided by hypothesis.                           | [evidence_extraction.md](phases/built/evidence_extraction.md)                                         | evidence/*.json (terms, actions, decisions, states, relationships, modifiers) |
+| 7   | **Evidence Index**                          | Code  | Aggregate evidence into concept-anchored index.                                                                   | [evidence_index.md](phases/built/evidence_index.md)                                                   | evidence_index.json                                                           |
 
-## Stage 2: Model (Phases 7–10)
-
-From Phase 7 onward, a single artifact: `solution_model.json` (concepts, behaviors, interaction_tree, evidence_refs).
-
-| Phase | Actor            | Ref                                                       | Outputs                                                                                          |
-| ----- | ---------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| 7     | AI               | [structure.md](phases/built/structure.md)                  | solution_model.json v1 (stories, steps, properties, inheritance, empty linked_behaviors)          |
-| 8     | AI               | [behavior.md](phases/built/behavior.md)                    | solution_model.json v2 (+ operations, linked_behaviors, scenarios)                                |
-| 9     | AI               | [variation.md](phases/built/variation.md)                  | solution_model.json v3 (+ subtype stories, failure-mode scenarios)                               |
-| 10    | AI               | [consolidate.md](phases/built/consolidate.md)              | solution_model.json v4 (+ examples, anti-pattern fixes)                                          |
-| —     | **Checkpoint 3** | Verify model quality and completeness                     | —                                                                                                |
 
 ---
 
-## Stage 3: Assess (Phases 11–12)
+## Stage 2: Model (Phases 8–11)
 
-| Phase | Actor    | Ref                                                   | Outputs                                                 |
-| ----- | -------- | ----------------------------------------------------- | ------------------------------------------------------- |
-| 11    | AI+Human | [assess.md](phases/built/assess.md)                   | assessment.json                                         |
-| 12    | AI       | [finalize.md](phases/built/finalize.md)               | solution_model.json final (assessment fixes applied)    |
+From Phase 8 onward, a single artifact: `solution_model.json` (concepts, behaviors, interaction_tree, evidence_refs).
+
+
+| #   | Phase            | Actor | What it does                                                                                          | Ref                                           | Outputs                |
+| --- | ---------------- | ----- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------- | ---------------------- |
+| 8   | **Structure**    | AI    | Build first solution_model from hypothesis + evidence index: properties, inheritance, stories, steps. | [structure.md](phases/built/structure.md)     | solution_model.json v1 |
+| 9   | **Behavior**     | AI    | Assign operations, link behaviors to steps, group steps into scenarios.                               | [behavior.md](phases/built/behavior.md)       | solution_model.json v2 |
+| 10  | **Variation**    | AI    | Split stories by subtype when mechanics differ; add failure modes.                                    | [variation.md](phases/built/variation.md)     | solution_model.json v3 |
+| 11  | **Consolidate**  | AI    | Fix anti-patterns (anemia, over-centralization); add examples.                                        | [consolidate.md](phases/built/consolidate.md) | solution_model.json v4 |
+
+
+---
+
+## Stage 3: Assess (Phases 12–13)
+
+
+| #   | Phase        | Actor    | What it does                                                                          | Ref                                     | Outputs                   |
+| --- | ------------ | -------- | ------------------------------------------------------------------------------------- | --------------------------------------- | ------------------------- |
+| 12  | **Assess**   | AI+Human | Produce model assessment: consistency, coverage, completeness, type-field-vs-subtype. | [assess.md](phases/built/assess.md)     | assessment.json           |
+| 13  | **Finalize** | AI       | Apply assessment fixes; produce validated model.                                      | [finalize.md](phases/built/finalize.md) | solution_model.json final |
 
 ---
 
@@ -367,14 +370,13 @@ AnotherConcept (qualifier):
 
 DrawIO class diagrams are generated from domain model `.md` files in `generated/domain/`.
 
-- **Mandatory** — auto-generated after `final_domain_model`
+- **Mandatory** — auto-generated after `finalize`
 - **Optional** — append `render-diagram` to any `generate` command
 
 ```bash
-python scripts/pipeline.py generate final_domain_model render-diagram
-python scripts/pipeline.py generate structural_model render-diagram
-python scripts/pipeline.py drawio                        # standalone, from latest domain model
-python scripts/pipeline.py drawio final_domain_model # standalone, from specific phase
+python scripts/pipeline.py generate finalize render-diagram
+python scripts/pipeline.py generate structure render-diagram
+python scripts/pipeline.py drawio  # standalone, from latest solution model
 ```
 
 Output: `generated/domain/<phase>.drawio` (alongside the source `.md` file).

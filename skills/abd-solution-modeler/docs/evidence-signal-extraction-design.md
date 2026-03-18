@@ -373,7 +373,7 @@ The modifiers bucket has been deprecated. A core weakness remains: the system co
 **Design & phases**
 
 - Design: [design-concept-anchored-pipeline.md](./design-concept-anchored-pipeline.md) — artifact shape, phase sequence, research grounding for evidence buckets
-- Phases: `phases/built/concept_guidance_v1.md` — current Phase 2 behavior
+- Phases: `phases/built/configure_concept_extraction_parameters.md` — current Phase 2 behavior
 - Evidence: `evidence/` — current extraction outputs
 
 **Research grounding for the twelve techniques**

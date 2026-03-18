@@ -54,20 +54,76 @@ def from_chunk_index(chunk_index_path: Path) -> list[dict]:
     return rule_chunks
 
 
+_MIN_CHUNK_LINES = 5
+_CHUNK_THRESHOLD_LINES = 200  # Files larger than this get split by headings/sections
+
+
+def _chunk_by_headings(text: str) -> list[str]:
+    """Split text at # or ## boundaries. Returns list of chunk texts."""
+    lines = text.split("\n")
+    chunks, current = [], []
+    for line in lines:
+        if re.match(r"^#{1,2}\s", line) and len(current) >= _MIN_CHUNK_LINES:
+            chunks.append("\n".join(current))
+            current = []
+        current.append(line)
+    if current:
+        chunks.append("\n".join(current))
+    return chunks
+
+
+def _chunk_by_chapter_markers(text: str) -> list[str]:
+    """Split on CHAPTER N markers (PDF/rpg book structure)."""
+    lines = text.split("\n")
+    chunks, current = [], []
+    section_pat = re.compile(r"^CHAPTER\s+\d+\b", re.IGNORECASE)
+    for line in lines:
+        if section_pat.search(line) and len(current) >= _MIN_CHUNK_LINES:
+            chunks.append("\n".join(current))
+            current = []
+        current.append(line)
+    if current:
+        chunks.append("\n".join(current))
+    return chunks
+
+
+def _split_large_md(rel: str, text: str) -> list[dict]:
+    """Split a large markdown file into chunks. Returns list of {chunk_id, source, text}."""
+    line_count = text.count("\n") + 1
+    if line_count <= _CHUNK_THRESHOLD_LINES:
+        return [{"chunk_id": _stable_id(rel, text), "source": rel, "text": text}]
+
+    if re.search(r"^#{1,2}\s", text, re.MULTILINE):
+        raw_chunks = _chunk_by_headings(text)
+    else:
+        raw_chunks = _chunk_by_chapter_markers(text)
+
+    result = []
+    for i, chunk_text in enumerate(raw_chunks):
+        if not chunk_text.strip():
+            continue
+        source = f"{rel}__section_{i:03d}" if len(raw_chunks) > 1 else rel
+        result.append({
+            "chunk_id": _stable_id(source, chunk_text),
+            "source": source,
+            "text": chunk_text,
+        })
+    return result
+
+
 def from_context_path(context_path: Path) -> list[dict]:
-    """Scan folder for .md files, produce rule_chunks."""
+    """Scan folder for .md files, chunk large files by headings/sections, produce rule_chunks."""
     rule_chunks = []
     for md in sorted(context_path.rglob("*.md")):
-        text = _clean_text(md.read_text(encoding="utf-8", errors="replace").strip())
+        raw = md.read_text(encoding="utf-8", errors="replace").strip()
+        if not raw:
+            continue
+        text = _clean_text(raw)
         if not text:
             continue
         rel = str(md.relative_to(context_path))
-        chunk_id = _stable_id(rel, text)
-        rule_chunks.append({
-            "chunk_id": chunk_id,
-            "source": rel,
-            "text": text,
-        })
+        for c in _split_large_md(rel, text):
+            rule_chunks.append(c)
     return rule_chunks
 
 

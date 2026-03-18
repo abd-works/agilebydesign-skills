@@ -322,13 +322,10 @@ The more types you have for a concept, the less it makes sense to bundle them in
 | 3   | **Extract**           | Code     | Mine chunks for actions, decisions, states, relationships guided by hypothesis.                                                                                                    | `evidence/*.json` (six files)                                           |
 | 4   | **Index**             | Code     | Aggregate evidence into a concept-anchored index so each concept knows its actions, states, and relationships.                                                                     | `evidence_index.json`                                                   |
 | 5   | **Revise Hypothesis** | AI       | Merge duplicates, discover missing concepts, refine modules and epics using indexed evidence.                                                                                      | `solution_model.json` v1 (concepts + epics/sub-epics + initial stories) |
-|     | **Checkpoint 1**      | Human    | Verify concept framing and interaction skeleton.                                                                                                                                   |                                                                         |
 | 6   | **Structure**         | AI       | Assign properties, composition, inheritance, aggregate boundaries; add steps to stories from evidence; assign actors and pre-conditions. Concepts and interaction tree gain structure in parallel. | `solution_model.json` v2                                                |
 | 7   | **Behavior**          | AI       | Assign operations to concepts by decision ownership; link each behavior to the step(s) that exercise it; group steps into scenarios (e.g. hit vs miss). Each step has at least one linked behavior. | `solution_model.json` v3                                                |
-|     | **Checkpoint 2**      | Human    | Verify behavior ownership and step-to-behavior links.                                                                                                                              |                                                                         |
 | 8   | **Variation**         | AI       | Split stories by subtype when mechanics differ (per *Story vs. Scenario* rule); add failure modes. Subtype concepts already exist from Phase 2/6 — Phase 8 does not discover them. | `solution_model.json` v4                                                |
 | 9   | **Consolidate**       | AI       | Detect anemia, over-centralization, orphans; fix anti-patterns; add examples to stories.                                                                                           | `solution_model.json` v5                                                |
-|     | **Checkpoint 3**      | Human    | Verify model quality and completeness.                                                                                                                                             |                                                                         |
 | 10  | **Assess**           | AI+Human | Produce model assessment: consistency, coverage, completeness, **type field vs subtype** (mechanical difference test). No late "walkthrough" — verification happens incrementally in Phases 6–7. | `assessment.json`                                                       |
 | 11  | **Finalize**          | AI       | Apply assessment fixes; produce validated model with full traceability.                                                                                                            | `solution_model.json` final                                             |
 
@@ -337,7 +334,7 @@ The more types you have for a concept, the less it makes sense to bundle them in
 
 ### Phase 4 (Index) is new
 
-Today `evidence_graph.py` builds a flat edge list:
+Earlier evidence extraction prototypes built a flat edge list:
 
 ```json
 {"from": "Effect", "relation": "performs", "to": "Checks", "action_id": "act_0003"}
@@ -390,7 +387,7 @@ Same data, different organization. Registries hold the actual evidence sentences
 
 **Alignment with CRC / OO design.** CRC cards (Beck & Cunningham, OOPSLA'89) use **Class**, **Responsibility** (verb phrases), and **Collaborator**. Our buckets map: actions → responsibilities; relationships → collaborators; states → entity attributes. Terminology extraction feeds concept naming. Decisions feed when/how behaviors apply. See References below.
 
-**Human-readable rendered view.** The index is optimized for AI lookup (IDs only). For human review at Checkpoint 2, render an expanded view that inlines the relevant details for each ID. Example:
+**Human-readable rendered view.** The index is optimized for AI lookup (IDs only). For human review, render an expanded view that inlines the relevant details for each ID. Example:
 
 ```markdown
 ## Effect
@@ -423,7 +420,7 @@ Today, Phases 6–12 produce markdown only. Every subsequent phase re-parses pro
 
 ### Fewer phases (11 vs 12)
 
-The current split between `concept_model` and `structural_model` can merge into one "Structure" phase. With concept-anchored evidence from Phase 4, the AI doesn't need a separate pass to "discover" relationships — they're already indexed.
+The old split between separate concept-modeling and structural-modeling passes can merge into one `Structure` phase. With concept-anchored evidence from Phase 4, the AI doesn't need a separate pass to "discover" relationships because they are already indexed.
 
 ## Phase Sequence Rationale
 

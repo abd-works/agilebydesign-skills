@@ -17,6 +17,7 @@ normalize context, chunk context, prepare context, convert context to memory
 ## Instructions
 
 - Load chunks from chunk_index.json or scan context_path for .md files
+- **Chunk large files:** When using context_path, files >200 lines are split by `#`/`##` headings or `CHAPTER N` markers (PDF/rpg structure). Small files stay as single chunks.
 - Assign stable IDs (hash of path + content prefix)
 - Preserve source location
 - Apply default noise filters (TOC, section headers, page numbers, short header-only chunks)

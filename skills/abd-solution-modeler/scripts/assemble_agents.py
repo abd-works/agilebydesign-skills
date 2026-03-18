@@ -26,75 +26,25 @@ _CONTENT_ORDER = [
     "scripts.md",
 ]
 
-_PHASE_PREFIXES = [
-    "concept-guidance", "concept-model", "structural",
-    "behavior", "variation", "refined", "validated",
-]
-
 # Concept-anchored pipeline phases (must match pipeline.py)
 _PHASES = [
-    "normalize", "configure_extraction", "extract_concepts", "concept_synthesis",
-    "extract_evidence", "index", "structure", "behavior", "variation",
+    "normalize", "configure_concept_extraction_parameters", "concept_extraction", "concept_index",
+    "concept_synthesis",
+    "evidence_extraction", "evidence_index", "structure", "behavior", "variation",
     "consolidate", "assess", "finalize",
 ]
 
-_PHASE_TO_PREFIX = {
-    "configure_extraction": "concept-guidance",
-    "concept_synthesis": "concept-guidance",
-    "structure": "structural",
-    "behavior": "behavior",
-    "variation": "variation",
-    "consolidate": "refined",
-    "assess": "validated",
-    "finalize": "validated",
-}
+_CODE_PHASES = {"normalize", "concept_index", "evidence_extraction", "evidence_index"}
 
-_CODE_PHASES = {"normalize", "extract_concepts", "extract_evidence", "index"}
+# Phases that produce config/hypothesis only — no domain model, no interaction tree.
+# Build injects only the phase content; no critical_quality_steps, domain spec, interaction spec, or rules.
+_PHASES_PHASE_ONLY = {"configure_concept_extraction_parameters"}
 
+# Phases that should keep quality steps and rules, but should NOT inject
+# domain/solution/interaction format spec files into the built phase prompt.
+_PHASES_NO_FORMAT_SPECS = {"concept_synthesis"}
 
-def _parse_order(rule_path: Path) -> int:
-    """Extract order from YAML frontmatter. Default 999."""
-    text = rule_path.read_text(encoding="utf-8")
-    if not text.startswith("---"):
-        return 999
-    end = text.index("---", 3)
-    for line in text[3:end].splitlines():
-        if line.strip().startswith("order:"):
-            try:
-                return int(line.split(":", 1)[1].strip())
-            except ValueError:
-                pass
-    return 999
-
-
-def _rules_for_phase(phase_name: str, skip_tree: bool = False) -> list[Path]:
-    """Collect only cross-phase rules (no prefix) and rules for this exact phase.
-
-    No accumulation — each phase gets its own rules plus cross-phase rules only.
-    When skip_tree is True, rules from the interaction-tree directory are excluded.
-    """
-    prefix = _PHASE_TO_PREFIX.get(phase_name)
-    if prefix is None:
-        return []
-    artifact_dirs = [_RULES_DIR / "domain", _RULES_DIR / "generated"]
-    if not skip_tree:
-        artifact_dirs.append(_RULES_DIR / "interaction-tree")
-    rules: list[Path] = []
-    for artifact_dir in artifact_dirs:
-        if not artifact_dir.exists():
-            continue
-        for rule_file in sorted(artifact_dir.glob("*.md")):
-            has_prefix = False
-            for known in _PHASE_PREFIXES:
-                if rule_file.stem.startswith(known + "-"):
-                    has_prefix = True
-                    if known == prefix:
-                        rules.append(rule_file)
-                    break
-            if not has_prefix:
-                rules.append(rule_file)
-    rules.sort(key=lambda r: (_parse_order(r), r.name))
-    return rules
+from _rules import rules_for_phase as _rules_for_phase
 
 
 _TREE_LINE_PATTERNS = [
@@ -161,6 +111,14 @@ def build_phases(no_tree: bool = False) -> int:
             continue
 
         phase_text = phase_file.read_text(encoding="utf-8").strip()
+        if phase_name in _PHASES_PHASE_ONLY:
+            if no_tree:
+                phase_text = _strip_tree_references(phase_text)
+            (_BUILT_DIR / f"{phase_name}.md").write_text(phase_text + "\n", encoding="utf-8")
+            count += 1
+            print(f"  {phase_name}: phase-only (no domain, interaction, quality)")
+            continue
+
         if no_tree:
             phase_text = _strip_tree_references(phase_text)
         # Inject critical_quality_steps at the top of every AI phase
@@ -173,21 +131,22 @@ def build_phases(no_tree: bool = False) -> int:
         else:
             parts = [phase_text]
         # Inject format specs after phase instructions, before rules
-        solution_model_phases = {"structure", "behavior", "variation", "consolidate", "assess", "finalize"}
-        if phase_name in solution_model_phases:
-            solution_spec_path = _PIECES_DIR / "solution_model.md"
-            if solution_spec_path.exists():
-                solution_spec = solution_spec_path.read_text(encoding="utf-8").strip()
-                parts.append(f"\n\n---\n\n# Solution Model Format\n\n{solution_spec}")
-        else:
-            domain_spec_path = _PIECES_DIR / "domain.md"
-            if domain_spec_path.exists():
-                domain_spec = domain_spec_path.read_text(encoding="utf-8").strip()
-                parts.append(f"\n\n---\n\n# Domain Model Format\n\n{domain_spec}")
-        tree_spec_path = _PIECES_DIR / "interaction_tree.md"
-        if not no_tree and tree_spec_path.exists():
-            tree_spec = tree_spec_path.read_text(encoding="utf-8").strip()
-            parts.append(f"\n\n---\n\n# Interaction Tree Format\n\n{tree_spec}")
+        if phase_name not in _PHASES_NO_FORMAT_SPECS:
+            solution_model_phases = {"structure", "behavior", "variation", "consolidate", "assess", "finalize"}
+            if phase_name in solution_model_phases:
+                solution_spec_path = _PIECES_DIR / "solution_model.md"
+                if solution_spec_path.exists():
+                    solution_spec = solution_spec_path.read_text(encoding="utf-8").strip()
+                    parts.append(f"\n\n---\n\n# Solution Model Format\n\n{solution_spec}")
+            else:
+                domain_spec_path = _PIECES_DIR / "domain.md"
+                if domain_spec_path.exists():
+                    domain_spec = domain_spec_path.read_text(encoding="utf-8").strip()
+                    parts.append(f"\n\n---\n\n# Domain Model Format\n\n{domain_spec}")
+            tree_spec_path = _PIECES_DIR / "interaction_tree.md"
+            if not no_tree and tree_spec_path.exists():
+                tree_spec = tree_spec_path.read_text(encoding="utf-8").strip()
+                parts.append(f"\n\n---\n\n# Interaction Tree Format\n\n{tree_spec}")
         rules = _rules_for_phase(phase_name, skip_tree=no_tree)
         if rules:
             domain_rules = [r for r in rules if r.parent.name == "domain"]

@@ -54,32 +54,35 @@ When recording corrections:
 
 ---
 
-# Phase 4 — Concept Synthesis
+# Phase 5 — Concept Synthesis
 
 **Actor:** AI
 
 ## Purpose
 
-Merge concept signals from Phase 3 into a hypothesis. Output: `hypothesis.json` with concept_guidance.
+Curate the concept list from Phase 4 (merge/split/kill), build hierarchy, allocate evidence. Reads source chunks via `chunk_ids` for semantic understanding.
 
 ## Trigger
 
-concept synthesis, hypothesis, concept guidance, merge signals
+concept synthesis, curate concepts, refine hypothesis, merge split kill, build hierarchy
 
 ## Inputs
 
-- `concept_signals/*.json` — term_candidates, definition_candidates, dependency_actions, cooccurrence_graph, table_vocabularies
+- `generated/hypothesis.json` — concept index from Phase 4 (concepts, registries, concept_guidance, chunk_ids per concept)
+- `context/` — source chunks (read via chunk_ids for semantic understanding)
 
 ## Instructions
 
-Synthesize concepts from the signals. Produce `hypothesis.json` with:
+1. **Curate concepts** — Merge duplicates, split overloaded concepts, remove noise. Use `chunk_ids` to read relevant source chunks; do not guess from chunks alone.
+2. **Build concept_hierarchy** — Derive parent-child from evidence (shared mechanics, shared protocol, subtype patterns). See rules for hierarchy-from-evidence.
+3. **Update concept_guidance** — priority_concepts, concept_aliases, mechanisms, actors, variation_axes, noise_filters.
+4. **Allocate evidence** — Ensure term_ids, performs, receives, states, decisions, relationships are correctly assigned to curated concepts.
 
-- **concepts** — candidate concepts with names
-- **concept_guidance** (optional) — priority concepts, aliases, mechanisms, actors, variation axes, noise filters for Phase 5
+Subtype discovery happens here; Phase 10 (Variation) works with concepts that already exist.
 
 ## Outputs
 
-- `generated/hypothesis.json`
+- `generated/hypothesis.json` (refined) — concept_hierarchy, updated concept_guidance, evidence allocation
 
 ## Run
 
@@ -90,246 +93,88 @@ python scripts/pipeline.py generate concept_synthesis
 
 ---
 
-# Domain Model Format
-
-# Domain Model Format
-
-## Module
-
-Heading: `## Module: <name>`
-
-```
-## Module: <name>
-- concepts — **ConceptA**, **ConceptB**, **ConceptC**
-- examples: at end of module, after all concepts; one table per concept; shared scenario links the module
-```
-
-## Domain Concept
-
-Heading: `### **ConceptName** : <BaseConcept if any>`
-One-liner description of the purpose of the concept
-
-```
-**ConceptName** : <BaseConcept if any>
-- <type> property
-      <collaborating concepts if any>
-      Invariant: <constraint on this property>
-- <type> operation(<param>, ...) → <return>
-      <collaborating concepts if any>
-      Invariant: <constraint enforced by this operation>
-- Interactions: interaction nodes this concept is used by
-```
-
-## Examples
-
-**## Examples** (at end of module, after all concepts — one table per concept, shared scenario links all):
-```
-ConceptName (qualifier):
-| scenario | property1 | property2 |
-|----------|-----------|-----------|
-| module-scenario.phase | val1 | val2 |
-===
-AnotherConcept (qualifier):
-| scenario | property1 |
-|----------|-----------|
-| module-scenario.phase | val1 |
-```
-
-- One scenario prefix for the module (e.g. `monthly-operations`); sub-phases allowed (e.g. `monthly-operations.after-payroll`)
-- Qualifier in parentheses after concept name
-- Scenario column required; kebab-case
-- Columns match concept property names
-- `===` separator between tables
-
-### Invariants
-
-Place invariants under the specific property or operation they apply to — not as a separate section. Format: `Invariant: <constraint>`.
-
-```
-- Number balance
-      Invariant: balance >= 0
-- debit(amount) → Boolean
-      Invariant: amount <= balance
-```
-
-## Guidelines
-
-- Prefer **composition** over inheritance
-- Use `Dictionary<K,V>` when items are keyed
-- Use `List<T>` only when ordering matters
-- Avoid central "service/manager" concepts
-- Use `EnumType name {value1, value2}` for constrained options — not `String` with parenthetical options
-
-## Example — Connected Concepts with Tables
-
-Account holds funds; transactions record deposits and withdrawals. The balance is what’s available.
-
-```
-## Module: Accounts
-- concepts — **Account**, **Transaction**
-
-### **Account**
-
-Holds funds. You deposit (credit) or withdraw (debit). Balance is what you have available.
-
-- String name
-- List<**Transaction**> transactions
-      **Transaction** — history of deposits and withdrawals
-- balance() → Number
-      current available funds
-- debit(amount) → Boolean
-      withdraws funds; fails if insufficient
-      **Transaction** — adds a withdrawal record
-- credit(amount) → void
-      deposits funds
-      **Transaction** — adds a deposit record
-
-- Interactions: Debit Account, Credit Account
-
-### **Transaction**
-
-A deposit or withdrawal. Belongs to an account.
-
-- **Account** account
-      **Account** — which account this affects
-- Number amount
-- String type {debit, credit}
-
-- Interactions:  Debit Account, Credit Account
-
-### examples
-
-Account (selected):
-| scenario                             | name            | balance  |
-|--------------------------------------|-----------------|----------|
-| monthly-operations.main-checking     | Main Checking   | 3247.50  |
-| monthly-operations.main-checking-od  | Main Checking   | 42.00    |
-| monthly-operations.savings           | Savings         | 500.00   |
-===
-Transaction (recorded):
-| scenario                             | account         | amount   | type   |
-|--------------------------------------|-----------------|----------|--------|
-| monthly-operations.main-checking     | Main Checking   | 2400.00  | credit |
-| monthly-operations.main-checking     | Main Checking   | 1000.00  | credit |
-| monthly-operations.main-checking     | Main Checking   | 142.50   | debit  |
-| monthly-operations.main-checking     | Main Checking   | 10.00    | debit  |
-| monthly-operations.main-checking-od  | Main Checking   | 500.00   | credit |
-| monthly-operations.main-checking-od  | Main Checking   | 458.00   | debit  |
-| monthly-operations.savings           | Savings         | 500.00   | credit |
-```
-
-One scenario per account. Balance = sum of transactions (credits − debits) for that account in that scenario. Main Checking: 3247.50 = 2400 + 1000 − 142.50 − 10. Overdraft: 42 = 500 − 458. Savings: 500 = 500.
-
-## Validation Checklist
-
-- [ ] Format: `**Concept** : <Base Concept if any>`
-- [ ] Module has examples: one table per concept, shared scenario, `===` separator
-- [ ] Properties, operations, collaborating concepts listed
-- [ ] Each concept referenced via `**Concept**` in interaction tree must exist here
-- [ ] Invariants under specific property/operation they apply to
-- [ ] No implementation details (APIs, services, databases, UI components, code)
-- [ ] No speculation beyond the provided material
-- [ ] Everything at logical/domain level
-
-
----
-
-# Interaction Tree Format
-
-# Interaction Tree Format
-
-## Hierarchy
-
-Epic → Sub-Epic → Story → Scenario → Step
-
-| Node | Meaning | Heading |
-| ----- | ----- | ----- |
-| Epic | Large domain capability — a major area of the system | `# Epic: <name> (<statement>)` |
-| Sub-Epic | Logical grouping of related stories — a feature area, not a behavior itself | `## Epic: <name> (<statement>)` |
-| Story | Smallest independently valuable behavior — has a triggering actor, a responding actor, and produces observable state change. If it has no actor and no state change, it is not a story. | `### Story: <name> (<statement>)` |
-| Scenario | A condition-specific grouping of steps within a story (e.g. success path, failure path) | `#### Scenario: <name>` |
-| Step | A single atomic interaction — one action by one actor | `- Step N: <name> (When/Then <statement>)` |
-
-## Per Interaction
-
-- **Trigger** — Triggering-Actor, Behavior
-- **Response** — Responding-Actor, Behavior
-- **Pre-Condition** — label only (Given/And)
-- **Failure-Modes** — bullet list, max 3; rule/state based only (no infrastructure failures)
-- **Domain Concepts** - Domain Concepts related to Interaction, must exist in the domain model
-- **Examples** — tables per concept
-
-
-### Commonly Generated Fields Per Node
-
-| Node | Commonly Generated | Case-by-Case |
-|------|--------------------|--------------|
-| Epic | Triggering-Actor, Responding-Actor, Name, Pre-Condition | Constraints |
-| Story | Trigger, Response, Name, Examples, Pre-Condition, Failure-Modes | Constraints |
-| Scenario | Trigger, Response, Pre-Condition, Examples | |
-| Step | Trigger, Response, Examples | Constraints (when step-specific) |
-
-## Domain Grounding
-
-Use `**Concept**` in labels. Every concept must exist in Domain Model.
-
-## Inheritance
-
-Parent → child; use `[brackets]` for inherited values (e.g. `Triggering-Actor: [User]`).
-
-## Example Tables
-
-Tables live on the interaction. One per concept referenced in labels, should be identical to examples in the domain model
-
-```
-ConceptName (qualifier):
-| scenario | field1 | field2 |
-|----------|--------|--------|
-| success  | val1   | val2   |
-
-AnotherConcept (qualifier):
-| scenario | field1 |
-|----------|--------|
-| success  | val1   |
-```
-
-- Qualifier in parentheses after concept name
-- Scenario column required; use kebab-case (e.g. `success`, `invalid-details`)
-- `===` separator between tables
-- Inherited examples: `Examples: [Table Name 1, Table Name 2]`
-
-## Validation Checklist
-
-**Epic**
-- [ ] Heading: `# Epic: <name using **Domain Concepts**> (<statement>)`
-- [ ] Triggering-Actor, Responding-Actor, Pre-Condition, Examples present (or inherited)
-- [ ] Pre-Condition on parent only when shared; children list only new or specialized state
-
-**Story**
-- [ ] Heading: `### Story: <name using **Domain Concepts**> (<statement>)`
-- [ ] Pre-Condition, Failure-Modes (max 3), Trigger, Response present
-- [ ] Trigger: sub-bullets Triggering-Actor, Behavior
-- [ ] Response: sub-bullets Responding-Actor, Behavior
-
-**Step**
-- [ ] `- Step N: <name using **Domain Concepts**> (When/Then <statement>)`
-- [ ] Trigger and Response with [inherited] when from parent
-
-**Example tables**
-- [ ] Qualifier in parentheses: `ConceptName (qualifier):`
-- [ ] Scenario column required; kebab-case
-- [ ] Each table: label, header row, separator row, data rows
-
-**Hierarchy**
-- [ ] Epic → Epic/Story → Scenario → Step
-- [ ] Each node touches at least one domain concept via `**Concept**`
-
-
----
-
-## Domain Model Rules (4)
+## Domain Model Rules (15)
 
 Apply these rules when producing the domain model output for this phase.
+
+---
+title: Hierarchy from evidence, not invention
+impact: HIGH
+---
+
+## Build concept_hierarchy from evidence
+
+**DO** derive parent-child relationships from evidence in `registries.actions` and concept `performs`/`receives`:
+- **Shared mechanics** — concepts that share the same resolution, cost, or validation role (e.g. Wire Transfer, ACH, Card Payment all resolve as Payment; Checking, Savings, Money Market → Account) → Child → Parent
+- **Shared protocol** — concepts that participate in the same workflow, lifecycle, or parent's collection → introduce a common base
+- **Subtype patterns** — when evidence describes different rules, formulas, or state transitions for variants → model as Child : Parent
+
+**DO** scan actions for each concept: subject, object, predicate, raw. Look for:
+- Co-occurrence (concepts that appear together as subject/object)
+- Shared terminology (term_ids, chunk_ids overlap)
+- Domain language (e.g. "Transaction", "Account", "Payment", "Fee", "Product", "Order" in raw text)
+
+**DO** build a **comprehensive** hierarchy. With hundreds of concepts, expect many parent types: Transaction, Account, Payment, Fee, Product, Order, Customer, etc. Each parent should have all its subtypes listed.
+
+**DO NOT** infer hierarchy from chapter titles, section headers, or ToC alone. Read the raw action text to confirm different mechanics.
+
+**DO NOT** leave hierarchy sparse. If you have 10+ concepts that share mechanics (e.g. Wire Transfer, ACH, Card Payment → Payment; Checking, Savings → Account), add them. If you have Transaction subtypes beyond Purchase/Refund/Chargeback, add them.
+
+**Related rules:** [concept_synthesis-subtypes-first-class](concept_synthesis-subtypes-first-class.md), [variation-base-inheritance](variation-base-inheritance.md), [domain-mechanics-not-toc](domain-mechanics-not-toc.md), [refined-integrate-concepts](refined-integrate-concepts.md).
+
+
+---
+
+---
+title: Model Instances, Not Smashed Properties
+impact: HIGH
+---
+
+## Model Instances, Not Smashed Properties
+
+**DO** consider when a concept is best represented as instances/examples (objects in diagram) vs smashing it into a property or method.
+
+**DO** model context with tables as one or more concepts with relationships.
+
+**DO** model instances and examples explicitly when structure matters.
+
+**DO NOT** smash complex objects with multiple concepts into a single property or method.
+
+
+---
+
+---
+title: Domain Model — Standard Types for Properties
+impact: HIGH
+---
+
+## Standard Types for Properties
+
+**DO** use standard types for Properties when defining concepts:
+
+| Type | Use when | Example |
+|------|----------|---------|
+| **String** | Text, names, labels | `Customer.name`, `Product.sku` |
+| **Number** | Quantities, amounts, counts | `Cart.total`, `LineItem.quantity` |
+| **Boolean** | Yes/no, flags | `Order.isPaid`, `Cart.isEmpty` |
+| **List** | Ordered collection | `Cart.lineItems` (List of LineItem) |
+| **Dictionary** | Key-value mapping | `Product.attributes`, `Config.settings` |
+| **UniqueID** | Identifier, reference | `Order.customerId`, `LineItem.productId` |
+| **Instant** | Point in time (ISO 8601) | `Order.createdAt`, `Payment.processedAt` |
+
+| **EnumType** | Fixed set of valid values | `ModifierType type {bonus, penalty}`, `ActionType action_type {standard, move, free, reaction}` |
+
+Use `List<T>` or `Dictionary<K,V>` when element types matter.
+
+**DO** use a named enum type when a property has a constrained set of valid values. Format: `EnumType property_name {value1, value2, value3}`.
+
+**DO NOT** use `String` with parenthetical options (e.g., `String type (bonus/penalty)`). Strings imply free-form text; constrained options are a distinct type.
+
+- Example (wrong): `String type (bonus/penalty)`, `String attack_type (close/ranged)`.
+- Example (right): `ModifierType type {bonus, penalty}`, `AttackType attack_type {close, ranged}`.
+
+
+---
 
 ---
 title: Speculation and assumptions
@@ -343,6 +188,48 @@ impact: HIGH
 
 **DO NOT** speculate beyond the provided material or invent mechanics when unclear.
 - Example (wrong): Story "Apply loyalty points at checkout" when context never mentions loyalty. Right: Omit, or state "Assumption: Loyalty points not in scope."
+
+
+---
+
+---
+title: Subtypes as first-class concepts
+impact: HIGH
+---
+
+## Subtypes as first-class concepts
+
+**DO** give each subtype its own `### **SubtypeName** : Parent` section with its own properties, operations, collaborators, and composition. Subtypes inherit from parent but have distinct mechanics — model those mechanics explicitly.
+
+**DO** ground each subtype's definition in evidence. Scan `actions.json` and `terms.json` for the subtype name (e.g. Purchase, Refund, Chargeback) and derive properties/operations from what the evidence says that subtype does.
+
+**DO NOT** list subtypes only in a parent's `Subtypes:` line without creating first-class sections for them.
+
+**DO NOT** collapse subtypes that have distinct rules (e.g. Purchase vs Refund vs Chargeback each have different validation, settlement, reversal) into a single parent definition.
+
+- Example (wrong): `### **Transaction**` with `Subtypes: Purchase, Refund, Chargeback` and no separate sections for Purchase, Refund, Chargeback.
+- Example (right): `### **Transaction**` plus `### **Purchase** : Transaction`, `### **Refund** : Transaction`, `### **Chargeback** : Transaction`, etc., each with its own properties, operations, and collaborators.
+
+
+---
+
+---
+title: Subtypes vs enum — verify before modeling
+impact: HIGH
+---
+
+## Subtypes vs enum — verify before modeling
+
+**DO** before creating a subtype section: verify actions.json and terms.json show different mechanics for that subtype. Different properties, operations, or resolution paths = subtype. Same logic, different label = enum on parent.
+
+**DO** use `EnumType property_name {value1, value2}` when the evidence shows same behavior across variants. Do not create subtype sections for enum-like variation.
+
+**DO NOT** create subtype sections from concept_hierarchy without evidence check. If concept_guidance listed Purchase, Refund, Chargeback as Transaction subtypes but the evidence treats them identically (same validation, same settlement flow), convert to `TransactionType type {purchase, refund, chargeback}` on Transaction.
+
+**DO NOT** have both a type enum and mirroring subtypes. If Transaction has `TransactionType type {purchase, refund, chargeback}`, do not also create Purchase, Refund, Chargeback as subtypes.
+
+- Example (right): Transaction has Purchase, Refund, Chargeback as subtypes — evidence shows Purchase has forward-payment validation, Refund has reversal rules and original-required check, Chargeback has issuer workflow. Each has distinct mechanics.
+- Example (wrong): Transaction has Purchase, Return, Exchange as subtypes when the rules only categorize by label. Right: Transaction with `TransactionType type {purchase, return, exchange}`.
 
 
 ---
@@ -407,9 +294,146 @@ impact: HIGH
 
 ---
 
+---
+title: Hierarchy from evidence, not invention
+impact: HIGH
+---
+
+## Build concept_hierarchy from evidence
+
+**DO** derive parent-child relationships from evidence in `registries.actions` and concept `performs`/`receives`:
+- **Shared mechanics** — concepts that share the same resolution, cost, or validation role (e.g. Wire Transfer, ACH, Card Payment all resolve as Payment; Checking, Savings, Money Market → Account) → Child → Parent
+- **Shared protocol** — concepts that participate in the same workflow, lifecycle, or parent's collection → introduce a common base
+- **Subtype patterns** — when evidence describes different rules, formulas, or state transitions for variants → model as Child : Parent
+
+**DO** scan actions for each concept: subject, object, predicate, raw. Look for:
+- Co-occurrence (concepts that appear together as subject/object)
+- Shared terminology (term_ids, chunk_ids overlap)
+- Domain language (e.g. "Transaction", "Account", "Payment", "Fee", "Product", "Order" in raw text)
+
+**DO** build a **comprehensive** hierarchy. With hundreds of concepts, expect many parent types: Transaction, Account, Payment, Fee, Product, Order, Customer, etc. Each parent should have all its subtypes listed.
+
+**DO NOT** infer hierarchy from chapter titles, section headers, or ToC alone. Read the raw action text to confirm different mechanics.
+
+**DO NOT** leave hierarchy sparse. If you have 10+ concepts that share mechanics (e.g. Wire Transfer, ACH, Card Payment → Payment; Checking, Savings → Account), add them. If you have Transaction subtypes beyond Purchase/Refund/Chargeback, add them.
+
+**Related rules:** [concept-model-subtypes-first-class](concept-model-subtypes-first-class.md), [variation-base-inheritance](variation-base-inheritance.md), [domain-mechanics-not-toc](domain-mechanics-not-toc.md), [refined-integrate-concepts](refined-integrate-concepts.md).
 
 
-## Interaction Tree Rules (4)
+---
+
+---
+title: Model Instances, Not Smashed Properties
+impact: HIGH
+---
+
+## Model Instances, Not Smashed Properties
+
+**DO** consider when a concept is best represented as instances/examples (objects in diagram) vs smashing it into a property or method.
+
+**DO** model context with tables as one or more concepts with relationships.
+
+**DO** model instances and examples explicitly when structure matters.
+
+**DO NOT** smash complex objects with multiple concepts into a single property or method.
+
+
+---
+
+---
+title: Domain Model — Standard Types for Properties
+impact: HIGH
+---
+
+## Standard Types for Properties
+
+**DO** use standard types for Properties when defining concepts:
+
+| Type | Use when | Example |
+|------|----------|---------|
+| **String** | Text, names, labels | `Customer.name`, `Product.sku` |
+| **Number** | Quantities, amounts, counts | `Cart.total`, `LineItem.quantity` |
+| **Boolean** | Yes/no, flags | `Order.isPaid`, `Cart.isEmpty` |
+| **List** | Ordered collection | `Cart.lineItems` (List of LineItem) |
+| **Dictionary** | Key-value mapping | `Product.attributes`, `Config.settings` |
+| **UniqueID** | Identifier, reference | `Order.customerId`, `LineItem.productId` |
+| **Instant** | Point in time (ISO 8601) | `Order.createdAt`, `Payment.processedAt` |
+
+| **EnumType** | Fixed set of valid values | `ModifierType type {bonus, penalty}`, `ActionType action_type {standard, move, free, reaction}` |
+
+Use `List<T>` or `Dictionary<K,V>` when element types matter.
+
+**DO** use a named enum type when a property has a constrained set of valid values. Format: `EnumType property_name {value1, value2, value3}`.
+
+**DO NOT** use `String` with parenthetical options (e.g., `String type (bonus/penalty)`). Strings imply free-form text; constrained options are a distinct type.
+
+- Example (wrong): `String type (bonus/penalty)`, `String attack_type (close/ranged)`.
+- Example (right): `ModifierType type {bonus, penalty}`, `AttackType attack_type {close, ranged}`.
+
+
+---
+
+---
+title: Speculation and assumptions
+impact: HIGH
+---
+
+## Speculation and assumptions
+
+**DO** state an assumption when something is unclear.
+- Example (right): "Assumption: Shipping Address is provided before checkout"; "Assumption: Loyalty points not in scope".
+
+**DO NOT** speculate beyond the provided material or invent mechanics when unclear.
+- Example (wrong): Story "Apply loyalty points at checkout" when context never mentions loyalty. Right: Omit, or state "Assumption: Loyalty points not in scope."
+
+
+---
+
+---
+title: Subtypes as first-class concepts
+impact: HIGH
+---
+
+## Subtypes as first-class concepts
+
+**DO** give each subtype its own `### **SubtypeName** : Parent` section with its own properties, operations, collaborators, and composition. Subtypes inherit from parent but have distinct mechanics — model those mechanics explicitly.
+
+**DO** ground each subtype's definition in evidence. Scan `actions.json` and `terms.json` for the subtype name (e.g. Purchase, Refund, Chargeback) and derive properties/operations from what the evidence says that subtype does.
+
+**DO NOT** list subtypes only in a parent's `Subtypes:` line without creating first-class sections for them.
+
+**DO NOT** collapse subtypes that have distinct rules (e.g. Purchase vs Refund vs Chargeback each have different validation, settlement, reversal) into a single parent definition.
+
+- Example (wrong): `### **Transaction**` with `Subtypes: Purchase, Refund, Chargeback` and no separate sections for Purchase, Refund, Chargeback.
+- Example (right): `### **Transaction**` plus `### **Purchase** : Transaction`, `### **Refund** : Transaction`, `### **Chargeback** : Transaction`, etc., each with its own properties, operations, and collaborators.
+
+
+---
+
+---
+title: Subtypes vs enum — verify before modeling
+impact: HIGH
+---
+
+## Subtypes vs enum — verify before modeling
+
+**DO** before creating a subtype section: verify actions.json and terms.json show different mechanics for that subtype. Different properties, operations, or resolution paths = subtype. Same logic, different label = enum on parent.
+
+**DO** use `EnumType property_name {value1, value2}` when the evidence shows same behavior across variants. Do not create subtype sections for enum-like variation.
+
+**DO NOT** create subtype sections from concept_hierarchy without evidence check. If concept_guidance listed Purchase, Refund, Chargeback as Transaction subtypes but the evidence treats them identically (same validation, same settlement flow), convert to `TransactionType type {purchase, refund, chargeback}` on Transaction.
+
+**DO NOT** have both a type enum and mirroring subtypes. If Transaction has `TransactionType type {purchase, refund, chargeback}`, do not also create Purchase, Refund, Chargeback as subtypes.
+
+- Example (right): Transaction has Purchase, Refund, Chargeback as subtypes — evidence shows Purchase has forward-payment validation, Refund has reversal rules and original-required check, Chargeback has issuer workflow. Each has distinct mechanics.
+- Example (wrong): Transaction has Purchase, Return, Exchange as subtypes when the rules only categorize by label. Right: Transaction with `TransactionType type {purchase, return, exchange}`.
+
+
+---
+
+
+
+## Interaction Tree Rules (6)
 
 Apply these rules when producing the interaction tree output for this phase.
 
@@ -458,6 +482,48 @@ Use outcome-oriented language over mechanism-oriented language. Focus on what is
 **DO NOT** use generic communication or mechanism verbs.
 - Example (wrong): "Visualizing Power Activation", "Showing Combat Results", "Displaying Hit Information", "Presenting Configuration Options".
 - Wrong: "Showing results", "Displaying information", "Visualizing data", "Presenting options", "Providing settings", "Enabling features", "Allowing access".
+
+
+---
+
+---
+title: Hierarchy — approximately 4 to 9 children
+impact: MEDIUM
+order: 3
+---
+
+## Hierarchy — approximately 4 to 9 children
+
+Any node (epic, story, scenario) has approximately 4–9 children. Does not apply to steps. For stories, count **steps** as children (not scenarios).
+**DO** keep child count in the 4–9 range for manageable granularity.
+- Epic: ~4–9 sub-epics or stories.
+- Story: ~4–9 steps (total across scenarios; scenarios are containers, not counted).
+- Scenario: ~4–9 steps.
+
+**DO NOT** create nodes with many more than 9 children — split or regroup.
+- Wrong: Epic with 15 stories (split into sub-epics).
+- Wrong: Story with 12 steps (consider splitting story or grouping steps into scenarios).
+
+
+---
+
+---
+title: Hierarchy — approximately 4 to 9 children
+impact: MEDIUM
+order: 3
+---
+
+## Hierarchy — approximately 4 to 9 children
+
+Any node (epic, story, scenario) has approximately 4–9 children. Does not apply to steps. For stories, count **steps** as children (not scenarios).
+**DO** keep child count in the 4–9 range for manageable granularity.
+- Epic: ~4–9 sub-epics or stories.
+- Story: ~4–9 steps (total across scenarios; scenarios are containers, not counted).
+- Scenario: ~4–9 steps.
+
+**DO NOT** create nodes with many more than 9 children — split or regroup.
+- Wrong: Epic with 15 stories (split into sub-epics).
+- Wrong: Story with 12 steps (consider splitting story or grouping steps into scenarios).
 
 
 ---

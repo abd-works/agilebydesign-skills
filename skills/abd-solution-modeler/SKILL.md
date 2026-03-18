@@ -26,7 +26,7 @@ Transforms raw context (rules, requirements, documentation) into a **Domain mode
 
 ## Spec and Plan
 
-- **Full spec:** `docs/requirements.md` — phases, formats, outputs, checkpoints
+- **Full spec:** `docs/requirements.md` — phases, formats, outputs
 - **Implementation plan:** `docs/plan.md` — skill structure, dependencies, implementation order
 
 ## Pipeline

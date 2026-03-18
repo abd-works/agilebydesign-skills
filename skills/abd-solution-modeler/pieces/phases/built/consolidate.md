@@ -227,69 +227,9 @@ AnotherConcept (qualifier):
 
 ---
 
-## Domain Model Rules (9)
+## Domain Model Rules (16)
 
 Apply these rules when producing the domain model output for this phase.
-
----
-title: Derive from context
-impact: HIGH
----
-
-## Derive from context
-
-**DO** derive concepts from the interactions you find in the context; focus on *who* exchanges *what* and *what must be true before and after*.
-- Example (right): Context says "Customer adds to cart" → interaction: Add to Cart; concepts: Shopping Cart, LineItem. Context says "User selects country for payment" → interaction: Select Country; concepts: Country, PaymentType.
-
-**DO NOT** invent workflows or mechanics not present in the context.
-- Example (wrong): Story "Express checkout" or concept "LoyaltyPoints" when context never mentions them. Right: Omit; if needed, state assumption.
-
-
----
-
----
-title: Mechanics from evidence, not table of contents
-impact: HIGH
----
-
-## Mechanics from evidence, not table of contents
-
-**DO** read evidence chunks for mechanical depth. For each candidate subtype, scan actions.json and terms.json for that name. Derive properties, operations, and collaborators from what the evidence says that variant does. A subtype is justified when the evidence describes different rules, formulas, state transitions, or interaction patterns.
-
-**DO** verify each subtype has its own trigger, conditions, or resolution path in the source. Different mechanics = subtype. Same mechanics with different label = enum.
-
-**DO NOT** infer subtypes from chapter titles, section headers, or bullet lists without reading the actual rule text. A table of contents that lists "Volume Discount, Loyalty Reward, Bundle Offer" under Promotions does not make them subtypes — only the rules for each do.
-
-**DO NOT** create subtypes from variation axes or category lists when each item shares the same resolution logic. "Transaction types: Purchase, Return, Exchange" in a summary is a categorization; read the rules to see if each resolves differently.
-
-- Example (wrong): Source has section "Transaction Types" with Purchase, Return, Exchange. You list those as subtypes. But the ToC categories are wrong — the mechanics show different resolution types (e.g. forward payment vs reversal vs disputed reversal). Right: Read the rules. Derive subtypes from resolution mechanics, not from ToC labels.
-- Example (wrong): Source lists "Payment Methods: Credit Card, Bank Transfer, Invoice" and you model each as a subtype because they use different rails. But the mechanics are identical — same flow, different input. Right: PaymentMethod with `method_type {credit_card, bank_transfer, invoice}` — data field, not subtypes. Same mechanics with different input = variable, not subtype.
-
-
----
-
----
-title: Subtypes vs enum — distinct mechanics required
-impact: HIGH
----
-
-## Subtypes vs enum — distinct mechanics required
-
-**DO** use subtype when the evidence shows different properties, operations, or resolution mechanics for each variant. A subtype is a concept when it has its own rules — different validation, different settlement, different formulas, different state transitions.
-
-**DO** use enum (or type property) when variants share the same logic and differ only by label. Same behavior, different data = enum. Format: `EnumType property_name {value1, value2, value3}`.
-
-**DO NOT** derive subtypes from table of contents or section headers alone. Verify each subtype has distinct mechanics in the evidence (actions.json, terms.json, context chunks). If the source only lists names under a category without different rules per name, it's an enum.
-
-**DO NOT** create both a parent "Type" or "Category" enum and subtypes that mirror it. Example (wrong): Transaction has `TransactionType type {purchase, refund, chargeback}` AND subtypes Purchase, Refund, Chargeback. Use one representation: either enum or subtypes with genuinely different mechanics.
-
-- Example (right — subtype): Transaction subtypes Purchase, Refund, Chargeback — each has different validation, settlement, and reversal rules. Purchase: forward payment, creates obligation. Refund: reversal, requires original. Chargeback: disputed reversal, involves issuer. Each gets its own concept.
-- Example (right — enum): Order has `OrderStatus status {pending, shipped, delivered}` — same state machine, different state. Or: LineItem has `ItemType type {product, service, subscription}` — same line-item logic, different label.
-- Example (wrong): Transaction types Purchase, Return, Exchange as Transaction subtypes when the rules treat them the same way and only categorize by label. Right: `TransactionType type {purchase, return, exchange}` on Transaction.
-- Example (wrong): Subtypes inferred from a bullet list "Promotions: Volume Discount, Loyalty Reward, Bundle Offer..." without reading whether each has different mechanics. Right: Read the actual rule text; if Volume Discount has tier-based calc, Loyalty Reward has points logic, Bundle has bundle rules, they're subtypes. If they're just names under a category, enum.
-
-
----
 
 ---
 title: Anemia / Centralization Critique
@@ -370,7 +310,7 @@ impact: HIGH
 
 ## Nest Related Capabilities Under Parent
 
-**DO** integrate related capabilities under a parent concept (e.g. Character Animation with multiple Operations, not separate Walk Animation, Run Animation concepts).
+**DO** integrate related capabilities under a parent concept (e.g. Portfolio with multiple Operations, not separate PortfolioValue, PortfolioRisk concepts).
 
 **DO** group concepts by business domain, not technical layers (Data Layer, Business Logic Layer).
 
@@ -419,9 +359,237 @@ impact: HIGH
 
 ---
 
+---
+title: Scenario / Message Walkthrough Validation
+impact: HIGH
+---
+
+## Scenario / Message Walkthrough
+
+Make sure the model can actually behave. A model that looks elegant but fails in message flow is not good OOAD.
+
+**Run walkthroughs for:**
+- Happy path
+- Error path
+- Edge case
+- Exception path
+- Stateful repetition
+- Alternate variation mode
+- Recovery, retry, or cancellation where relevant
+
+**Validate at two levels:**
+
+**Scenario flow:** What happens in the domain?
+
+**Message flow:** Which object sends what message to whom? Does the receiver know enough to act? Is the sender delegating a decision or making it centrally?
+
+**This step exposes:** missing objects, misplaced behavior, centralization, fake relationships, state with no owner.
+
+**DO NOT** truncate. Full Model Assessment requires multiple scenario walkthroughs with message flow (happy path, error path, edge case, stateful repetition, alternate variation, recovery where relevant). Persist the full assessment in run-N-ooad.md. A one-line note is insufficient.
 
 
-## Interaction Tree Rules (6)
+---
+
+---
+title: Derive from context
+impact: HIGH
+---
+
+## Derive from context
+
+**DO** derive concepts from the interactions you find in the context; focus on *who* exchanges *what* and *what must be true before and after*.
+- Example (right): Context says "Customer adds to cart" → interaction: Add to Cart; concepts: Shopping Cart, LineItem. Context says "User selects country for payment" → interaction: Select Country; concepts: Country, PaymentType.
+
+**DO NOT** invent workflows or mechanics not present in the context.
+- Example (wrong): Story "Express checkout" or concept "LoyaltyPoints" when context never mentions them. Right: Omit; if needed, state assumption.
+
+
+---
+
+---
+title: Mechanics from evidence, not table of contents
+impact: HIGH
+---
+
+## Mechanics from evidence, not table of contents
+
+**DO** read evidence chunks for mechanical depth. For each candidate subtype, scan actions.json and terms.json for that name. Derive properties, operations, and collaborators from what the evidence says that variant does. A subtype is justified when the evidence describes different rules, formulas, state transitions, or interaction patterns.
+
+**DO** verify each subtype has its own trigger, conditions, or resolution path in the source. Different mechanics = subtype. Same mechanics with different label = enum.
+
+**DO NOT** infer subtypes from chapter titles, section headers, or bullet lists without reading the actual rule text. A table of contents that lists "Volume Discount, Loyalty Reward, Bundle Offer" under Promotions does not make them subtypes — only the rules for each do.
+
+**DO NOT** create subtypes from variation axes or category lists when each item shares the same resolution logic. "Transaction types: Purchase, Return, Exchange" in a summary is a categorization; read the rules to see if each resolves differently.
+
+- Example (wrong): Source has section "Transaction Types" with Purchase, Return, Exchange. You list those as subtypes. But the ToC categories are wrong — the mechanics show different resolution types (e.g. forward payment vs reversal vs disputed reversal). Right: Read the rules. Derive subtypes from resolution mechanics, not from ToC labels.
+- Example (wrong): Source lists "Payment Methods: Credit Card, Bank Transfer, Invoice" and you model each as a subtype because they use different rails. But the mechanics are identical — same flow, different input. Right: PaymentMethod with `method_type {credit_card, bank_transfer, invoice}` — data field, not subtypes. Same mechanics with different input = variable, not subtype.
+
+
+---
+
+---
+title: Subtypes vs enum — distinct mechanics required
+impact: HIGH
+---
+
+## Subtypes vs enum — distinct mechanics required
+
+**DO** use subtype when the evidence shows different properties, operations, or resolution mechanics for each variant. A subtype is a concept when it has its own rules — different validation, different settlement, different formulas, different state transitions.
+
+**DO** use enum (or type property) when variants share the same logic and differ only by label. Same behavior, different data = enum. Format: `EnumType property_name {value1, value2, value3}`.
+
+**DO NOT** derive subtypes from table of contents or section headers alone. Verify each subtype has distinct mechanics in the evidence (actions.json, terms.json, context chunks). If the source only lists names under a category without different rules per name, it's an enum.
+
+**DO NOT** create both a parent "Type" or "Category" enum and subtypes that mirror it. Example (wrong): Transaction has `TransactionType type {purchase, refund, chargeback}` AND subtypes Purchase, Refund, Chargeback. Use one representation: either enum or subtypes with genuinely different mechanics.
+
+- Example (right — subtype): Transaction subtypes Purchase, Refund, Chargeback — each has different validation, settlement, and reversal rules. Purchase: forward payment, creates obligation. Refund: reversal, requires original. Chargeback: disputed reversal, involves issuer. Each gets its own concept.
+- Example (right — enum): Order has `OrderStatus status {pending, shipped, delivered}` — same state machine, different state. Or: LineItem has `ItemType type {product, service, subscription}` — same line-item logic, different label.
+- Example (wrong): Transaction types Purchase, Return, Exchange as Transaction subtypes when the rules treat them the same way and only categorize by label. Right: `TransactionType type {purchase, return, exchange}` on Transaction.
+- Example (wrong): Subtypes inferred from a bullet list "Promotions: Volume Discount, Loyalty Reward, Bundle Offer..." without reading whether each has different mechanics. Right: Read the actual rule text; if Volume Discount has tier-based calc, Loyalty Reward has points logic, Bundle has bundle rules, they're subtypes. If they're just names under a category, enum.
+
+
+---
+
+---
+title: Hierarchy from evidence, not invention
+impact: HIGH
+---
+
+## Build concept_hierarchy from evidence
+
+**DO** derive parent-child relationships from evidence in `registries.actions` and concept `performs`/`receives`:
+- **Shared mechanics** — concepts that share the same resolution, cost, or validation role (e.g. Wire Transfer, ACH, Card Payment all resolve as Payment; Checking, Savings, Money Market → Account) → Child → Parent
+- **Shared protocol** — concepts that participate in the same workflow, lifecycle, or parent's collection → introduce a common base
+- **Subtype patterns** — when evidence describes different rules, formulas, or state transitions for variants → model as Child : Parent
+
+**DO** scan actions for each concept: subject, object, predicate, raw. Look for:
+- Co-occurrence (concepts that appear together as subject/object)
+- Shared terminology (term_ids, chunk_ids overlap)
+- Domain language (e.g. "Transaction", "Account", "Payment", "Fee", "Product", "Order" in raw text)
+
+**DO** build a **comprehensive** hierarchy. With hundreds of concepts, expect many parent types: Transaction, Account, Payment, Fee, Product, Order, Customer, etc. Each parent should have all its subtypes listed.
+
+**DO NOT** infer hierarchy from chapter titles, section headers, or ToC alone. Read the raw action text to confirm different mechanics.
+
+**DO NOT** leave hierarchy sparse. If you have 10+ concepts that share mechanics (e.g. Wire Transfer, ACH, Card Payment → Payment; Checking, Savings → Account), add them. If you have Transaction subtypes beyond Purchase/Refund/Chargeback, add them.
+
+**Related rules:** [concept-model-subtypes-first-class](concept-model-subtypes-first-class.md), [variation-base-inheritance](variation-base-inheritance.md), [domain-mechanics-not-toc](domain-mechanics-not-toc.md), [refined-integrate-concepts](refined-integrate-concepts.md).
+
+
+---
+
+---
+title: Model Instances, Not Smashed Properties
+impact: HIGH
+---
+
+## Model Instances, Not Smashed Properties
+
+**DO** consider when a concept is best represented as instances/examples (objects in diagram) vs smashing it into a property or method.
+
+**DO** model context with tables as one or more concepts with relationships.
+
+**DO** model instances and examples explicitly when structure matters.
+
+**DO NOT** smash complex objects with multiple concepts into a single property or method.
+
+
+---
+
+---
+title: Domain Model — Standard Types for Properties
+impact: HIGH
+---
+
+## Standard Types for Properties
+
+**DO** use standard types for Properties when defining concepts:
+
+| Type | Use when | Example |
+|------|----------|---------|
+| **String** | Text, names, labels | `Customer.name`, `Product.sku` |
+| **Number** | Quantities, amounts, counts | `Cart.total`, `LineItem.quantity` |
+| **Boolean** | Yes/no, flags | `Order.isPaid`, `Cart.isEmpty` |
+| **List** | Ordered collection | `Cart.lineItems` (List of LineItem) |
+| **Dictionary** | Key-value mapping | `Product.attributes`, `Config.settings` |
+| **UniqueID** | Identifier, reference | `Order.customerId`, `LineItem.productId` |
+| **Instant** | Point in time (ISO 8601) | `Order.createdAt`, `Payment.processedAt` |
+
+| **EnumType** | Fixed set of valid values | `ModifierType type {bonus, penalty}`, `ActionType action_type {standard, move, free, reaction}` |
+
+Use `List<T>` or `Dictionary<K,V>` when element types matter.
+
+**DO** use a named enum type when a property has a constrained set of valid values. Format: `EnumType property_name {value1, value2, value3}`.
+
+**DO NOT** use `String` with parenthetical options (e.g., `String type (bonus/penalty)`). Strings imply free-form text; constrained options are a distinct type.
+
+- Example (wrong): `String type (bonus/penalty)`, `String attack_type (close/ranged)`.
+- Example (right): `ModifierType type {bonus, penalty}`, `AttackType attack_type {close, ranged}`.
+
+
+---
+
+---
+title: Speculation and assumptions
+impact: HIGH
+---
+
+## Speculation and assumptions
+
+**DO** state an assumption when something is unclear.
+- Example (right): "Assumption: Shipping Address is provided before checkout"; "Assumption: Loyalty points not in scope".
+
+**DO NOT** speculate beyond the provided material or invent mechanics when unclear.
+- Example (wrong): Story "Apply loyalty points at checkout" when context never mentions loyalty. Right: Omit, or state "Assumption: Loyalty points not in scope."
+
+
+---
+
+---
+title: Subtypes as first-class concepts
+impact: HIGH
+---
+
+## Subtypes as first-class concepts
+
+**DO** give each subtype its own `### **SubtypeName** : Parent` section with its own properties, operations, collaborators, and composition. Subtypes inherit from parent but have distinct mechanics — model those mechanics explicitly.
+
+**DO** ground each subtype's definition in evidence. Scan `actions.json` and `terms.json` for the subtype name (e.g. Purchase, Refund, Chargeback) and derive properties/operations from what the evidence says that subtype does.
+
+**DO NOT** list subtypes only in a parent's `Subtypes:` line without creating first-class sections for them.
+
+**DO NOT** collapse subtypes that have distinct rules (e.g. Purchase vs Refund vs Chargeback each have different validation, settlement, reversal) into a single parent definition.
+
+- Example (wrong): `### **Transaction**` with `Subtypes: Purchase, Refund, Chargeback` and no separate sections for Purchase, Refund, Chargeback.
+- Example (right): `### **Transaction**` plus `### **Purchase** : Transaction`, `### **Refund** : Transaction`, `### **Chargeback** : Transaction`, etc., each with its own properties, operations, and collaborators.
+
+
+---
+
+---
+title: Subtypes vs enum — verify before modeling
+impact: HIGH
+---
+
+## Subtypes vs enum — verify before modeling
+
+**DO** before creating a subtype section: verify actions.json and terms.json show different mechanics for that subtype. Different properties, operations, or resolution paths = subtype. Same logic, different label = enum on parent.
+
+**DO** use `EnumType property_name {value1, value2}` when the evidence shows same behavior across variants. Do not create subtype sections for enum-like variation.
+
+**DO NOT** create subtype sections from concept_hierarchy without evidence check. If concept_guidance listed Purchase, Refund, Chargeback as Transaction subtypes but the evidence treats them identically (same validation, same settlement flow), convert to `TransactionType type {purchase, refund, chargeback}` on Transaction.
+
+**DO NOT** have both a type enum and mirroring subtypes. If Transaction has `TransactionType type {purchase, refund, chargeback}`, do not also create Purchase, Refund, Chargeback as subtypes.
+
+- Example (right): Transaction has Purchase, Refund, Chargeback as subtypes — evidence shows Purchase has forward-payment validation, Refund has reversal rules and original-required check, Chargeback has issuer workflow. Each has distinct mechanics.
+- Example (wrong): Transaction has Purchase, Return, Exchange as subtypes when the rules only categorize by label. Right: Transaction with `TransactionType type {purchase, return, exchange}`.
+
+
+---
+
+
+
+## Interaction Tree Rules (9)
 
 Apply these rules when producing the interaction tree output for this phase.
 
@@ -470,6 +638,27 @@ Use outcome-oriented language over mechanism-oriented language. Focus on what is
 **DO NOT** use generic communication or mechanism verbs.
 - Example (wrong): "Visualizing Power Activation", "Showing Combat Results", "Displaying Hit Information", "Presenting Configuration Options".
 - Wrong: "Showing results", "Displaying information", "Visualizing data", "Presenting options", "Providing settings", "Enabling features", "Allowing access".
+
+
+---
+
+---
+title: Hierarchy — approximately 4 to 9 children
+impact: MEDIUM
+order: 3
+---
+
+## Hierarchy — approximately 4 to 9 children
+
+Any node (epic, story, scenario) has approximately 4–9 children. Does not apply to steps. For stories, count **steps** as children (not scenarios).
+**DO** keep child count in the 4–9 range for manageable granularity.
+- Epic: ~4–9 sub-epics or stories.
+- Story: ~4–9 steps (total across scenarios; scenarios are containers, not counted).
+- Scenario: ~4–9 steps.
+
+**DO NOT** create nodes with many more than 9 children — split or regroup.
+- Wrong: Epic with 15 stories (split into sub-epics).
+- Wrong: Story with 12 steps (consider splitting story or grouping steps into scenarios).
 
 
 ---
@@ -556,6 +745,33 @@ impact: MEDIUM
 ---
 
 ---
+title: Example tables match Domain Model
+impact: HIGH
+---
+
+## Example tables must align with Domain Model
+
+**DO** ensure every example table corresponds to a domain concept in the Domain Model. Table columns must match the concept's properties. Table relationships must match the Domain Model's concept relationships (composition, aggregation). Every `**Concept**` referenced in Pre-Condition, Trigger, or Response labels must have a corresponding example table (or inherit one). Every example table must be referenced via `**Concept**` in labels — no orphaned tables.
+- Example (right): Domain Model has `Country` with properties `country_code`, `country_name`. Example table: `Selected Country: | scenario | country_code | country_name |`. Domain Model has `User` → `Session` (composition). Tables appear in order: `Logged In User`, then `Active User Session` — relationship expressed through table ordering.
+
+**DO** use source entity data in tables, not aggregated or calculated values. Show the actual records that produce the outcome. If a scenario computes a result, the table shows the inputs, not the output count.
+- Example (right): `UpdateReport (renames): | original_name | new_name | parent |` — shows actual renamed entities.
+- Example (wrong): `UpdateReport: | renames_count | new_count | | 1 | 2 |` — counts defer real work; where do these numbers come from?
+
+**DO** express table relationships through table ordering and qualifier names — not through ID columns. IDs are implementation concerns. Domain Model says `Epic` contains `SubEpic`; tables appear in that order: `Epic` first, then `SubEpic (child of Epic)`.
+- Example (right): `User: | user_name | user_role |` then `Session: | user_name | session_id | expires_at |` — connected by domain attribute, not by `user_id` foreign key.
+
+**DO NOT** have `**Concept**` in labels without a matching example table. Do not have example tables that no label references. Do not invent column names not in the Domain Model — use the concept's actual property names.
+- Example (wrong): Steps reference `**PaymentType**` but no PaymentType example table exists. Or: `Entitlement` table exists but no step mentions `**Entitlement**`.
+- Example (wrong): Domain has `recipient_name` but table uses `payee` or `beneficiary_label`.
+
+**DO NOT** flatten related concepts into one table or use lookup-style tables with ID columns for joining. Each concept gets its own table; relationships are expressed through ordering and qualifiers.
+- Example (wrong): `| enterprise_id | recipient_id | account_id |` — flat table loses relationship structure. Right: separate tables for Enterprise, Recipient, Account in domain relationship order.
+
+
+---
+
+---
 title: Failure modes
 impact: MEDIUM
 ---
@@ -567,6 +783,30 @@ impact: MEDIUM
 
 **DO NOT** include infrastructure or technical failures.
 - Example (wrong): "Database timeout"; "Network unreachable"; "Server crash". Right: "Insufficient balance"; "Account suspended".
+
+
+---
+
+---
+title: Scaffold pattern not enumeration
+impact: HIGH
+---
+
+## Scaffold pattern not enumeration
+
+The first cut of `interaction-tree.md` and `domain-model.md` establishes the pattern for each epic. Later phases expand and refine. If the first cut enumerates everything, later phases have nothing to do.
+
+**DO** detail 2-3 representative stories per epic/sub-epic with full fields (Trigger, Response, Pre-Condition, domain concepts). List remaining stories by name only with "N more stories following this pattern based on [specific items]."
+- Example (right): Two stories under a sub-epic shown in full with Trigger/Response and domain concepts; then "4 more stories following this pattern: [Story A], [Story B], [Story C], [Story D]."
+
+**DO** have the session scaffold reference the output files and list every story by name with exact counts. Mark which stories have full trigger/response detail *(detailed)* and which are listed by name only. Use "N detailed + N more = total" counts per sub-epic that sum to the epic total.
+- Example (right): Session scaffold says "See `interaction-tree.md` for full trigger/response detail on stories marked *(detailed)*." then lists: "Configure **Abilities** (2 stories): Set **AbilityRank** *(detailed)*, Validate **AbilityRank** *(detailed)*". Epic total: "16 sub-epics, 66 stories".
+- Example (right): "Configure **Damage** Powers [MG1] (1 detailed + 4 more = 5 stories): Configure **Damage** *(detailed)*, 4 more following this pattern: Configure **Blast**, Configure **MentalBlast**, Configure **EnergyAura**, Configure **Strike**"
+- Example (wrong): "Configure **Damage** Powers | 5 | DamageEffect, ResistanceCheck" — a table row with a count and concept names but no story names, no *(detailed)* markers, no reference to where the full content lives.
+- Example (wrong): "~55 stories" when the actual count is 66 — approximate counts lose trust and make it impossible to verify completeness.
+
+**DO NOT** enumerate every story with full detail in the first cut. The first cut is not the finished map — it is the pattern that runs expand.
+- Example (wrong): All 6 stories in a sub-epic shown with full Trigger, Response, Pre-Condition, and domain concepts in the first-cut interaction-tree.md. Runs then have nothing to add for that sub-epic.
 
 
 ---

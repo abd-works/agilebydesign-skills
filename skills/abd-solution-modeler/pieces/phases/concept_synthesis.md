@@ -1,29 +1,32 @@
-# Phase 4 — Concept Synthesis
+# Phase 5 — Concept Synthesis
 
 **Actor:** AI
 
 ## Purpose
 
-Merge concept signals from Phase 3 into a hypothesis. Output: `hypothesis.json` with concept_guidance.
+Curate the concept list from Phase 4 (merge/split/kill), build hierarchy, allocate evidence. Reads source chunks via `chunk_ids` for semantic understanding.
 
 ## Trigger
 
-concept synthesis, hypothesis, concept guidance, merge signals
+concept synthesis, curate concepts, refine hypothesis, merge split kill, build hierarchy
 
 ## Inputs
 
-- `concept_signals/*.json` — term_candidates, definition_candidates, dependency_actions, cooccurrence_graph, table_vocabularies
+- `generated/hypothesis.json` — concept index from Phase 4 (concepts, registries, concept_guidance, chunk_ids per concept)
+- `context/` — source chunks (read via chunk_ids for semantic understanding)
 
 ## Instructions
 
-Synthesize concepts from the signals. Produce `hypothesis.json` with:
+1. **Curate concepts** — Merge duplicates, split overloaded concepts, remove noise. Use `chunk_ids` to read relevant source chunks; do not guess from chunks alone.
+2. **Build concept_hierarchy** — Derive parent-child from evidence (shared mechanics, shared protocol, subtype patterns). See rules for hierarchy-from-evidence.
+3. **Update concept_guidance** — priority_concepts, concept_aliases, mechanisms, actors, variation_axes, noise_filters.
+4. **Allocate evidence** — Ensure term_ids, performs, receives, states, decisions, relationships are correctly assigned to curated concepts.
 
-- **concepts** — candidate concepts with names
-- **concept_guidance** (optional) — priority concepts, aliases, mechanisms, actors, variation axes, noise filters for Phase 5
+Subtype discovery happens here; Phase 10 (Variation) works with concepts that already exist.
 
 ## Outputs
 
-- `generated/hypothesis.json`
+- `generated/hypothesis.json` (refined) — concept_hierarchy, updated concept_guidance, evidence allocation
 
 ## Run
 

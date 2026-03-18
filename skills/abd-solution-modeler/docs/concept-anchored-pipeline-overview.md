@@ -12,7 +12,7 @@ The concept-anchored pipeline takes unstructured or semi-structured source mater
 2. **An interaction tree**  epics, sub-epics, stories, steps, and scenarios that describe user flows
 3. **Full traceability**  every concept, behavior, and step links back to evidence and to each other
 
-The pipeline alternates between **code phases** (chunking, extraction, indexing) and **AI phases** (hypothesis, structure, behavior, variation). Human checkpoints verify framing, coverage, and quality at key stages.
+The pipeline alternates between **code phases** (chunking, extraction, indexing) and **AI phases** (hypothesis, structure, behavior, variation).
 
 **Guided extraction:** AI configures extraction parameters (weights, patterns, grammar rules); code runs evidence-signal extraction across the corpus; AI synthesizes concepts from those signals. Extraction is guided by these concepts. Evidence speaks first; concepts follow. See [Appendix B: Evidence-Signal Extraction](#appendix-b-evidence-signal-extraction) for the full design.
 
@@ -34,7 +34,7 @@ The pipeline alternates between **code phases** (chunking, extraction, indexing)
 
 ## The Artifact: `solution_model.json`
 
-From Phase 5 onward, every phase reads and writes a single structured file. The shape:
+From Phase 8 (Structure) onward, every phase reads and writes a single structured file. The shape:
 
 ```json
 {
@@ -177,40 +177,41 @@ From Phase 5 onward, every phase reads and writes a single structured file. The 
 ## Phases at a Glance
 
 1. **Normalize** — Chunk and clean raw source into uniform text segments.
-2. **Configure extraction** — AI scans corpus and proposes weights, patterns, and grammar rules for concept extraction. Output: `extraction_config.json`.
-3. **Extract Concepts** — Code runs extraction using the config; produces concept signals (term_candidates, definition_candidates, dependency_actions, co-occurrence graph, table vocabularies). Deterministic, fast.
-4. **Concept synthesis** — AI merges concept signals from step 3 into a hypothesis. Output: `hypothesis.json` + concept_guidance.
-5. **Extract evidence** — Code mines chunks for actions, decisions, states, relationships, and terms, guided by hypothesis. Output: `evidence/*.json` (six files).
-6. **Index** — Create the concept-anchored evidence index from the evidence files. Output: `evidence_index.json`.
-7. **Structure** — Build first `solution_model.json` from hypothesis + evidence index; assign properties, inheritance, steps; concepts and tree gain structure in parallel.
-8. **Behavior** — Assign operations, link behaviors to steps, group steps into scenarios.
-9. **Variation** — Split stories by subtype when mechanics differ; add failure modes
-10. **Consolidate** — Fix anti-patterns; add examples.
-11. **Assess** — Produce consistency, coverage, completeness, and type-field-vs-subtype assessment.
-12. **Finalize** — Apply assessment fixes; produce validated model.
+2. **Configure concept extraction parameters** — AI calibrates weights, patterns, and thresholds for all 12 evidence-signal techniques via 3 focused scans (structure, behavior, tuning). Output: `extraction_config.json`.
+3. **Concept Extraction** — Code runs extraction using the config; produces concept signals (term_candidates, definition_candidates, dependency_actions, co-occurrence graph, table vocabularies). Deterministic, fast.
+4. **Concept synthesis** — Code merges concept signals from step 3 into a hypothesis (concept index). Output: `hypothesis.json` with `chunk_ids` per concept.
+5. **Synthesis** — AI curates the concept list (merge/split/kill), builds hierarchy, allocates evidence. Reads source chunks via `chunk_ids`. Output: refined `hypothesis.json`.
+6. **Extract evidence** — Code mines chunks for actions, decisions, states, relationships, and terms, guided by hypothesis. Output: `evidence/*.json` (six files).
+7. **Index** — Create the concept-anchored evidence index from the evidence files. Output: `evidence_index.json`.
+8. **Structure** — Build first `solution_model.json` from hypothesis + evidence index; assign properties, inheritance, steps; concepts and tree gain structure in parallel.
+9. **Behavior** — Assign operations, link behaviors to steps, group steps into scenarios.
+10. **Variation** — Split stories by subtype when mechanics differ; add failure modes
+11. **Consolidate** — Fix anti-patterns; add examples.
+12. **Assess** — Produce consistency, coverage, completeness, and type-field-vs-subtype assessment.
+13. **Finalize** — Apply assessment fixes; produce validated model.
 
 ---
 
 ## Pipeline Table
 
-Every AI phase (5-8, 10) receives the full `solution_model.json` and updates both the domain (concepts, behaviors) and the interaction tree (stories, scenarios, steps) in the same pass. Phase 9 (Assess) produces a cross-cutting report; it does not redo scenario walkthroughs that were already enforced during build.
+Every AI phase (8–11) receives the full `solution_model.json` and updates both the domain (concepts, behaviors) and the interaction tree (stories, scenarios, steps) in the same pass. Phase 12 (Assess) produces a cross-cutting report; it does not redo scenario walkthroughs that were already enforced during build.
 
 
 | #   | Phase            | Actor    | What it does                                                                                                                                                                                         | Output                                                     | Concepts gain                                              | Interaction tree gains                                                             |
 | --- | ---------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | 1   | **Normalize**    | Code     | Chunk and clean raw source into uniform text segments.                                                                                                                                               | `context_chunks.json`                                      |                                                            |                                                                                    |
-| 2   | **Hypothesize**  | AI       | Scan chunks to identify candidate concepts, modules, mechanisms, actors, and broad epic areas.                                                                                                       | `hypothesis.json` + interaction tree skeleton (epics only) | concept_guidance (priority_concepts, hierarchy)            | epics only                                                                         |
-| 3   | **Extract**      | Code     | Mine chunks for actions, decisions, states, relationships guided by hypothesis.                                                                                                                      | `evidence/*.json` (six files)                              |                                                            |                                                                                    |
-| 4   | **Index**        | Code     | Aggregate evidence into a concept-anchored index so each concept knows its actions, states, and relationships.                                                                                       | `evidence_index.json`                                      | evidence collected into concepts                           |                                                                                    |
-| 5   | **Structure**    | AI       | Build first `solution_model.json` from hypothesis + evidence index: merge duplicates, refine modules/epics, create stories; assign properties, inheritance, steps; assign actors and pre-conditions. | `solution_model.json` v1                                   | story_refs, evidence_refs, properties, relationships, kind | stories (epics, sub-epics), steps (actors, pre-conditions), empty linked_behaviors |
-|     | **Checkpoint 1** | Human    | Verify concept framing and interaction skeleton.                                                                                                                                                     |                                                            |                                                            |                                                                                    |
-| 6   | **Behavior**     | AI       | Assign operations to concepts by decision ownership; link each behavior to the step(s) that exercise it; group steps into scenarios (e.g. hit vs miss). Each step has at least one linked behavior.  | `solution_model.json` v2                                   | operations, behavior_refs                                  | linked_behaviors, when_then, scenarios (step groupings)                            |
-|     | **Checkpoint 2** | Human    | Verify behavior ownership and step-to-behavior links.                                                                                                                                                |                                                            |                                                            |                                                                                    |
-| 7   | **Variation**    | AI       | Split stories by subtype when mechanics differ (per *Story vs. Scenario* rule); add failure modes. Subtype concepts already exist from Phase 4; Variation does not discover them.                    | `solution_model.json` v3                                   | (unchanged subtypes already exist)                         | subtype stories, failure-mode scenarios                                            |
-| 8   | **Consolidate**  | AI       | Detect anemia, over-centralization, orphans; fix anti-patterns; add examples to stories.                                                                                                             | `solution_model.json` v4                                   | examples                                                   | examples on steps                                                                  |
-|     | **Checkpoint 3** | Human    | Verify model quality and completeness.                                                                                                                                                               |                                                            |                                                            |                                                                                    |
-| 9   | **Assess**       | AI+Human | Produce model assessment: consistency, coverage, completeness, **type field vs subtype** (mechanical difference test). No late "walkthrough" verification happens incrementally in Phases 7-8.       | `assessment.json`                                          |                                                            |                                                                                    |
-| 10  | **Finalize**     | AI       | Apply assessment fixes; produce validated model with full traceability.                                                                                                                              | `solution_model.json` final                                | fixes from assessment                                      | fixes from assessment                                                              |
+| 2   | **Configure concept extraction parameters** | AI (3 scans) | Calibrate weights, patterns, and thresholds for all 12 evidence-signal techniques. 3 focused scans: structure, behavior, tuning. 30% stratified corpus sample. | `extraction_config.json` | | |
+| 3   | **Concept extraction** | Code     | Run extraction using config; produce concept signals (tf_weights, dependency_verbs, definition_patterns, etc.).                                                                                      | `concept_signals/*.json`                                   |                                                            |                                                                                    |
+| 4   | **Concept synthesis** | Code     | Merge signals into hypothesis (concept index) with chunk_ids per concept.                                                                                                                          | `hypothesis.json`                                          | concept index with chunk_ids                                |                                                                                    |
+| 5   | **AI concept synthesis** | AI       | Curate concepts (merge/split/kill), build hierarchy, allocate evidence. Reads source chunks via chunk_ids.                                                                                        | `hypothesis.json` (refined)                                | concept_hierarchy, concept_guidance                         |                                                                                    |
+| 6   | **Extract evidence** | Code     | Mine chunks for actions, decisions, states, relationships guided by hypothesis.                                                                                                                      | `evidence/*.json` (six files)                              |                                                            |                                                                                    |
+| 7   | **Index**        | Code     | Aggregate evidence into a concept-anchored index so each concept knows its actions, states, and relationships.                                                                                       | `evidence_index.json`                                      | evidence collected into concepts                           |                                                                                    |
+| 8   | **Structure**    | AI       | Build first `solution_model.json` from hypothesis + evidence index: merge duplicates, refine modules/epics, create stories; assign properties, inheritance, steps; assign actors and pre-conditions. | `solution_model.json` v1                                   | story_refs, evidence_refs, properties, relationships, kind | stories (epics, sub-epics), steps (actors, pre-conditions), empty linked_behaviors |
+| 9   | **Behavior**     | AI       | Assign operations to concepts by decision ownership; link each behavior to the step(s) that exercise it; group steps into scenarios (e.g. hit vs miss). Each step has at least one linked behavior.  | `solution_model.json` v2                                   | operations, behavior_refs                                  | linked_behaviors, when_then, scenarios (step groupings)                            |
+| 10  | **Variation**    | AI       | Split stories by subtype when mechanics differ (per *Story vs. Scenario* rule); add failure modes. Subtype concepts already exist from Phase 5; Variation does not discover them.                   | `solution_model.json` v3                                   | (unchanged subtypes already exist)                         | subtype stories, failure-mode scenarios                                            |
+| 11  | **Consolidate**  | AI       | Detect anemia, over-centralization, orphans; fix anti-patterns; add examples to stories.                                                                                                             | `solution_model.json` v4                                   | examples                                                   | examples on steps                                                                  |
+| 12  | **Assess**       | AI+Human | Produce model assessment: consistency, coverage, completeness, **type field vs subtype** (mechanical difference test). No late "walkthrough" verification happens incrementally in Phases 9–11.       | `assessment.json`                                          |                                                            |                                                                                    |
+| 13  | **Finalize**     | AI       | Apply assessment fixes; produce validated model with full traceability.                                                                                                                              | `solution_model.json` final                                | fixes from assessment                                      | fixes from assessment                                                              |
 
 
 ---
@@ -241,37 +242,50 @@ Each phase reads the previous output, enriches it, and writes the next. Outputs 
 
 **How it works:** Code processes the source (PDF, markdown, HTML, etc.), applies chunking rules (section boundaries, paragraph breaks), and normalizes formatting. Output is `context_chunks.json`  a structured list of text segments with metadata (source, section, position).
 
-### Phase 2  Configure extraction
+### Phase 2  Configure concept extraction parameters
 
-**What it does:** AI scans the corpus and proposes weights, patterns, and grammar rules for concept extraction. The extractor is configured, not run here.
+**What it does:** AI calibrates the extraction instrument. Three focused scans read 30% of the corpus (stratified: beginning, middle, end) and propose the best weights, patterns, and thresholds for each of the 12 evidence-signal techniques.
 
-**Output:** `extraction_config.json` (weights, patterns, grammar rules).
+**Output:** `extraction_config.json` (all 12 signal configurations).
 
-**How it works:** AI analyzes corpus structure (rulebook vs API spec vs narrative) and outputs configuration that code will apply deterministically. Reproducible: same config yields same extraction.
+**How it works:** This is instrument calibration, not concept extraction. The AI observes how the corpus is structured, what definition syntax it uses, what verbs express domain relationships, who the actors are — then proposes parameters so Phase 3's code extraction produces the strongest signals. Three scans:
+- **Scan A (Structure):** TF weights, definition patterns, table mining, enumeration patterns
+- **Scan B (Behavior):** Dependency verbs, noun phrases, contrast patterns, actor detection, verb interaction
+- **Scan C (Tuning):** Co-occurrence, topic modeling, centrality, noise filters
+
+Same config yields same extraction. When extraction is wrong, re-calibrate config — not prompts.
 
 See [Appendix B: Evidence-Signal Extraction](#appendix-b-evidence-signal-extraction) for the full design.
 
-### Phase 3  Extract concepts
+### Phase 3  Concept extraction
 
 **What it does:** Code runs extraction using the config from Phase 2. Produces concept signals: term_candidates, definition_candidates, dependency_actions, co-occurrence graph, table vocabularies.
 
-**Output:** Concept signal files (deterministic, fast).
+**Output:** `concept_signals/concept_signals.json` + `concept_signals/concept_signals.md` (deterministic, fast). Each JSON output has a markdown render for human review and downstream AI phases.
 
-**How it works:** Code applies the configured weights and patterns across the corpus. No AI guessing; the text speaks first. High-weighted terms and definition patterns surface before any hypothesis exists.
+**How it works:** Code applies the configured weights and patterns across the corpus. No AI guessing; the text speaks first. High-weighted terms and definition patterns surface before any hypothesis exists. After writing JSON, a markdown version is emitted for each signal section.
 
 See [Appendix B: Evidence-Signal Extraction](#appendix-b-evidence-signal-extraction) for the twelve evidence-signal techniques.
 
 ### Phase 4  Concept synthesis
 
-**What it does:** AI merges concept signals from Phase 3 into a hypothesis. Produces the initial domain hypothesis and interaction tree skeleton (epics only; no stories yet).
+**What it does:** Code merges concept signals from Phase 3 into a hypothesis (concept index). Produces `hypothesis.json` with concepts, registries, concept_guidance, and **chunk_ids** per concept.
 
-**Output:** `hypothesis.json` + concept_guidance (`priority_concepts`, `concept_aliases`, `concept_hierarchy`, `priority_mechanisms`, `priority_actors`, 
+**Output:** `hypothesis.json` + `hypothesis.md` (markdown render for human review). Each concept has `chunk_ids` — the list of chunk IDs that touch it (from tf_weights, dependency_verbs, definition_patterns, table_mining, enumeration_patterns, contrast_patterns, verb_interaction).
 
-**How it works:** AI consolidates the evidence signals into named concepts and hierarchy. Not guessing from chunks; synthesizing from what the extraction surfaced. Subtype discovery happens here; Phase 9 (Variation) works with concepts that already exist.
+**How it works:** Code aggregates evidence signals into named concepts. Deterministic, fast. No AI; the index lists all chunks per concept for Phase 5.
 
-### Phase 5  Extract evidence
+### Phase 5  Synthesis
 
-**What it does:** Mines chunks for actions, decisions, states, relationships, and terms, guided by the hypothesis from Phase 4.
+**What it does:** AI curates the concept list (merge/split/kill), builds hierarchy, allocates evidence. Two passes: (1) curate concepts using source chunks via `chunk_ids`; (2) allocate evidence and update concept_guidance.
+
+**Output:** Refined `hypothesis.json` with `concept_hierarchy`, updated `concept_guidance`, and evidence allocation.
+
+**How it works:** AI reads source chunks (via `chunk_ids`) for semantic understanding. Not guessing from chunks alone; using the index to focus on relevant passages. Subtype discovery happens here; Phase 10 (Variation) works with concepts that already exist.
+
+### Phase 6  Extract evidence
+
+**What it does:** Mines chunks for actions, decisions, states, relationships, and terms, guided by the hypothesis from Phase 5.
 
 **Output:** Six flat files in `evidence/`: `actions.json`, `decisions.json`, `states.json`, `relationships.json`, `terms.json`.
 
@@ -289,7 +303,7 @@ See [Appendix B: Evidence-Signal Extraction](#appendix-b-evidence-signal-extract
 
 **Alignment with CRC / OO design:** CRC cards (Beck & Cunningham, OOPSLA'89) use **Class**, **Responsibility** (verb phrases), and **Collaborator**. The buckets map: actions â†’ responsibilities; relationships â†’ collaborators; states â†’ entity attributes. Terminology extraction feeds concept naming. Decisions feed when/how behaviors apply.
 
-### Phase 6  Index
+### Phase 7  Index
 
 **What it does:** Creates the concept-anchored evidence index from the six evidence files so each concept knows its actions, states, and relationships. This is a core part of the pipeline  it reorganizes flat evidence around concepts so downstream AI phases can look up "what does Concept X do?" in one place.
 
@@ -467,9 +481,9 @@ See [Appendix B: Evidence-Signal Extraction](#appendix-b-evidence-signal-extract
 }
 ```
 
-Same data, different organization. Registries hold the actual evidence sentences (from extraction `raw`), keyed by ID. The index is keyed by concepts from the hierarchy (Phase 2); subtypes (AreaEffectAttack, PerceptionAttack; Attack Effect, Damage Effect, etc.) get their own entries when rule text distinguishes them.
+Same data, different organization. Registries hold the actual evidence sentences (from extraction `raw`), keyed by ID. The index is keyed by concepts from the hierarchy (Phase 5); subtypes (AreaEffectAttack, PerceptionAttack; Attack Effect, Damage Effect, etc.) get their own entries when rule text distinguishes them.
 
-**Human-readable rendered view:** The index is optimized for AI lookup (IDs only). For human review at Checkpoint 2, render an expanded view that inlines the relevant details for each ID:
+**Human-readable rendered view:** The index is optimized for AI lookup (IDs only). For human review, render an expanded view that inlines the relevant details for each ID:
 
 ```markdown
 ## Character
@@ -559,7 +573,7 @@ Same data, different organization. Registries hold the actual evidence sentences
 *(inherits from Effect; sibling to Attack Effect; senses, concealment, invisibility)*
 ```
 
-### Phase 7  Structure
+### Phase 8  Structure
 
 **What it does:** Builds first `solution_model.json` from hypothesis + evidence index: merges duplicates, refines modules/epics, creates stories; assigns properties, inheritance, steps; assigns actors and pre-conditions. Concepts and interaction tree gain structure in parallel.
 
@@ -640,7 +654,7 @@ Same data, different organization. Registries hold the actual evidence sentences
 3. Attack misses (Character â†’ ?)
 ```
 
-### Phase 8  Behavior
+### Phase 9  Behavior
 
 **What it does:** Assigns operations to concepts by decision ownership; links each behavior to the step(s) that exercise it; groups steps into scenarios (e.g. hit vs miss). Each step has at least one linked behavior.
 
@@ -731,7 +745,7 @@ Same data, different organization. Registries hold the actual evidence sentences
 - Attack misses: step_activate_attack, step_attack_misses
 ```
 
-### Phase 9  Variation
+### Phase 10  Variation
 
 **What it does:** Splits stories by subtype when mechanics differ; adds failure-mode scenarios. Subtype concepts already exist from Phase 4; Phase 9 does not discover them.
 
@@ -852,7 +866,7 @@ Triggering-Actor: Player | Responding-Actor: Gamemaster
 ### Story: Apply Afflicting Effect
 ```
 
-### Phase 9  Consolidate
+### Phase 11  Consolidate
 
 **What it does:** Detects anemia, over-centralization, orphans; fixes anti-patterns; adds examples to stories.
 
@@ -885,7 +899,7 @@ Triggering-Actor: Player | Responding-Actor: Gamemaster
    Examples: [Punch hits Goblin, Damage Effect applies 5 damage]; [Weakening Touch hits Goblin, Weakening Effect reduces Toughness]; [Paralyzing gaze hits target, Afflicting Effect imposes Vulnerable]
 ```
 
-### Phase 11  Assess
+### Phase 12  Assess
 
 **What it does:** Produces a cross-cutting model assessment. **It does not redo scenario walkthroughs.**
 
@@ -932,7 +946,7 @@ Verification of stepâ†”behaviorâ†”concept consistency happens incremen
 }
 ```
 
-### Phase 12  Finalize
+### Phase 13  Finalize
 
 **What it does:** Applies assessment fixes; produces validated model with full traceability.
 
@@ -1063,7 +1077,7 @@ The design artifact includes fields the overview example omits:
 
 ### Phase 4 (Index) is new
 
-Today `evidence_graph.py` builds a flat edge list:
+Earlier evidence extraction prototypes built a flat edge list:
 
 ```json
 {"from": "Effect", "relation": "performs", "to": "Checks", "action_id": "act_0003"}
@@ -1116,7 +1130,7 @@ Same data, different organization. Registries hold the actual evidence sentences
 
 **Alignment with CRC / OO design.** CRC cards (Beck & Cunningham, OOPSLA'89) use **Class**, **Responsibility** (verb phrases), and **Collaborator**. Our buckets map: actions â†’ responsibilities; relationships â†’ collaborators; states â†’ entity attributes. Terminology extraction feeds concept naming. Decisions feed when/how behaviors apply. See References above.
 
-**Human-readable rendered view.** The index is optimized for AI lookup (IDs only). For human review at Checkpoint 2, render an expanded view that inlines the relevant details for each ID. Example:
+**Human-readable rendered view.** The index is optimized for AI lookup (IDs only). For human review, render an expanded view that inlines the relevant details for each ID. Example:
 
 ```markdown
 ## Effect
@@ -1149,4 +1163,4 @@ Today, Phases 6â€“12 produce markdown only. Every subsequent phase re-parse
 
 ### Fewer phases (11 vs 12)
 
-The current split between `concept_model` and `structural_model` can merge into one "Structure" phase. With concept-anchored evidence from Phase 4, the AI doesn't need a separate pass to "discover" relationships  they're already indexed.
+The old split between separate concept-modeling and structural-modeling passes can merge into one `Structure` phase. With concept-anchored evidence from Phase 4, the AI doesn't need a separate pass to "discover" relationships because they are already indexed.
