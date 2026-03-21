@@ -1,0 +1,19 @@
+{
+  "schema_version": "v1",
+  "generated_at": "2026-03-21T06:50:31.076101+00:00",
+  "context_root": "test/mm3/context",
+  "artifacts": {
+    "context_index.json": {
+      "sha256": "625ea01626ec7d9659a2683f0a2509c12fea5327b3e0b16ae88c8ea04db522a5",
+      "bytes": 1333591
+    },
+    "modeling_kind_sidecar.json": {
+      "sha256": "1f6f1abffced0982a2a2cb353116c283fd917c819adf88a75274ae6974531fad",
+      "bytes": 141346
+    },
+    "phase0_audit_metrics.json": {
+      "sha256": "4549182d5c17ddceba1c546d2fe54239353514ced6318361291ecd4489eba73c",
+      "bytes": 1632
+    }
+  }
+}
