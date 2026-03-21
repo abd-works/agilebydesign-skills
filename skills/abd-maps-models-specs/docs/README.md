@@ -15,3 +15,4 @@ Put **durable** reference material here: pipeline analysis, architecture rationa
 | [`orchestrator.md`](orchestrator.md) | **Autonomous loop** — planner / runner / critic; public scores = corpus + rules; optional gold map → `private_gap_analysis` (critic-only, not planner). |
 | [`reference/README.md`](reference/README.md) | **Gold map / ontology** — human + critic-private gap analysis; not builder input. |
 | [`phase2_terms_and_mechanisms.md`](phase2_terms_and_mechanisms.md) | **Phase 2** — terms layer, mechanisms, candidate queue; promotion rule vs `concepts[]`. |
+| [`phase3_behavioral_story_map.md`](phase3_behavioral_story_map.md) | **Phase 3** — behavioral story map (anchors, term refs, evidence); validator script. |

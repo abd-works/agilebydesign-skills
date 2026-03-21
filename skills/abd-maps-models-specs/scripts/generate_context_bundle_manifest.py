@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CTX = ROOT / "test" / "mm3" / "context"
 PHASE2 = ROOT / "test" / "mm3" / "phase2"
+PHASE3 = ROOT / "test" / "mm3" / "phase3"
 OUT = CTX / "context_bundle_manifest.json"
 
 
@@ -50,12 +51,21 @@ def main() -> None:
                 "bytes": p.stat().st_size,
             }
 
+    phase3_artifacts: dict[str, object] = {}
+    p3 = PHASE3 / "mm3_story_map.json"
+    if p3.is_file():
+        phase3_artifacts["test/mm3/phase3/mm3_story_map.json"] = {
+            "sha256": sha256_file(p3),
+            "bytes": p3.stat().st_size,
+        }
+
     payload = {
         "schema_version": "v1",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "context_root": str(CTX.relative_to(ROOT)).replace("\\", "/"),
         "artifacts": artifacts,
         "phase2": phase2_artifacts if phase2_artifacts else None,
+        "phase3": phase3_artifacts if phase3_artifacts else None,
     }
     OUT.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     print("Wrote", OUT)

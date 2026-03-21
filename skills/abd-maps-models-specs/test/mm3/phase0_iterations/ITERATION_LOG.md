@@ -9,6 +9,7 @@ python scripts/phase0_audit.py
 python scripts/apply_modeling_kind_heuristics.py
 python scripts/validate_modeling_kind_sidecar.py --golden
 python scripts/build_phase2_artifacts.py
+python scripts/validate_phase3_story_map.py
 python scripts/generate_context_bundle_manifest.py
 python scripts/sample_domain_rule_review.py
 python scripts/orchestrator_loop.py --min-iterations 10 --max-iterations 20
@@ -112,6 +113,15 @@ Per [`plan/PROCESS-PLAN.md`](../../../plan/PROCESS-PLAN.md) **Execution order** 
 - **Promotion rule:** terms/mechanisms do not mint `concepts[]`; candidates require **Phase 4** gate.
 
 **Next (process):** **Phase 3** — behavioral story map keyed to terms; or extend Phase 2 with LLM labels for noisy chunks.
+
+## Iteration 13 — Phase 3 behavioral story map
+
+- **Built:** `test/mm3/phase3/mm3_story_map.json` — 4 epics (bounded contexts), 9 stories with **anchor** (`read` / `write` / `both`), `term_refs` into Phase 2, evidence chunks where cited.
+- **Built:** `scripts/validate_phase3_story_map.py` — term_id and chunk file checks.
+- **Changed:** `scripts/generate_context_bundle_manifest.py` — optional **`phase3`** hash for `mm3_story_map.json`.
+- **Docs:** `docs/phase3_behavioral_story_map.md`; `plan/PROCESS-PLAN.md` execution §6–7.
+
+**Next (process):** **Phase 4** — sparse `concepts[]` with reject gate; align promoted types to stories and candidate queue.
 
 ## Iteration 9 — OO analysis & design foundation (map/model/spec)
 
