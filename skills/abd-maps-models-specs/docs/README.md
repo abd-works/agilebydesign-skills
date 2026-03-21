@@ -2,6 +2,8 @@
 
 Put **durable** reference material here: pipeline analysis, architecture rationale, operator guides—content that should remain useful after the v2 build is “done.”
 
+**Git version branches** (milestones): see [`VERSION-BRANCHES.md`](VERSION-BRANCHES.md) (`abd-maps-models-specs/v1-*`, `v2-*`, …).
+
 **Contrast:** `plan/` holds **working** plans you may **discard** after milestones; `docs/` is what you expect the next maintainer (or you in six months) to read.
 
 ## Contents
