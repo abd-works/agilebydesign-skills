@@ -174,6 +174,8 @@ This gate is where a **deliberate** rebuild of context happens if the audit says
 2. If **rebuild**: implement **Phase 1** from `HeroesHandbook.md` + an explicit **chunking spec** (rules **written first**, then scripts).
 3. If **keep**: add **sidecar** or **migrate** `context_index.json` into the **canonical** schema with `modeling_kind` filled (LLM batch or rules + spot-check).
 4. Only then: **Phase 2** onward in order.
+5. **Phase 2**: run `python scripts/build_phase2_artifacts.py` — emits `test/mm3/phase2/` (terms, mechanisms, candidate queue). See [`docs/phase2_terms_and_mechanisms.md`](../docs/phase2_terms_and_mechanisms.md). Re-run `generate_context_bundle_manifest.py` to record phase2 hashes.
+6. **Phase 3–8**: story map → types → variants → deepen → integrate → validate/render (per sections above).
 
 ---
 

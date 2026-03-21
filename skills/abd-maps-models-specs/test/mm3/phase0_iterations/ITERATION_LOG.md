@@ -8,6 +8,7 @@
 python scripts/phase0_audit.py
 python scripts/apply_modeling_kind_heuristics.py
 python scripts/validate_modeling_kind_sidecar.py --golden
+python scripts/build_phase2_artifacts.py
 python scripts/generate_context_bundle_manifest.py
 python scripts/sample_domain_rule_review.py
 python scripts/orchestrator_loop.py --min-iterations 10 --max-iterations 20
@@ -102,6 +103,15 @@ Per [`plan/PROCESS-PLAN.md`](../../../plan/PROCESS-PLAN.md) **Execution order** 
 | Orchestrator | `orchestrator_loop.py` `--stop-on-score 0.96` `--critic-model` … `--run-prefix process-20260322-am` | **overall_score 0.967**, `pipeline_ok` true (iteration 1 stop) |
 
 **Next (process):** Phase 1 **merge preconditions** from iteration 6 — optional **JSON Schema** for forward-index rows with `reason` populated; or proceed to **Phase 2** (terms & mechanisms queue) once you want narrative artifacts beyond the MM3 critic + `map-model-spec.md`.
+
+## Iteration 12 — Phase 2 artifacts (terms, mechanisms, candidate queue)
+
+- **Built:** `scripts/build_phase2_artifacts.py` → `test/mm3/phase2/mm3_terms_layer.json` (178 terms), `mm3_mechanisms.json` (8 mechanisms by `section_path`), `mm3_candidate_queue.json` (80 capped `domain_rule_candidate` rows), `phase2_build_summary.json`.
+- **Changed:** `scripts/generate_context_bundle_manifest.py` — optional **`phase2`** block with SHA-256 of phase2 JSON files.
+- **Docs:** `docs/phase2_terms_and_mechanisms.md`; `plan/PROCESS-PLAN.md` execution order §5–6; `docs/README.md` row.
+- **Promotion rule:** terms/mechanisms do not mint `concepts[]`; candidates require **Phase 4** gate.
+
+**Next (process):** **Phase 3** — behavioral story map keyed to terms; or extend Phase 2 with LLM labels for noisy chunks.
 
 ## Iteration 9 — OO analysis & design foundation (map/model/spec)
 

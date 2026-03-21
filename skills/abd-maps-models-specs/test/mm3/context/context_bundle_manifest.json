@@ -1,6 +1,6 @@
 {
   "schema_version": "v1",
-  "generated_at": "2026-03-21T07:31:47.465680+00:00",
+  "generated_at": "2026-03-21T07:33:32.863653+00:00",
   "context_root": "test/mm3/context",
   "artifacts": {
     "context_index.json": {
@@ -12,8 +12,26 @@
       "bytes": 141346
     },
     "phase0_audit_metrics.json": {
-      "sha256": "13d5e77cfc20e57cb01d710e03998bf0ec1adec8bcc5b3e0a7b8fc3bb5b88a08",
+      "sha256": "a6e1e797c952d12f9768c59853c5e412faaff619c88190b3a40a8b7f734d13f7",
       "bytes": 1632
+    }
+  },
+  "phase2": {
+    "test/mm3/phase2/mm3_terms_layer.json": {
+      "sha256": "1b6c34240f19c309402ce5338616b5f4b155adf354dceaa3041cbd754873b8fc",
+      "bytes": 72263
+    },
+    "test/mm3/phase2/mm3_mechanisms.json": {
+      "sha256": "f11374fe9ac139ba6396d1ec3b8202a970a9e7464eb8c3190c5b3e08ab48ccba",
+      "bytes": 3619
+    },
+    "test/mm3/phase2/mm3_candidate_queue.json": {
+      "sha256": "c6766bfb8d86d77dfbc5d4f8cdf01cbc6209d27868539bd5252063234645f370",
+      "bytes": 38024
+    },
+    "test/mm3/phase2/phase2_build_summary.json": {
+      "sha256": "efb4aef9e9335ca146db62da5b300112ba2e86f360d42bb5c332a521825f0d9f",
+      "bytes": 327
     }
   }
 }

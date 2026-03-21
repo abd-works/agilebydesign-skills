@@ -9,6 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CTX = ROOT / "test" / "mm3" / "context"
+PHASE2 = ROOT / "test" / "mm3" / "phase2"
 OUT = CTX / "context_bundle_manifest.json"
 
 
@@ -34,11 +35,27 @@ def main() -> None:
         else:
             artifacts[p.name] = {"missing": True}
 
+    phase2_artifacts: dict[str, object] = {}
+    for name in (
+        "mm3_terms_layer.json",
+        "mm3_mechanisms.json",
+        "mm3_candidate_queue.json",
+        "phase2_build_summary.json",
+    ):
+        p = PHASE2 / name
+        if p.is_file():
+            rel = f"test/mm3/phase2/{name}"
+            phase2_artifacts[rel] = {
+                "sha256": sha256_file(p),
+                "bytes": p.stat().st_size,
+            }
+
     payload = {
         "schema_version": "v1",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "context_root": str(CTX.relative_to(ROOT)).replace("\\", "/"),
         "artifacts": artifacts,
+        "phase2": phase2_artifacts if phase2_artifacts else None,
     }
     OUT.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     print("Wrote", OUT)
