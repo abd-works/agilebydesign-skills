@@ -12,4 +12,5 @@ Put **durable** reference material here: pipeline analysis, architecture rationa
 | -------- | ------- |
 | [`why-story-mapping-first.md`](why-story-mapping-first.md) | **Why** story mapping (behavior) comes before sparse domain types—user context and AI steer; complements Phase 3 in `plan/PROCESS-PLAN.md`. |
 | [`modeling_kind_sidecar_v1.md`](modeling_kind_sidecar_v1.md) | **`modeling_kind` sidecar** (v1 payload, **v2** body TOC heuristics) — promotion gate helper; golden regression + JSON Schema under `docs/schemas/`. |
-| [`orchestrator.md`](orchestrator.md) | **Autonomous loop** — planner / runner / MM3 domain critic; `scripts/orchestrator_loop.py` (10–20 runs, optional `ORCHESTRATOR_AGENT_URL`). |
+| [`orchestrator.md`](orchestrator.md) | **Autonomous loop** — planner / runner / critic; public scores = corpus + rules; optional gold map → `private_gap_analysis` (critic-only, not planner). |
+| [`reference/README.md`](reference/README.md) | **Gold map / ontology** — human + critic-private gap analysis; not builder input. |

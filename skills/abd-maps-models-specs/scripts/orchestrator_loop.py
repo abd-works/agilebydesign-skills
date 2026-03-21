@@ -28,11 +28,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
-ORCH = ROOT / "test" / "mm3" / "orchestration"
-DEFAULT_MODEL_GLOB = [
-    ROOT / "test" / "mm3" / "maps-models-specs" / "map-model-spec.md",
-    ROOT / "test" / "mm3" / "maps-models-specs" / "map-model-spec.json",
-]
+ORCH_BASE = ROOT / "test" / "mm3" / "orchestration"
+# Builder candidate paths — optional; never the gold map. Empty = corpus-only public scores.
+DEFAULT_CRITIC_MODEL_GLOB: list[Path] = []
+DEFAULT_GOLD_MAP = ROOT / "docs" / "reference" / "mm3-map-model-solution-reference.md"
+
+
+def _public_critic_view(critic: dict) -> dict:
+    """Strip critic-only fields before planner, API, or builder-facing steps."""
+    return {k: v for k, v in critic.items() if k != "private_gap_analysis"}
 
 
 def _run(cmd: list[str], cwd: Path) -> tuple[int, str]:
@@ -74,17 +78,18 @@ def _remote_planner(iteration: int, critic: dict, runner_log: list[dict]) -> str
 
 
 def deterministic_plan(iteration: int, critic: dict, pipeline_ok: bool) -> str:
+    """Planner must not receive gold-map or private_gap_analysis (pass *public* critic only)."""
     score = critic.get("overall_score", 0)
     lines = [
         f"## Plan — iteration {iteration}",
         f"- **Time:** {datetime.now(timezone.utc).isoformat()}",
         f"- **Pipeline OK:** {pipeline_ok}",
-        f"- **Critic overall_score:** {score}",
+        f"- **Critic overall_score:** {score} (corpus / first-principles only)",
         "",
         "### Next actions",
         "1. Keep runner green: `phase0_audit` → `apply_modeling_kind_heuristics` → `validate` (--golden) → `generate_context_bundle_manifest`.",
-        "2. Add or extend `test/mm3/maps-models-specs/map-model-spec.md` (or `.json`) so **checks / traits / powers / effects** separation can be scored against `rules/mm3_domain_critic.json`.",
-        "3. Align promoted types with `test/mm3/maps-models-specs/mm3_target_ontology.json` (reference, not TOC).",
+        "2. Improve evidence and sidecars from the **handbook corpus**; do **not** use `docs/reference/` gold map as an input to the runner.",
+        "3. **Evaluator** scores `rules/mm3_domain_critic.json` vs corpus; optional `--gold-map` on critic is critic-only (private gap notes never appear here).",
         "",
         "### Critic recommendations",
     ]
@@ -114,16 +119,24 @@ def run_pipeline() -> tuple[bool, list[dict]]:
     return ok, log
 
 
-def critic_command(model_paths: list[Path], pipeline_ok: bool, out_json: Path) -> tuple[int, dict]:
+def critic_command(
+    candidate_paths: list[Path],
+    gold_map: Path,
+    pipeline_ok: bool,
+    out_json: Path,
+) -> tuple[int, dict]:
+    """Invoke critic; full JSON may include private_gap_analysis (gold vs candidate)."""
     cmd = [
         sys.executable,
         str(SCRIPTS / "critic_mm3_domain.py"),
         "--json-out",
         str(out_json),
     ]
+    if gold_map.is_file():
+        cmd.extend(["--gold-map", str(gold_map)])
     if pipeline_ok:
         cmd.append("--pipeline-ok")
-    for mp in model_paths:
+    for mp in candidate_paths:
         if mp.is_file():
             cmd.extend(["--model", str(mp)])
     code, _ = _run(cmd, ROOT)
@@ -139,11 +152,34 @@ def main() -> int:
     ap.add_argument("--max-iterations", type=int, default=20)
     ap.add_argument("--stop-on-score", type=float, default=0.92, help="Stop early if critic score >= this and pipeline OK")
     ap.add_argument("--no-early-stop", action="store_true", help="Always run max-iterations")
+    ap.add_argument(
+        "--run-prefix",
+        default="",
+        metavar="NAME",
+        help="Optional subfolder under test/mm3/orchestration/ for this run (e.g. run-03) so parallel runs do not overwrite logs",
+    )
+    ap.add_argument(
+        "--gold-map",
+        type=Path,
+        default=None,
+        metavar="PATH",
+        help="Reference map for critic private gap analysis only (default: docs/reference/mm3-map-model-solution-reference.md). Does not affect public score.",
+    )
+    ap.add_argument(
+        "--critic-model",
+        action="append",
+        default=[],
+        metavar="PATH",
+        help="Optional builder candidate file(s) for private gap vs gold (repeatable). Not used for overall_score.",
+    )
     args = ap.parse_args()
 
     if args.min_iterations < 1 or args.max_iterations < args.min_iterations:
         print("Invalid iteration range", file=sys.stderr)
         return 2
+
+    rp = (args.run_prefix or "").strip().replace("..", "_")
+    ORCH = ORCH_BASE / rp if rp else ORCH_BASE
 
     ORCH.mkdir(parents=True, exist_ok=True)
     plans = ORCH / "plans"
@@ -156,10 +192,15 @@ def main() -> int:
     state_path = ORCH / "state.json"
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
-    model_paths: list[Path] = []
-    for p in DEFAULT_MODEL_GLOB:
+    gold_map = args.gold_map or DEFAULT_GOLD_MAP
+    candidate_paths: list[Path] = []
+    for p in DEFAULT_CRITIC_MODEL_GLOB:
         if p.is_file():
-            model_paths.append(p)
+            candidate_paths.append(p)
+    for p in args.critic_model:
+        pp = Path(p)
+        if pp.is_file():
+            candidate_paths.append(pp)
 
     summary: list[dict] = []
     stop_reason: str | None = None
@@ -172,10 +213,11 @@ def main() -> int:
         )
 
         critic_json = critic_dir / f"critic_{it:03d}.json"
-        ccode, critic = critic_command(model_paths, pipeline_ok, critic_json)
+        ccode, critic = critic_command(candidate_paths, gold_map, pipeline_ok, critic_json)
 
-        prefix = _remote_planner(it, critic, runner_log)
-        plan_body = deterministic_plan(it, critic, pipeline_ok)
+        critic_public = _public_critic_view(critic)
+        prefix = _remote_planner(it, critic_public, runner_log)
+        plan_body = deterministic_plan(it, critic_public, pipeline_ok)
         if prefix:
             plan_body = prefix + "\n" + plan_body
         (plans / f"plan_{it:03d}.md").write_text(plan_body, encoding="utf-8")
@@ -184,12 +226,12 @@ def main() -> int:
             "iteration": it,
             "pipeline_ok": pipeline_ok,
             "critic_exit": ccode,
-            "overall_score": critic.get("overall_score"),
+            "overall_score": critic_public.get("overall_score"),
             "critic_json": str(critic_json),
         }
         summary.append(row)
 
-        score = float(critic.get("overall_score") or 0)
+        score = float(critic_public.get("overall_score") or 0)
         if (
             not args.no_early_stop
             and it >= args.min_iterations

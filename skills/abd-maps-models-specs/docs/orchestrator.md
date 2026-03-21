@@ -2,11 +2,11 @@
 
 ## Roles
 
-| Role | Script responsibility | What it does |
+| Role | Script responsibility | What it sees |
 | ---- | ---------------------- | ------------ |
-| **1 — Planner (builder)** | `orchestrator_loop.py` | Writes `test/mm3/orchestration/plans/plan_NNN.md` — next steps from **deterministic** templates, or from your HTTP API if configured. |
-| **2 — Runner** | same | Runs `phase0_audit.py` → `apply_modeling_kind_heuristics.py` → `validate_modeling_kind_sidecar.py --golden` → `generate_context_bundle_manifest.py`. Logs under `orchestration/runner/`. |
-| **3 — Critic (evaluator)** | `critic_mm3_domain.py` | Scores pipeline health + **optional** `map-model-spec` text against `rules/mm3_domain_critic.json` and `mm3_target_ontology.json`. |
+| **1 — Planner** | `orchestrator_loop.py` | Writes `plans/plan_NNN.md` from **deterministic** templates or `ORCHESTRATOR_AGENT_URL`. Receives **public** critic output only (no `private_gap_analysis`). |
+| **2 — Runner (builder)** | same | `phase0_audit` → `apply_modeling_kind_heuristics` → `validate` (--golden) → `generate_context_bundle_manifest`. **Does not** read `docs/reference/*` gold map. |
+| **3 — Critic (evaluator)** | `critic_mm3_domain.py` | **Public score:** `rules/mm3_domain_critic.json` invariants vs **HeroesHandbook.md** (corpus / first principles). **Optional:** `--gold-map` + `--model` (candidate) add **`private_gap_analysis`** in the JSON for humans — **never** fed to planner or builder. |
 
 ## One-command loop
 
@@ -15,47 +15,30 @@ cd skills/abd-maps-models-specs
 python scripts/orchestrator_loop.py --min-iterations 10 --max-iterations 20 --stop-on-score 0.92
 ```
 
-- Runs **at least** `--min-iterations` (default 10), **at most** `--max-iterations` (default 20).
-- Stops early when **critic `overall_score` ≥ `--stop-on-score`** and the pipeline is green (unless `--no-early-stop`).
+- **`--gold-map PATH`** — default: `docs/reference/mm3-map-model-solution-reference.md` if present. Used only for **private** gap notes vs candidate; **does not change** `overall_score`.
+- **`--critic-model PATH`** — optional builder **candidate** map (repeatable). Used only for private gap analysis, not for scoring.
 
-## Optional HTTP API (you are the orchestrator host)
+**Horizon:** “10–20” means **iterations**, not calendar time.
 
-Set **`ORCHESTRATOR_AGENT_URL`** to a server you control. Each iteration POSTs JSON:
+## Evaluator contract
 
-```json
-{
-  "role": "planner",
-  "iteration": 3,
-  "critic": { "overall_score": 0.71, "invariants": [], "recommendations": [] },
-  "runner_log": [{ "cmd": ["python", "scripts/phase0_audit.py"], "exit": 0, "tail": "..." }]
-}
-```
+1. **`overall_score`** = corpus alignment to invariants (**no** keyword-matching against the gold map).
+2. **Gold map** may be read **inside** the critic process to explain **why** a candidate diverges (`private_gap_analysis`). That block is **not** copied into `recommendations` and is **stripped** before deterministic plans and before POSTing to `ORCHESTRATOR_AGENT_URL`.
+3. **Remote planner** receives the same **public** critic view as the local planner.
 
-Return:
+## Optional HTTP API
 
-```json
-{ "plan_markdown": "## Custom plan\n..." }
-```
-
-If the request fails or the variable is unset, the loop prepends a short failure note and uses the **built-in deterministic plan** (never blocks).
-
-## Domain heuristics (critic “cheat sheet”)
-
-Edit **`rules/mm3_domain_critic.json`** — checks/traits, powers vs effects, damage/affliction, modifiers. The critic uses **keyword presence** in:
-
-- `test/mm3/maps-models-specs/map-model-spec.md` (and optional `.json`), and  
-- `test/mm3/docs/HeroesHandbook.md` (fallback: `context_index.json`) for corpus coverage.
+Set **`ORCHESTRATOR_AGENT_URL`**. Payload includes **sanitized** critic JSON (no `private_gap_analysis`).
 
 ## Artifacts
 
 | Path | Purpose |
 | ---- | ------- |
-| `test/mm3/orchestration/state.json` | Last iteration + stop reason |
-| `test/mm3/orchestration/run_summary.json` | Per-iteration scores |
-| `test/mm3/orchestration/plans/plan_NNN.md` | Planner output |
-| `test/mm3/orchestration/critic/critic_NNN.json` | Full critic payload |
+| `test/mm3/orchestration/critic/critic_NNN.json` | Full critic output (may include `private_gap_analysis` for human review) |
+| `test/mm3/orchestration/plans/plan_NNN.md` | Planner — **public** inputs only |
 
 ## See also
 
+- `docs/reference/README.md` — gold map / ontology (human reference, not builder input)
 - `plan/PROCESS-PLAN.md`
 - `docs/modeling_kind_sidecar_v1.md`

@@ -80,3 +80,17 @@ python scripts/orchestrator_loop.py --min-iterations 10 --max-iterations 20
 ## Orchestrator synthesis (`critic_round_04_orchestrator_synthesis.md`)
 
 Short cross-cut: three critics agree the **corpus is worth keeping** and **`modeling_kind` is mandatory**; v1 heuristics are **honest scaffolding**—extend with content signals, enum validation (done), and **explicit non-promotion** semantics for `domain_rule_candidate` (doc updated).
+
+## Iteration 10 — Critic may read gold map; private gap never shared with builder/planner
+
+- **Scoring:** `critic_mm3_domain.py` **overall_score** = invariants vs **corpus** (`corpus_keywords` only) — first principles; **not** vs gold map.
+- **Optional:** `--gold-map` + `--model` (candidate) → `private_gap_analysis` in full JSON (reference terms missing in candidate). **Stripped** before `deterministic_plan` and `ORCHESTRATOR_AGENT_URL` payload (`_public_critic_view`).
+- **Orchestrator:** `--gold-map`, `--critic-model`; default gold `docs/reference/mm3-map-model-solution-reference.md`.
+- **Docs:** `docs/orchestrator.md`, `docs/reference/README.md`.
+
+## Iteration 9 — OO analysis & design foundation (map/model/spec)
+
+- **Replaced stub:** `test/mm3/maps-models-specs/map-model-spec.md` — bounded context, **Check** specialization family, **Trait** vs **Power**, composition **Power → Effect**, **AttackEffect** ← **Damage** / **Affliction**, **Modifier** family, collaboration diagram, anti-patterns (TOC ≠ types, Power does not extend Effect).
+- **Updated:** `mm3_target_ontology.json` (v0.2) — `core_types` includes check specializations, **AttackEffect**, **Stamina**, **ResistanceCheck**; `expected_relationships` and `anti_patterns` expanded.
+- **Critic:** `critic_mm3_domain.py` **overall_score ≥ 0.98** with pipeline green; all five invariants **pass**.
+- **Orchestrator:** one run under `test/mm3/orchestration/oo-foundation-20260321/` (early stop on score threshold).
