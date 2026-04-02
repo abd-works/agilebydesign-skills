@@ -1,15 +1,25 @@
 """Path resolution for abd-maps-models-specs — layered config (no hardcoded handbook paths).
 
-1. <skill_path>/conf/abd-config.json → active skill workspace root (directory containing solution.conf)
-   Resolution order for the workspace path string: active_skill_workspace, then solution_workspace,
-   then skill_space_path (deprecated aliases).
-2. <skill_workspace>/solution.conf → output_dir, context_path, manifest_sources[], context_chunking_spec, …
+1. <skill_path>/conf/abd-config.json → **active_skill_workspace** only (absolute path to the directory
+   containing solution.conf). No other keys are read for workspace; no relative resolution.
+2. <active_skill_workspace>/solution.conf → output_dir, context_path, manifest_sources[], …
 
-Paths in solution.conf are relative to the skill workspace root. See abd-skill-builder/parts/phases/plan-script-build.md (Skill path, skill workspace, and configuration).
+Paths in solution.conf are relative to that workspace root.
+
+**Spec layout (canonical):** Under ``output_dir`` (usually ``spec/``):
+
+- **Files at the root of ``output_dir``** — domain and pipeline JSON (e.g. ``map-model-spec.json``,
+  ``terms_layer.json``, ``shaped_story_map.json``, ``scenario_walkthroughs.json``, manifests).
+- **Exactly two subfolders:** ``context/`` (``context_index.json`` + chunk ``*.md`` files in that folder — no ``chunks/`` subfolder) and ``walkthroughs/``
+  (narrative ``*.md``). No ``phase*``, ``maps-models-specs``, or other extra directories under ``spec/``.
+
+If ``context_path`` is omitted in ``solution.conf``, it defaults to ``<output_dir>/context`` (so context
+lives under ``spec`` with walkthroughs as the only sibling folder).
 """
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -40,32 +50,32 @@ def skill_config() -> dict:
     return _load_json(SKILL_ROOT / "conf" / "abd-config.json")
 
 
-def _workspace_path_string(data: dict) -> str | None:
-    """First non-empty among canonical and deprecated install keys."""
-    for key in ("active_skill_workspace", "solution_workspace", "skill_space_path"):
-        v = data.get(key)
-        if v is None:
-            continue
-        s = str(v).strip()
-        if s:
-            return s
-    return None
+def _active_skill_workspace_string(data: dict) -> str | None:
+    v = data.get("active_skill_workspace")
+    if v is None:
+        return None
+    s = str(v).strip()
+    return s if s else None
 
 
 def declared_workspace_root() -> Path:
     data = skill_config()
-    ws = _workspace_path_string(data)
+    ws = _active_skill_workspace_string(data)
     if ws is None:
         _die(
-            'conf/abd-config.json must set non-empty "active_skill_workspace" '
-            '(or deprecated "solution_workspace" / "skill_space_path") — directory containing solution.conf.'
+            'conf/abd-config.json must set non-empty string "active_skill_workspace" '
+            "(absolute path to the directory that contains solution.conf). "
+            "Set it with: python scripts/set_workspace.py <path>"
         )
     p = Path(ws)
     if not p.is_absolute():
-        p = SKILL_ROOT / p
+        _die(
+            f'"active_skill_workspace" must be an absolute path (got relative: {ws!r}). '
+            "Use python scripts/set_workspace.py <path> with an absolute or resolvable path."
+        )
     p = p.resolve()
     if not p.is_dir():
-        _die(f"solution_workspace is not a directory: {p}")
+        _die(f"active_skill_workspace is not a directory: {p}")
     return p
 
 
@@ -76,7 +86,7 @@ def solution_conf_path() -> Path:
         if not p.is_file():
             _die(f"solution config not found: {p}")
         if p.parent.resolve() != root.resolve():
-            _die(f"--config must live under skill workspace ({root}); got {p}")
+            _die(f"--config must live under workspace root ({root}); got {p}")
         return p
     p = root / "solution.conf"
     if not p.is_file():
@@ -94,14 +104,18 @@ def workspace_config() -> dict:
 
 def output_dir() -> Path:
     ws = workspace_root()
-    out = workspace_config().get("output_dir", "abd-maps-models-specs")
+    out = workspace_config().get("output_dir", "spec")
     return ws / out
 
 
 def context_path() -> Path:
+    """Directory for ``context_index.json`` and ``chunks/`` — default ``<output_dir>/context``."""
     ws = workspace_root()
-    ctx = workspace_config().get("context_path", "context")
-    return ws / ctx
+    cfg = workspace_config()
+    cp = cfg.get("context_path")
+    if cp is not None and str(cp).strip():
+        return (ws / str(cp).replace("\\", "/")).resolve()
+    return output_dir() / "context"
 
 
 def context_index_path() -> Path:
@@ -109,7 +123,13 @@ def context_index_path() -> Path:
 
 
 def chunks_dir() -> Path:
-    return context_path() / "chunks"
+    """Where chunk markdown lives: same directory as ``context_index.json`` (flat ``*.md``, no ``chunks/`` subfolder)."""
+    return context_path()
+
+
+def walkthroughs_dir() -> Path:
+    """Narrative walkthrough markdown under ``output_dir`` (``spec/walkthroughs`` when output_dir is ``spec``)."""
+    return output_dir() / "walkthroughs"
 
 
 def source_path_dir() -> Path:
@@ -146,31 +166,32 @@ def resolved_manifest_sources() -> list[tuple[Path, str, str]]:
     return out
 
 
-# --- Phase artifact basenames (under PHASE2 / PHASE3) ---
+# --- Artifact basenames (under output_dir / OUT_ROOT) ---
 
 TERMS_LAYER_JSON = "terms_layer.json"
 MECHANISMS_JSON = "mechanisms.json"
 CANDIDATE_QUEUE_JSON = "candidate_queue.json"
 SHAPED_STORY_MAP_JSON = "shaped_story_map.json"
 
-
-# --- Phase output dirs (under output_dir) ---
+# Emitted in those three JSON files' "schema" field by build_terms_mechanisms_scaffold.py
+TERMS_MECHANISMS_QUEUE_SCHEMA = "terms_mechanisms_queue/v1"
 
 
 def _phase_dirs() -> dict[str, Path]:
+    """Legacy aliases: all pipeline outputs live at OUT_ROOT (flat under output_dir)."""
     o = output_dir()
     return {
         "OUT_ROOT": o,
-        "PHASE0": o / "phase0",
-        "PHASE1": o / "phase1",
-        "PHASE2": o / "phase2",
-        "PHASE3": o / "phase3",
-        "PHASE4": o / "phase4",
-        "PHASE5": o / "phase5",
-        "PHASE6": o / "phase6",
-        "PHASE7": o / "phase7",
-        "PHASE8": o / "phase8",
-        "MAPS_MODELS_SPECS": o / "maps-models-specs",
+        "PHASE0": o,
+        "PHASE1": o,
+        "PHASE2": o,
+        "PHASE3": o,
+        "PHASE4": o,
+        "PHASE5": o,
+        "PHASE6": o,
+        "PHASE7": o,
+        "PHASE8": o,
+        "MAPS_MODELS_SPECS": o,
     }
 
 
@@ -198,8 +219,27 @@ _init_module_paths()
 
 
 def map_model_spec_path() -> Path:
-    """Published domain spec JSON under output_dir (Phases 4–7)."""
-    return MAPS_MODELS_SPECS / "map-model-spec.json"
+    """Published domain spec JSON at the root of output_dir."""
+    return OUT_ROOT / "map-model-spec.json"
+
+
+def agile_bots_root() -> Path:
+    """Root of the agile_bots repo (for native Draw.io emitters)."""
+    data = skill_config()
+    r = data.get("agile_bots_root")
+    if r and str(r).strip():
+        p = Path(str(r).strip()).resolve()
+        if p.is_dir():
+            return p
+    env = os.environ.get("AGILE_BOTS_ROOT", "").strip()
+    if env:
+        p = Path(env).resolve()
+        if p.is_dir():
+            return p
+    _die(
+        'Set non-empty "agile_bots_root" in conf/abd-config.json (absolute path to the '
+        "agile_bots repository) or set environment variable AGILE_BOTS_ROOT."
+    )
 
 
 def default_map_model_spec_path() -> Path:

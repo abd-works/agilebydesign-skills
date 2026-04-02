@@ -176,6 +176,7 @@ Place invariants under the specific property or operation they apply to — not 
 
 These fields extend the domain view in JSON. Align with `**[foundational]`** in prose and with Phases **4–7** in `[content/parts/process.md](../../../content/parts/process.md)` (domain types → variants → deepen → integrate)..
 
+Shaped stories live in **`phase3/shaped_story_map.json`** at the root of **`output_dir`** (see [shaped-story-map.md](../../parts/phases/shaped-story-map.md)); **`map-model-spec.json`** holds modules and **`concepts[]`** only.
 
 | Field                            | Where          | Purpose                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | -------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -200,6 +201,24 @@ These fields extend the domain view in JSON. Align with `**[foundational]`** in 
 **Composition vs inheritance in `name`:** “has-a” (properties referencing other concepts) stays in `**properties[]` / `operations[]`** with collaborating types. “is-a” subtype layering uses `**Base:Extension`** in `**name`** (not a second field) plus shared `**owns`** / evidence on the subtype.
 
 Epic and confirming-story naming: see `[story-map.md](story-map.md)`; module naming stays **noun phrase**, epic/story **Verb Noun** (verb-noun rule). `**concepts[].name`** and domain words in `**epic.statement`** / `**confirming_stories`** must match **exactly (100%)** — rule **scaffold-concept-story-name-alignment** where enforced.
+
+##### Relationships between concepts — plan and checks
+
+**Primary (automated):** Rule **`map-model-relationships`** with scanner **`scripts/scanners/map_model_relationships.py`** runs in the **`build.py`** pipeline when **`map-model-spec.json`** exists. It enforces **reference integrity**: every **`depends_on[].concept`** names a declared **`concept.name`**; every **`module.depends_on`** entry references existing **module** names and **concept** names in **`dependent_concepts`** / **`provides_concepts`**. It does **not** check acyclicity or semantic relation types — only resolution. See **`[map-model-relationships-plan.md](map-model-relationships-plan.md)`** and **`[../../rules/map-model-relationships.md](../../rules/map-model-relationships.md)`**.
+
+###### Where to attach `depends_on` (pre- vs post-property)
+
+| Situation | Guidance |
+|-----------|----------|
+| **Before** properties/operations exist | **Concept-level** `depends_on` alone is OK as a scaffold. |
+| **After** properties and/or operations are filled in | **Authoritative** collaborations belong on **`properties[]` / `operations[]`** `depends_on` (who collaborates on which field or behavior). |
+| **Optional class-level** `depends_on` | Allowed as a **diagram summary** only if every peer also appears on **at least one** property or operation under that concept (**subset sync** — enforced by the scanner when members exist). |
+
+###### Optional product patterns (non-normative)
+
+Workspace specs may use extra concepts for RAG-style systems: e.g. **hub source tree** vs **chat UI** aggregates, **scope filters** from hub folders, **conversion → chunk → vector** artifacts, **folder-level pipeline rollup** from per-file stages. Name and module layout are **product-specific**; the skill only requires resolved names and the **`depends_on`** rules above.
+
+**Optional:** Narrative **scenario walkthroughs** ([`scenario-walkthrough-template.md`](scenario-walkthrough-template.md)) and sidecar **`scenario_walkthroughs.json`** beside **`map-model-spec.json`** stress-test collaborations against **`shaped_story_map.json`**; they do **not** replace structural validation.
 
 ---
 
@@ -334,6 +353,247 @@ A single module with several concepts that collaborate around payment by country
 
 
 
+### `map-model-relationships-plan.md`
+
+### Plan — domain relationships and collaboration validation
+
+**Status:** Implemented in the skill repo — rule **`map-model-relationships`** + scanner, four **`scenario-walkthrough-***` rules, template, example sidecar under the active workspace’s **`spec/.../maps-models-specs/`**, **`skill-config.json`** bindings, **`process.md`** / **`phases/deepen.md`** exit text.
+
+**Source of truth for this initiative.** The skill pipeline phases below are **`generate_prompt.py` slugs** and match **`content/parts/process.md`** (Stage 3–4: Deepen → Integrate → Validate).
+
+---
+
+#### 1. What the pipeline phases do (this thread)
+
+This is the mapping we kept circling: **relationship work is not one blob** — it **splits across phases**.
+
+| Process # | Phase slug | `generate_prompt --phase …` | Relationships & collaboration — **practitioner work** |
+|-----------|------------|------------------------------|------------------------------------------------------|
+| **8** | **`deepen`** | `deepen` | **Author** **`depends_on`** and cross-concept edges in **`map-model-spec.json`**. **Write scenario walkthroughs** (object-flow; **Scope** = explicit epic/story[/scenario] set from **`shaped_story_map.json`** and, if used, e.g. **`docs/story/story-graph.json`**). **Walks + Gaps** → patch spec (**`scenario-walkthrough-update-spec-on-gap`**) then **revisit `depends_on`** in the same phase. **Optional** sidecar **`spec/maps-models-specs/scenario_walkthroughs.json`** (Option B). **Cite `chunk_id`** when adding claims. Exit: relationships + collaboration depth addressed for in-scope concepts **or** explicit waiver. |
+| **9** | **`integrate`** | `integrate` | **Reconcile** one coherent **`map-model-spec`**: synonyms, references, drained candidate queue. **Align** walkthrough narrative / sidecar with merged spec. **Do not** treat Integrate as “first time you think about edges” — edges should be argued in Deepen. |
+| **10** | **`validate`** | `validate` | Run **`python scripts/build.py`** (full pipeline). **Structural gate:** once implemented, **`map_model_relationships`** scanner **fails the build** if **`depends_on`** / module concept refs **don’t resolve**. Reports, manifest, CI. |
+
+| Mechanism | Validates | Fails when |
+|-----------|-----------|------------|
+| **Declared graph** (scanner) | JSON **`depends_on`** graph | Dangling concept name; **subset sync** when class-level + members exist; optional reachability/orphan per rule |
+| **Scenario walkthrough** (rules + prose) | Story-level **collaboration plausibility** | Walkthrough shows gap → **update spec** (and evidence) before signing off Deepen |
+
+**Why you need both:** Passing **validate** (graph) only means **names resolve**. Passing **Deepen** walkthrough review means **behavior** across those names is **argued**. Neither replaces the other.
+
+---
+
+#### 2. Skill implementation order (maintainers — build the gates)
+
+Do this **sequence** to ship the plan into the repo.
+
+##### Structural graph (automated in `build.py`)
+
+| Step | Action | Proof |
+|------|--------|--------|
+| **S1** | Add **`rules/map-model-relationships.md`** | Rule file merged |
+| **S2** | Add **`scripts/scanners/map_model_relationships.py`** | Non-zero exit on bad spec; test or sample workspace |
+| **S3** | **`rules/scanners.json`** + **`skill-config.json`** (`build_pipeline`, **`phase_rules`** for **`validate`**, optionally **`integrate`**) | `build.py` invokes scanner |
+| **S4** | Run **`build.py`** on **sample-workspace** / **abd-answers** spec; fix spec or scanner | Green or documented waivers |
+| **S5** | **`domain-model.md`** — what the scanner enforces | Short paragraph + **pre/post-property** and **subset sync** (`depends_on` on members vs optional class-level summary) |
+
+##### Narrative walkthroughs (rules inlined into **`deepen`**)
+
+| Step | Action | Proof |
+|------|--------|--------|
+| **N1** | **`content/parts/library/scenario-walkthrough-template.md`** | File exists |
+| **N2** | Example **`scenario_walkthroughs.json`** beside **`map-model-spec`** path pattern | Valid JSON |
+| **N3** | Four rules: align-spec, trace-complete, scope-covers, update-spec-on-gap | Four **`rules/*.md`** |
+| **N4** | **`skill-config.json`** → **`phase_rules.deepen`** (+ **`integrate`** if needed) | `generate_prompt --phase deepen` inlines rules |
+| **N5** | **`process.md`** + **`phases/deepen.md`** — **exit criteria** tied to §1 table | Prescriptive text |
+| **N6** | **`python scripts/build.py --merge-only`** | Built bundles updated |
+
+**Recommended order:** **S1→S5** first, then **N1→N6**. (Parallel possible after S1.)
+
+##### Optional later
+
+| Step | Action |
+|------|--------|
+| **O1** | Walkthrough **coverage** scanner + binding + **`validate`** |
+
+---
+
+#### 3. Done (definition)
+
+1. **`build.py`** fails on unresolved **`depends_on`** (per **S3–S4**).
+2. Template + four rules + sidecar pattern exist (**N1–N2–N3**); **`deepen`** bundle includes walkthrough rules (**N4**).
+3. **§1** is reflected in **`process.md`** / **`deepen.md`** exit criteria (**N5**).
+
+---
+
+#### 4. Why the model “missed” this (and how you beat that)
+
+- **Conversation context is not reliable storage.** Put the **phase mapping** (§1) **only** in this file (and process/deepen when edited). Re-open this file or paste §1 at the start of a session when driving implementation.
+- **Optional:** Cursor **project rule** one line: “When changing relationships or walkthroughs for abd-maps-models-specs, follow **`content/parts/library/map-model-relationships-plan.md`** §1.”
+
+---
+
+#### 5. Existing scanners (unchanged)
+
+`stage-1-context-decisions`, `shaped-story-shape`, `evidence-citations-required` — they do **not** replace the graph scanner or walkthrough rules.
+
+---
+
+#### 6. Out of scope
+
+CRC **bot** / **agile_bots** `story-graph.json` as SoT for this skill. Replacing **`chunk_id`** with walkthrough prose.
+
+---
+
+#### See also
+
+- `[process.md](../../parts/process.md)` — full pipeline table
+- `[domain-model.md](domain-model.md)`
+- `[../rules/scanners.json](../../rules/scanners.json)`
+
+
+### `scenario-walkthrough-template.md`
+
+### Scenario walkthrough (object-flow)
+
+Use this template for **narrative collaboration checks** tied to **`map-model-spec.json`**. **Story / interaction scope** must come from your workspace’s **story graph** (see **Scope** below)—not invented labels. Optional machine-readable index: **`scenario_walkthroughs.json`** under your workspace **`output_dir`** (often next to `map-model-spec.json`) — see [`map-model-relationships-plan.md`](map-model-relationships-plan.md) and [`walkthrough-semantic-alignment.md`](walkthrough-semantic-alignment.md).
+
+---
+
+#### Purpose
+
+One or two sentences: what collaboration this walkthrough stress-tests (which graph nodes, which concepts).
+
+#### Strategy
+
+How you chose **Scope** (which epics / stories / scenarios) and which concepts you expect to participate.
+
+---
+
+#### Walkthrough: &lt;scenario name&gt;
+
+**Scope (required):** A **finite set** of nodes copied **verbatim** from the workspace story graph so reviewers can verify them:
+
+1. **Always** list at least one **epic** and **story** from **`phase3/shaped_story_map.json`** (`epics[].name` → `stories[].name`). That file is the skill’s canonical interaction map (trigger/response, anchor, evidence links).
+
+2. **If** your workspace also maintains a richer graph (e.g. **`docs/story/story-graph.json`** with sub-epics and **scenario** names under stories), list **those** nodes too when the walk is about a specific scenario — same spelling as in that JSON.
+
+**Format (example):**
+
+```text
+- Epics: <name>
+- Stories: <name> [, <name> …]
+- Scenarios (if applicable): <story> / <scenario name> [, …]
+- Source files: phase3/shaped_story_map.json [; docs/story/story-graph.json]
+```
+
+Do not paraphrase story or scenario titles.
+
+**Language:** Reuse the graph’s **interaction vocabulary** — for shaped stories, **trigger** / **response** **behavior** strings and **anchor**; for BDD scenarios, **scenario name** and step intent. Do **not** introduce parallel product wording unless the walkthrough explicitly maps it to a graph node.
+
+##### Walks
+
+Repeat per collaboration slice you want to check.
+
+###### Walk 1 — &lt;short label&gt;
+
+**Covers:** Which responsibility or interaction path this walk exercises (must align with **Scope** nodes — see rule **`scenario-walkthrough-scope-covers`**).
+
+**Object flow** (pseudocode / bullet flow):
+
+```
+ActorOrConcept
+  -> message or state
+  -> CollaboratorConcept
+  -> ...
+```
+
+**Covers (summary):** One line tying to **`depends_on`** or operations if relevant.
+
+##### Gaps
+
+What the flow exposed (missing edge, weak evidence, open question). **If the gap belongs in the spec,** update **`map-model-spec.json`** (and evidence) — do not leave the gap only in prose.
+
+##### Model updates
+
+Optional bullets: what changed or should change in the spec after this pass.
+
+---
+
+#### Relationship pass (post-walkthrough, still Deepen)
+
+After you finish **Walks** / **Gaps** for this document, **apply discoveries to the relationship graph** in the same Deepen cycle:
+
+1. For each **Gap** that is in scope, patch **`map-model-spec.json`** (`depends_on`, responsibilities, operations) per **`scenario-walkthrough-update-spec-on-gap`**, or record a **deferral** in **`open_questions`** / the candidate queue.
+2. Reconcile any new collaborations with **Step 2** in **`phases/deepen.md`** (topological `depends_on`).
+3. Do **not** treat **Integrate** as the first time edges appear — Integrate merges and aligns; **Deepen** is where walkthrough findings land in the spec.
+
+---
+
+#### Model updates (cross-scenario)
+
+Optional: consolidated **`depends_on`**, rename, or deferrals across walks.
+
+
+### `class-diagram-from-spec.md`
+
+### Class diagram from `map-model-spec.json`
+
+**When:** During **process phases 4–9** (terms & mechanisms through integrate), whenever you have **materially updated** the domain model in **`map-model-spec.json`**, re-run the generator so the **class diagram file** beside your spec stays aligned with promoted concepts, modules, and **`depends_on`**.
+
+This is **human visualization**, not validation: Phase **10** (**validate**) still relies on **`python scripts/build.py`** and rule-bound scanners.
+
+---
+
+#### Command (skill package)
+
+From the **abd-maps-models-specs** root (directory that contains `scripts/` and `skill-config.json`), with **`conf/abd-config.json`** pointing at the workspace that contains **`solution.conf`**:
+
+```bash
+python scripts/render_map_model_class_diagram.py
+```
+
+- **Input:** `<output_dir>/map-model-spec.json` (see [`domain-model.md`](domain-model.md) and your workspace `solution.conf`).
+- **Output:** `<output_dir>/map-model-class-diagram.drawio` — **native diagrams.net XML** (same **`mxfile` / `mxCell`** stack as agile_bots story-map Draw.io), with modules, concepts, members, and **`depends_on`** edges.
+
+**Prerequisite:** `conf/abd-config.json` must include **`agile_bots_root`** (absolute path to the **agile_bots** repo), or set environment variable **`AGILE_BOTS_ROOT`**. The skill invokes `agile_bots/scripts/render_map_model_drawio.py`.
+
+Optional path override:
+
+```bash
+python scripts/render_map_model_class_diagram.py --output path/to/custom-name.drawio
+```
+
+Re-running the command **replaces** that file; any layout you applied in diagrams.net is **not** tracked by this skill.
+
+---
+
+#### Open in diagrams.net
+
+Open **`map-model-class-diagram.drawio`** in VS Code (Draw.io extension), diagrams.net desktop, or **app.diagrams.net** → **File → Open from…** — no Mermaid import step.
+
+---
+
+#### Relationship to other tooling
+
+- **agile_bots** **crc_bot** can emit **diagrams from `story-graph.json`** domain concepts — a **different** source than **`map-model-spec.json`**. For **this** skill’s published spec, use **`render_map_model_class_diagram.py`** so the diagram tracks **`modules_and_epics`** and **`depends_on`** in **`map-model-spec.json`** (rendered via **`synchronizers.story_io.map_model_spec_drawio`**).
+- **Story graph** outline/increment diagrams from the story-bot pipeline are **not** this artifact.
+
+---
+
+#### Cadence
+
+| Phase slug | Process # | After you… |
+|------------|-------------|------------|
+| `terms-mechanisms` | 4 | Change terms/mechanisms that affect how you think about types (optional diagram; types may not exist yet). |
+| `shaped-story-map` | 5 | Extend or reshape stories that drive promotion (optional). |
+| `domain-types` | 6 | Add or promote **`concepts[]`** — **re-run the command** when the promoted set changes. |
+| `variant-classification` | 7 | Change variant strategy affecting type shape — refresh when useful. |
+| `deepen` | 8 | Add **`depends_on`**, properties, operations — **re-run** so edges and members update. |
+| `integrate` | 9 | Merge or drain queue into final spec — **re-run** before handoff. |
+
+Minimum practical habit: run the command **after** **`domain-types`** when concepts exist, and **again after `deepen` or `integrate`** when collaboration edges change.
+
+
 ## Rules
 
 ### `evidence-citations-required.md`
@@ -447,6 +707,23 @@ Other skills may use stricter templates (e.g. interaction-tree prose). This rule
 ```
 
 Opaque labels—**violation** (reviewer cannot infer behavior or ownership).
+
+
+### `scenario-walkthrough-align-spec.md`
+
+**See also:** [`content/parts/library/walkthrough-semantic-alignment.md`](../../parts/library/walkthrough-semantic-alignment.md) (index vs narrative, optional scanners).
+
+#### Scenario walkthrough: names align with `map-model-spec`
+
+**When** you document a scenario walkthrough (prose or sidecar), **concept and module names** used in object-flow text **must match** **`concept.name`** and **`module.name`** in **`map-model-spec.json`** for the integrated slice — no shadow synonyms unless Integrate has recorded a merge.
+
+**DO**
+
+- Use the same spelling as in the spec for every named concept in the walk.
+
+**DON'T**
+
+- Introduce alternate labels for the same concept without a synonym row in the candidate queue or spec.
 
 
 ## Principles
