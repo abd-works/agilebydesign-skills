@@ -1,0 +1,33 @@
+---
+chunk_id: blk_db8d16b34e21
+source:
+  canonical_path: docs/HeroesHandbook.md
+  line_start: 10661
+  line_end: 10682
+evidence_type: rule
+modeling_kind: rule
+---
+<!-- Source: docs/HeroesHandbook.md, section 521 | file:///C:/dev/agilebydesign-skills/skills/abd-maps-models-specs/test/mm3/docs/HeroesHandbook.md -->
+
+ABILITIES - BLANK SLATE
+
+STRENGTH
+2
+STAMINA
+2
+
+AGILITY
+2
+DEXTERITY
+2
+
+FIGHTING
+2
+INTELLECT
+2
+
+AWARENESS
+2
+PRESENCE
+2
+

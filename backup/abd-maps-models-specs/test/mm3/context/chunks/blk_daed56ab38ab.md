@@ -1,0 +1,22 @@
+---
+chunk_id: blk_daed56ab38ab
+source:
+  canonical_path: docs/HeroesHandbook.md
+  line_start: 24003
+  line_end: 24012
+evidence_type: rule
+modeling_kind: rule
+---
+<!-- Source: docs/HeroesHandbook.md, section 1303 | file:///C:/dev/agilebydesign-skills/skills/abd-maps-models-specs/test/mm3/docs/HeroesHandbook.md -->
+
+SUPPORTING WEIGHT
+
+If a created object needs to support weight—created as
+a  bridge  or  to  support  a  weakened  structure,  for  exam-
+ple—it has an effective Strength equal to its rank. You can
+“shore  up”  a  created  object  by  taking  a  standard  action
+and concentrating, increasing its Strength by 1 until the
+start of your next round. You can also use extra effort to
+increase  a  created  object’s  Strength  for  one  round,  and
+these modifiers are cumulative.
+

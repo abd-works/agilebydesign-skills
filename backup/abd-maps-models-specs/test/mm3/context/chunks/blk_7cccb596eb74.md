@@ -1,0 +1,29 @@
+---
+chunk_id: blk_7cccb596eb74
+source:
+  canonical_path: docs/HeroesHandbook.md
+  line_start: 32563
+  line_end: 32579
+evidence_type: rule
+modeling_kind: rule
+---
+<!-- Source: docs/HeroesHandbook.md, section 1736 | file:///C:/dev/agilebydesign-skills/skills/abd-maps-models-specs/test/mm3/docs/HeroesHandbook.md -->
+
+ARMOR TRAITS
+
+Armor has the following traits:
+
+Category:  Armors  are  categorized  as  archaic  (ancient
+styles of armor like chain- and plate-mail), modern (typi-
+cally bulletproof composites and synthetics), and shields
+(requiring some active use to protect against attacks).
+
+Effect: The effect of most armor is Protection, sometimes
+with  the  Impervious  modifier.  Shields  provide  a  sort  of
+mobile cover (see Cover in the Action & Adventure chap-
+ter), granting Enhanced Dodge and Parry defenses.
+
+Cost: This is the armor’s cost in points. Characters pay this
+cost from their equipment points to have the armor of this
+type as part of their regular equipment.
+

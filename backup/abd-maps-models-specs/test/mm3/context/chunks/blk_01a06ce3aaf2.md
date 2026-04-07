@@ -1,0 +1,72 @@
+---
+chunk_id: blk_01a06ce3aaf2
+source:
+  canonical_path: docs/HeroesHandbook.md
+  line_start: 35294
+  line_end: 35354
+evidence_type: rule
+modeling_kind: rule
+---
+<!-- Source: docs/HeroesHandbook.md, section 1891 | file:///C:/dev/agilebydesign-skills/skills/abd-maps-models-specs/test/mm3/docs/HeroesHandbook.md -->
+
+SAMPLE POISON RANKS
+
+RANK
+
+SAMPLE POISON
+
+1
+
+3
+
+4
+
+7
+
+8
+
+9
+
+11
+
+13
+
+14
+
+15
+
+Food poisoning: Affliction conditions typically include impaired and disabled, perhaps also dazed and
+stunned for especially severe nausea.
+
+Alcohol: Impaired and disabled are the most common conditions, perhaps dazed and stunned for severe
+drunkenness, as for food poisoning.
+
+Pesticides: Common Affliction conditions include impaired and disabled, although a large enough dose
+or repeated exposure can also Weaken Stamina, even leading to death.
+
+Chloroform: Affliction with dazed, stunned, and incapacitated effects.
+
+Cobra venom: Typically a Weaken effect against Strength, Agility, or Stamina (sometimes more than one),
+with Weaken Stamina potentially lethal, if the victim’s Stamina drops below –5.
+
+Mustard gas: Affliction with impaired, disabled, and incapacitated effects, linked with a Damage effect
+resisted by Fortitude.
+
+Poisonous mushrooms: Typically a Fortitude Damage effect. Side-effects might include conditions like
+dazed, impaired, or hindered.
+
+Chlorine gas: Affliction with dazed, stunned, and incapacitated effects, linked with a Damage effect re-
+sisted by Fortitude.
+
+Curare: Affliction with dazed and hindered, stunned and immobilized, and incapacitated effects, linked
+with Weaken Stamina, as the poison can potentially stop the target’s heart.
+
+Cyanide: Fortitude Damage effect.
+
+Nerve gas: Affliction with dazed and impaired, stunned and disabled, and incapacitated effects, linked
+with Fortitude Damage.
+
+16+
+
+Alien, supernatural, or super-science toxins
+

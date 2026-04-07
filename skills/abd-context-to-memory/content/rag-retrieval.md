@@ -1,6 +1,6 @@
 # RAG Semantic Retrieval
 
-When the user asks about content in memory, run semantic search and inject results into your response.
+When the user asks about content in memory, run semantic search and inject results.
 
 ## Trigger Phrases
 
@@ -9,27 +9,28 @@ Run `search_memory "<query>"` when the user says:
 - "use memory", "search memory", "what does memory say"
 - "from our content", "from ABD materials", "from our decks"
 - "what do we have on [topic]"
-- Asks about Agile, training, proposals, service offerings, client engagements, or ABD materials
+- Asks about Agile, training, proposals, service offerings, or any ingested materials
 
 ## Agent Flow
 
-1. **Derive query** — Extract a semantic query from the user's question (topic, concept, or question).
-2. **Run search** — From workspace root:
+1. **Derive query** — Extract a semantic query from the user's question.
+2. **Run search** — From the workspace root:
    ```bash
-   python .agents/skills/ace-context-to-memory/scripts/search_memory.py "<query>" --k 5
+   python skills/abd-context-to-memory/scripts/search_memory.py "<query>" --rag <source>/memory/rag --k 5
    ```
 3. **Inject results** — Use the returned chunks in your response.
-4. **Cite sources** — Include path, slide/page when using retrieved content.
+4. **Cite sources** — Include path and slide/section when using retrieved content.
 
 ## Requirements
 
-- RAG deps: `pip install -r .agents/skills/ace-context-to-memory/requirements-rag.txt`
-- `OPENAI_API_KEY` set (for embeddings)
-- Index must exist: run **`embed_and_index.py`** (hub aggregate) or **`index_memory --embed`** (per-topic) after adding content
+- RAG deps: `pip install -r skills/abd-context-to-memory/requirements-rag.txt`
+- `OPENAI_API_KEY` set
+- Index exists: run `index_memory.py --path <source>` first
 
-## Architecture
+## Output Layout
 
-- **Chunk files** — File-based reference (e.g. "open the Agile Overview deck")
-- **Vector index** — Semantic search via `search_memory` for topic-based retrieval
-
-Pipeline: convert → chunk → chunk files on disk; **embed + FAISS** is a separate step (`embed_and_index.py` or `index_memory --embed`).
+```
+<source>/memory/rag/
+  index.faiss
+  metadata.json
+```

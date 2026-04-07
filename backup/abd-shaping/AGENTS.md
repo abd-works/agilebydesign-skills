@@ -171,6 +171,13 @@ When analyzing **existing content**, review and follow the strategy.
 - **Example (wrong):** `AbdSkill.get_instructions_for(operation, context)` — context passed as parameter.
 - **Example (correct):** AbdSkill has `Engine engine` (injected); `instructions` property; assembles using `engine.workspace`, `engine.strategy_path` when needed.
 
+### Skill Update Workflow
+
+**DO** — Update the ace-shaping skill in `agile-context-engine/skills/ace-shaping/` first (core); then copy those updates to test installations (e.g. `mutants-and-masterminds/.agents/skills/ace-shaping/`).
+
+- **Example (wrong):** Editing the skill only in a test project; creating standalone scripts in test without updating core; core and test copies drift.
+- **Example (correct):** Edit `agile-context-engine/skills/ace-shaping/`; run build; copy updated `scripts/build.py`, `content/script-invocation.md`, and any other changed files to the test project's ace-shaping copy.
+
 ---
 
 # Required Output Structure
@@ -277,7 +284,7 @@ After generating interactions and concepts, verify:
 
 AI guidance for calling ace-shaping scripts.
 
-## get_instructions.py
+## build.py get_instructions
 
 Gets the assembled prompt for an operation from the Engine. **Call this before producing any shaping output.**
 
@@ -288,8 +295,8 @@ Gets the assembled prompt for an operation from the Engine. **Call this before p
 
 **Usage:**
 ```bash
-cd .agents/skills/ace-shaping
-python scripts/get_instructions.py generate_slice
+cd skills/ace-shaping
+python scripts/build.py get_instructions generate_slice
 ```
 
 **Output:** The assembled prompt (sections + strategy doc + context). **Inject this output into your response and follow it.** Do not skip this step — the Engine assembles the correct sections, strategy, and paths.
@@ -302,7 +309,7 @@ Assembles content/*.md into AGENTS.md.
 
 **Usage:**
 ```bash
-cd .agents/skills/ace-shaping
+cd skills/ace-shaping
 python scripts/build.py
 ```
 

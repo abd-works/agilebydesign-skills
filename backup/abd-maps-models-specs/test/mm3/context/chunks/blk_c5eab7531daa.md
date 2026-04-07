@@ -1,0 +1,47 @@
+---
+chunk_id: blk_c5eab7531daa
+source:
+  canonical_path: docs/HeroesHandbook.md
+  line_start: 4869
+  line_end: 4904
+evidence_type: rule
+modeling_kind: rule
+---
+<!-- Source: docs/HeroesHandbook.md, section 207 | file:///C:/dev/agilebydesign-skills/skills/abd-maps-models-specs/test/mm3/docs/HeroesHandbook.md -->
+
+POWERS
+
+AGILITY
+2
+DEXTERITY
+3
+
+FIGHTING
+4
+INTELLECT
+10
+
+AWARENESS
+5
+PRESENCE
+0
+
+Blaster: 24-point Array, Easily Removable (-10 points).
+
+•  Ranged Damage 12 • 24 points
+
+•  Dazzle 12 • 1 point.
+
+Force Shield Belt: Protection 10,
+Impervious, Sustained, Precise,
+Removable (-4 points)
+• 21 points.
+
+Jetpack: Flight 5 (60 MPH),
+Removable (-2 points)
+ • 10 points.
+
+Quick-Thinking: Quickness 4,
+
+Limited to Mental Tasks • 2 points.
+

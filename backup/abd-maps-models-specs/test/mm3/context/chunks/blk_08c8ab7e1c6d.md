@@ -1,0 +1,38 @@
+---
+chunk_id: blk_08c8ab7e1c6d
+source:
+  canonical_path: docs/HeroesHandbook.md
+  line_start: 41577
+  line_end: 41603
+evidence_type: rule
+modeling_kind: rule
+---
+<!-- Source: docs/HeroesHandbook.md, section 2185 | file:///C:/dev/agilebydesign-skills/skills/abd-maps-models-specs/test/mm3/docs/HeroesHandbook.md -->
+
+ADVENTURE BACKGROUND
+
+Among  the  many  extra-dimensional  worlds  parallel  to
+Freedom  City’s  Earth-Prime  continuum  is  Earth-Ape,  a
+planet  where  simians  evolved  from  mankind  and  built  a
+comparable  civilization,  complete  with  costumed  super-
+heroes and supervillains. One of the latter, a powerful mys-
+tic known as Marmo-Set, journeyed to Earth-Prime several
+years ago, his attention drawn by the sudden appearance
+of an immense concentration of ancient magic energy.
+
+Marmo-Set  errantly  arrived  in  Earth-Prime’s  Spain,  far
+from  the  source’s  true  location  in  Freedom  City,  and
+was subdued by the pursuing Earth-Ape heroes known
+as the Primate Patrol before he could get any closer to
+his intended target. Before being returned to Earth-Ape,
+Marmo-Set was able to discern the nature of the mystic
+energy  he  had  sought:  it  was  akin  to  the  supernatural
+plagues that had brought low the pharaohs of Ancient
+Apegypt. It was power enough to make Marmo-Set feel
+fear…  and  even  greater  covetousness.  Now,  having  re-
+cently  re-emerged  from  mild-mannered  Prof.  Victor’s
+
+a Mutants & Masterminds
+
+292292
+

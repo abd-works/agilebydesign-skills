@@ -1,0 +1,53 @@
+---
+chunk_id: blk_2695a80deca2
+source:
+  canonical_path: docs/HeroesHandbook.md
+  line_start: 20063
+  line_end: 20103
+evidence_type: rule
+modeling_kind: rule
+---
+<!-- Source: docs/HeroesHandbook.md, section 1070 | file:///C:/dev/agilebydesign-skills/skills/abd-maps-models-specs/test/mm3/docs/HeroesHandbook.md -->
+
+STABILIZE
+
+You’re trained in treating injuries and ailments. The check
+DC and effect of Treatment depend on the task:
+
+TREATMENT DIFFICULTIES
+
+DC
+
+10
+
+15
+
+15
+
+15
+
+15
+
+TASK
+
+Diagnose injuries and ailments.
+
+Provide long-term care.
+
+Revive dazed or stunned characters.
+
+Stabilize dying character.
+
+Treat diseases or poisons.
+
+If  you  do  not  have  the  appropriate  medical  equipment
+and supplies, you take a –5 circumstance penalty on your
+check.  If  your  subject  has  a  particularly  unusual  biology
+(an alien, for example) you may also suffer a circumstance
+penalty.
+
+You  can  use  the Treatment  skill  on  yourself,  but  only  to
+diagnose,  provide  care,  or  treat  disease  or  poison.  You
+take a –5 circumstance penalty on checks when treating
+yourself.
+

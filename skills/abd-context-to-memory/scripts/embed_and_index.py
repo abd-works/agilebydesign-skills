@@ -1,22 +1,9 @@
 """
-Embed chunked markdown and index for semantic search.
-
-Uses OpenAI embeddings (pure Python, no native compilation).
-Works on Python 3.13, Windows ARM64, and any platform.
+Embed chunked markdown into a local FAISS vector store.
 
 Usage:
-  python embed_and_index.py [--memory <memory_name>]
-  python embed_and_index.py  # index all memory
-
-Run with CONTENT_MEMORY_ROOT (or cwd) = **junction hub root** (local clone; not SharePoint).
-
-- **With `--memory <name>`:** reads `memory/<name>/*.md`.
-- **With no `--memory`:** reads (1) each **subfolder** under **`<hub>/<junctions_dir>/`** (topic junctions →
-  remote `memory` trees). ``junctions_dir`` is per hub in ``conf/content_memory_roots.json`` (default ``assets``).
-  Chunk paths in metadata are prefixed with that folder name. (2) any ``memory/**/*.md`` under the hub (legacy).
-  Writes one **aggregate** index to ``rag_path`` for that hub (not inside the repo when pointed at SharePoint).
-  Override with ``CONTENT_MEMORY_RAG_PATH``, ``skill-config.json``, or ``rag_path`` in ``content_memory_roots.json``.
-- **With `--memory`:** writes to **`memory/rag/`** (per-topic tree, e.g. ``index_memory --path``).
+  python embed_and_index.py --path <memory_folder>           # embed all .md under folder
+  python embed_and_index.py --path <memory_folder> --replace # rebuild index from scratch
 
 Requires: pip install openai faiss-cpu numpy. Set OPENAI_API_KEY.
 """
@@ -27,12 +14,9 @@ import re
 import sys
 from pathlib import Path
 
-from _config import ASSETS, MEMORY, ROOT, ensure_root, rag_dir_for_embed
+import _config  # loads .env / .secrets
 
-ensure_root()
-CHECKPOINT_INTERVAL = 200  # save every N batches
-# Subdirs under <junctions_dir>/ that are not topic junctions (reserved; local fallback rag may live here).
-_SKIP_JUNCTION_SUBDIRS = frozenset({"rag"})
+CHECKPOINT_INTERVAL = 200
 EMBEDDING_MODEL = "text-embedding-3-small"
 # text-embedding-3-small limit: 8191 tokens per input. ~4 chars/token.
 MAX_CHARS_PER_CHUNK = 8000  # ~2000 tokens, safe under 8191
@@ -99,10 +83,7 @@ def _collect_chunks_under_base(
         try:
             rel_str = md_path.relative_to(base).as_posix()
         except ValueError:
-            try:
-                rel_str = md_path.relative_to(ROOT).as_posix()
-            except ValueError:
-                rel_str = md_path.name
+            rel_str = md_path.name
         if path_prefix:
             rel_str = f"{path_prefix}/{rel_str}"
         meta = {
@@ -114,35 +95,9 @@ def _collect_chunks_under_base(
     return chunks
 
 
-def collect_chunks(memory_name: str | None) -> list[tuple[Path, str, dict]]:
-    """Collect chunk files. Returns [(path, text, metadata), ...].
-
-    - memory_name ``context``: ROOT/context (chunks in source tree).
-    - memory_name set: MEMORY/<name>/*.md
-    - memory_name None: **<junctions_dir>/<topic_junction>/** each subdir (hub layout) plus MEMORY/**/*.md (legacy).
-    """
-    if memory_name == "context" and (ROOT / "context").exists():
-        return _collect_chunks_under_base(ROOT / "context", path_prefix=None)
-
-    if memory_name:
-        base = MEMORY / memory_name
-        if not base.is_dir():
-            return []
-        return _collect_chunks_under_base(base, path_prefix=None)
-
-    # Aggregate hub: junctions under <hub>/<junctions_dir>/ + optional flat memory/
-    out: list[tuple[Path, str, dict]] = []
-    junctions_root = ASSETS
-    if junctions_root.is_dir():
-        for item in sorted(junctions_root.iterdir()):
-            if not item.is_dir():
-                continue
-            if item.name in _SKIP_JUNCTION_SUBDIRS or item.name.startswith("."):
-                continue
-            out.extend(_collect_chunks_under_base(item, path_prefix=item.name))
-    if MEMORY.is_dir():
-        out.extend(_collect_chunks_under_base(MEMORY, path_prefix=None))
-    return out
+def collect_chunks(memory_dir: Path) -> list[tuple[Path, str, dict]]:
+    """Collect all .md chunk files under memory_dir. Returns [(path, text, metadata), ...]."""
+    return _collect_chunks_under_base(memory_dir)
 
 
 def _embed_with_openai(
@@ -301,32 +256,25 @@ def index_chunks(
 
 
 def main():
-    memory_name = None
-    if "--memory" in sys.argv:
-        idx = sys.argv.index("--memory")
-        if idx + 1 < len(sys.argv):
-            memory_name = sys.argv[idx + 1]
-    if memory_name is None and "--path" in sys.argv:
-        idx = sys.argv.index("--path")
-        if idx + 1 < len(sys.argv):
-            memory_name = Path(sys.argv[idx + 1]).name
-    replace = "--replace" in sys.argv
+    args = sys.argv[1:]
+    replace = "--replace" in args
+    args = [a for a in args if a != "--replace"]
 
-    rag_dir = rag_dir_for_embed(memory_name)
-    chunks = collect_chunks(memory_name)
+    path_idx = next((i for i, a in enumerate(args) if a == "--path"), None)
+    if path_idx is None or path_idx + 1 >= len(args):
+        print("Usage: python embed_and_index.py --path <memory_folder> [--replace]")
+        sys.exit(1)
+
+    memory_dir = Path(args[path_idx + 1]).resolve()
+    rag_dir = memory_dir / "rag"
+
+    chunks = collect_chunks(memory_dir)
     if not chunks:
-        if memory_name:
-            scope = f"memory/{memory_name}"
-        else:
-            scope = f"{ASSETS.name}/*/ (junction subfolders) and memory/"
-        print(f"No chunks found under {scope}")
-        print(
-            "Run convert_to_markdown and chunk_markdown first, or add topic junctions under "
-            f"{ASSETS}."
-        )
+        print(f"No chunks found under {memory_dir}")
+        print("Run convert_to_markdown.py and chunk_markdown.py first.")
         return
 
-    print(f"Indexing {len(chunks)} chunks...")
+    print(f"Indexing {len(chunks)} chunks → {rag_dir}")
     n = index_chunks(chunks, replace=replace, rag_dir=rag_dir)
     print(f"Done: {n} chunks indexed to {rag_dir}")
 

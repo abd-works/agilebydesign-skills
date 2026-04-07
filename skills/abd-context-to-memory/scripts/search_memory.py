@@ -2,9 +2,9 @@
 Search memory using semantic (vector) retrieval.
 
 Usage:
-  python search_memory.py "agile transformation approach" [--k 5] [--format text|json]
+  python search_memory.py "agile transformation approach" --rag <memory/rag> [--k 5] [--format text|json]
 
-Run from workspace root. Returns top-k chunks from the vector index.
+Run from workspace root. Returns top-k chunks from the FAISS vector index.
 Requires: pip install openai faiss-cpu numpy
 Set OPENAI_API_KEY environment variable.
 """
@@ -14,9 +14,8 @@ import os
 import sys
 from pathlib import Path
 
-from _config import ensure_root, resolve_search_rag_dir
+import _config  # noqa: F401 — loads OPENAI_API_KEY from .env/.secrets
 
-ensure_root()
 EMBEDDING_MODEL = "text-embedding-3-small"
 DEFAULT_K = 5
 
@@ -30,7 +29,7 @@ def _embed_query(query: str) -> list[float]:
     return resp.data[0].embedding
 
 
-def search(query: str, k: int = DEFAULT_K) -> list[dict]:
+def search(query: str, rag_dir: Path, k: int = DEFAULT_K) -> list[dict]:
     """Return top-k chunks with content, source, and score."""
     if not os.environ.get("OPENAI_API_KEY"):
         print("Error: OPENAI_API_KEY environment variable is required.", file=sys.stderr)
@@ -44,7 +43,6 @@ def search(query: str, k: int = DEFAULT_K) -> list[dict]:
         print("Run: pip install openai faiss-cpu numpy", file=sys.stderr)
         sys.exit(1)
 
-    rag_dir = resolve_search_rag_dir()
     index_file = rag_dir / "index.faiss"
     metadata_file = rag_dir / "metadata.json"
 
@@ -88,12 +86,13 @@ def search(query: str, k: int = DEFAULT_K) -> list[dict]:
 def main():
     args = sys.argv[1:]
     if not args or args[0].startswith("--"):
-        print("Usage: python search_memory.py \"<query>\" [--k 5] [--format text|json]")
+        print('Usage: python search_memory.py "<query>" --rag <memory/rag> [--k 5] [--format text|json]')
         return
 
     query = args[0]
     k = DEFAULT_K
     fmt = "text"
+    rag_dir: Path | None = None
     i = 1
     while i < len(args):
         if args[i] == "--k" and i + 1 < len(args):
@@ -102,10 +101,17 @@ def main():
         elif args[i] == "--format" and i + 1 < len(args):
             fmt = args[i + 1].lower()
             i += 2
+        elif args[i] == "--rag" and i + 1 < len(args):
+            rag_dir = Path(args[i + 1]).resolve()
+            i += 2
         else:
             i += 1
 
-    results = search(query, k=k)
+    if rag_dir is None:
+        print("Error: --rag <memory/rag> is required", file=sys.stderr)
+        sys.exit(1)
+
+    results = search(query, rag_dir=rag_dir, k=k)
 
     if fmt == "json":
         print(json.dumps(results, indent=2))

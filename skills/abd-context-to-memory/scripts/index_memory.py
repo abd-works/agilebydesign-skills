@@ -1,232 +1,65 @@
 """
-Orchestrate full pipeline: convert → chunk → index chunks → (optional) embed.
+Full pipeline: convert → chunk → embed into local FAISS vector store.
 
 Usage:
-  python index_memory.py --path <source_folder>   # convert, chunk, index chunks, sync URLs (no embed by default)
-  python index_memory.py --path <source_folder> --embed   # also per-topic embed_and_index → memory/rag/
-  python index_memory.py --path <source_folder> --skip-convert   # skip convert (markdown under <topic>/markdown/)
-  python index_memory.py --memory <memory_name>   # chunk + sync (+ embed only with --embed)
-  python index_memory.py --replace                # rebuild vector index via embed_and_index only
+  python index_memory.py --path <source_folder>               # convert + chunk + embed
+  python index_memory.py --path <source_folder> --skip-convert  # skip convert, chunk + embed only
+  python index_memory.py --rebuild --path <source_folder>     # rebuild index from existing chunks
 
-Run from workspace root. Requires: markitdown; openai/faiss only when embedding. Set OPENAI_API_KEY for embed.
-
-ROOT (memory storage) for --path: the **source folder you pass**. Chunks live under `<source>/memory/`
-(topic flow) or `<parent>/memory/context/` when the folder is named `context`. Set CONTENT_MEMORY_ROOT
-only when running --memory without a source (chunk + optional embed).
-
-After a successful --path pipeline, creates **<hub>/<junctions_dir>/<source_folder_name> -> <source>/memory**
-(``junctions_dir`` from ``content_memory_roots.json``, default ``assets``). Hub root: cwd,
-**ABD_CONTENT_ROOT**, or **--memory-root** / **--junction-workspace**. Skip with --no-junction or SKIP_MEMORY_JUNCTION=1.
-
-Chunk index: index_chunks runs after chunk; writes chunk_index.json to story-synthesizer/context/
-when that path exists. Required for abd-story-synthesizer evidence extraction.
+Chunks land in <source>/memory/. FAISS index in <source>/memory/rag/.
+Run from workspace root.
 """
 
-import os
 import subprocess
 import sys
 from pathlib import Path
 
-from _config import ROOT, MEMORY, ensure_root, get_default_context_folder
-from memory_junction import ensure_named_source_junction
-
-ensure_root()
 SCRIPTS = Path(__file__).resolve().parent
 
 
-def _strip_junction_flags(args: list[str]) -> tuple[list[str], Path | None, bool]:
-    """Remove --no-junction, --junction-workspace, --memory-root; return (args, hub_root_or_none, skip)."""
-    skip = "--no-junction" in args
-    out = [a for a in args if a != "--no-junction"]
-    ws_flag: Path | None = None
-    i = 0
-    hub_flags = ("--junction-workspace", "--memory-root")
-    while i < len(out):
-        if out[i] in hub_flags and i + 1 < len(out):
-            ws_flag = Path(out[i + 1]).resolve()
-            out = out[:i] + out[i + 2 :]
-            continue
-        i += 1
-    return out, ws_flag, skip
-
-
-def _memory_hub_root(explicit: Path | None) -> Path:
-    if explicit is not None:
-        return explicit
-    env = os.environ.get("ABD_CONTENT_ROOT", "").strip()
-    if env:
-        return Path(env).expanduser().resolve()
-    return Path.cwd().resolve()
-
-
-def _run(script: str, args: list[str], content_root: Path | None = None) -> bool:
-    """Run a script; return True on success.
-    When content_root is set, use it as cwd and CONTENT_MEMORY_ROOT so memory lives with the source."""
-    cmd = [sys.executable, str(SCRIPTS / script)] + args
-    cwd = str(content_root) if content_root else str(ROOT)
-    env = os.environ.copy()
-    if content_root:
-        env["CONTENT_MEMORY_ROOT"] = str(content_root)
-    r = subprocess.run(cmd, cwd=cwd, env=env)
-    return r.returncode == 0
+def run(script: str, args: list[str], cwd: Path) -> None:
+    result = subprocess.run([sys.executable, str(SCRIPTS / script)] + args, cwd=str(cwd))
+    if result.returncode != 0:
+        print(f"ERROR: {script} failed.")
+        sys.exit(1)
 
 
 def main():
     args = sys.argv[1:]
-    replace = "--replace" in args
-    if replace:
-        args = [a for a in args if a != "--replace"]
+
     skip_convert = "--skip-convert" in args
-    if skip_convert:
-        args = [a for a in args if a != "--skip-convert"]
-    do_embed = "--embed" in args
-    if do_embed:
-        args = [a for a in args if a != "--embed"]
-    args, junction_workspace_flag, skip_junction = _strip_junction_flags(args)
+    rebuild = "--rebuild" in args
+    args = [a for a in args if a not in ("--skip-convert", "--rebuild")]
 
-    # Full rebuild: embed all memory with --replace
-    if replace and not any(a in args for a in ("--path", "--memory")):
-        if not _run("embed_and_index.py", ["--replace"]):
-            sys.exit(1)
-        print("Full index rebuilt.")
-        return
-
-    # --path: convert → chunk → embed (or default: skill_space_path/context when no folder specified)
     path_idx = next((i for i, a in enumerate(args) if a == "--path"), None)
-    src = None
-    if path_idx is not None and path_idx + 1 < len(args):
-        src = args[path_idx + 1]
-    elif not any(a in args for a in ("--path", "--memory")):
-        default = get_default_context_folder()
-        if default is not None:
-            src = str(default)
-            print(f"Using default context folder: {src}\n")
-    if src is not None:
-        src_path = Path(src).resolve()
-        # Folder named "context" (e.g. skill_space_path/context): keep legacy layout
-        # chunks at <parent>/memory/context/ so project RAG stays under project root.
-        if src_path.name == "context":
-            content_root = src_path.parent
-            memory_name = "context"
-            memory_dir = content_root / "memory" / memory_name
-            tail_ctx = "sync SharePoint" + (" -> embed" if do_embed else "")
-            phase = (
-                f"chunk -> index chunks -> {tail_ctx}"
-                if skip_convert
-                else f"convert -> chunk -> index chunks -> {tail_ctx}"
-            )
-            print(f"Pipeline: {phase} for {src}")
-            print(f"Memory root (project): {content_root}  |  chunks: {memory_dir}\n")
-            if skip_convert:
-                print("Skipping convert (--skip-convert): using existing .md beside sources.\n")
-            elif not _run("convert_to_markdown.py", ["--memory", str(src_path)], content_root=content_root):
-                sys.exit(1)
-            if not _run(
-                "chunk_markdown.py",
-                ["--path", str(content_root), "--output", str(memory_dir)],
-                content_root=content_root,
-            ):
-                sys.exit(1)
-            chunk_folder = memory_dir
-            _run("index_chunks.py", ["--context-path", str(chunk_folder)], content_root=content_root)
-            if not _run("sync_sharepoint_urls.py", ["--memory", memory_name], content_root=content_root):
-                sys.exit(1)
-            if do_embed:
-                embed_args = ["--memory", memory_name]
-                if replace:
-                    embed_args.append("--replace")
-                if not _run("embed_and_index.py", embed_args, content_root=content_root):
-                    sys.exit(1)
-            else:
-                print("Skipping embed (default; pass --embed for per-topic FAISS, or run embed_and_index.py from hub).\n")
-            if not skip_junction:
-                ensure_named_source_junction(
-                    _memory_hub_root(junction_workspace_flag),
-                    source_folder=src_path,
-                    memory_dir=memory_dir,
-                )
-            print("\nDone: indexed.")
-            return
+    if path_idx is None or path_idx + 1 >= len(args):
+        print("Usage: python index_memory.py --path <source_folder> [--skip-convert] [--rebuild]")
+        sys.exit(1)
 
-        # Topic / memory source: chunks under <source>/memory/
-        content_root = src_path
-        memory_dir = content_root / "memory"
-        tail = "sync SharePoint" + (" -> embed" if do_embed else "")
-        phase = (
-            f"chunk -> index chunks -> {tail}"
-            if skip_convert
-            else f"convert -> chunk -> index chunks -> {tail}"
-        )
-        print(f"Pipeline: {phase} for {src}")
-        print(f"Topic root (CONTENT_MEMORY_ROOT): {content_root}")
-        print(f"Chunks: {memory_dir}\n")
-        if skip_convert:
-            print("Skipping convert (--skip-convert): using existing .md beside sources.\n")
-        elif not _run("convert_to_markdown.py", ["--memory", str(src_path)], content_root=content_root):
-            sys.exit(1)
-        if not _run(
-            "chunk_markdown.py",
-            ["--path", str(src_path), "--output", str(memory_dir)],
-            content_root=content_root,
-        ):
-            sys.exit(1)
-        chunk_folder = memory_dir
-        _run("index_chunks.py", ["--context-path", str(chunk_folder)], content_root=content_root)
-        if not _run("sync_sharepoint_urls.py", [], content_root=content_root):
-            sys.exit(1)
-        if do_embed:
-            embed_args: list[str] = []
-            if replace:
-                embed_args.append("--replace")
-            if not _run("embed_and_index.py", embed_args, content_root=content_root):
-                sys.exit(1)
-        else:
-            print("Skipping embed (default; pass --embed for per-topic FAISS, or run embed_and_index.py from hub).\n")
-        if not skip_junction:
-            ensure_named_source_junction(
-                _memory_hub_root(junction_workspace_flag),
-                source_folder=src_path,
-                memory_dir=memory_dir,
-            )
-        print("\nDone: indexed.")
-        return
+    src = Path(args[path_idx + 1]).resolve()
+    if not src.exists():
+        print(f"ERROR: source folder not found: {src}")
+        sys.exit(1)
 
-    # --memory / --path: chunk → embed (assumes convert already ran or chunks exist)
-    mem_idx = next((i for i, a in enumerate(args) if a == "--memory"), None)
-    path_idx = next((i for i, a in enumerate(args) if a == "--path"), None)
-    src = None
-    if path_idx is not None and path_idx + 1 < len(args):
-        src = args[path_idx + 1]
-    elif mem_idx is not None and mem_idx + 1 < len(args):
-        src = args[mem_idx + 1]
-    if src:
-        src_path = Path(src).resolve()
-        memory_name = src_path.name
-        # Chunks go to src when src is "context" folder, else MEMORY/memory_name
-        chunk_folder = src_path if memory_name == "context" else MEMORY / memory_name
-        print(f"Pipeline: chunk -> index chunks -> sync SharePoint -> embed for {src}\n")
-        if not _run("chunk_markdown.py", ["--path", src]):
-            sys.exit(1)
-        _run("index_chunks.py", ["--context-path", str(chunk_folder)])
-        if not _run("sync_sharepoint_urls.py", ["--memory", memory_name]):
-            sys.exit(1)
-        if do_embed:
-            embed_args = ["--memory", memory_name]
-            if replace:
-                embed_args.append("--replace")
-            if not _run("embed_and_index.py", embed_args):
-                sys.exit(1)
-        else:
-            print("Skipping embed (default; pass --embed for per-topic FAISS, or run embed_and_index.py from hub).\n")
-        print("\nDone: indexed.")
-        return
+    memory_dir = src / "memory"
+    memory_dir.mkdir(parents=True, exist_ok=True)
 
-    print("Usage:")
-    print("  python index_memory.py --path <source_folder>   # full pipeline")
-    print("  python index_memory.py --path <folder> [--skip-convert] [--embed] [--memory-root <hub>] [--junction-workspace <hub>] [--no-junction]")
-    print("  python index_memory.py --memory <memory_name>   # chunk + embed (convert already ran)")
-    print("  python index_memory.py                          # if skill_space_path set: use <skill_space_path>/context")
-    print("  python index_memory.py --replace                # rebuild entire index")
+    if not skip_convert:
+        print(f"[1/3] Converting documents in {src} → markdown/")
+        run("convert_to_markdown.py", ["--memory", str(src)], cwd=src)
+    else:
+        print("[1/3] Skipping convert (--skip-convert)")
+
+    print(f"[2/3] Chunking markdown → {memory_dir}")
+    run("chunk_markdown.py", ["--path", str(src), "--output", str(memory_dir)], cwd=src)
+
+    print(f"[3/3] Embedding chunks → {memory_dir / 'rag'}")
+    embed_args = ["--path", str(memory_dir)]
+    if rebuild:
+        embed_args.append("--replace")
+    run("embed_and_index.py", embed_args, cwd=src)
+
+    print(f"\nDone. Index: {memory_dir / 'rag'}")
 
 
 if __name__ == "__main__":

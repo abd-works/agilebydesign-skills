@@ -10,15 +10,14 @@ The unit of work a commit describes. Scope is inferred from conversation, change
 3. **Conversation** — What the user asked to do; features, areas, artifacts discussed
 4. **Changed files** — Paths, directory structure, file names, document content
 
-**Context is also scope.** When working with ace-skills, infer scope from what part of the skill workflow is active:
-- **ace-shaping** — Which slice is being run (Slice 1, Slice 2, …); which part of the strategy (create strategy, generate slice, improve strategy); which epic or story in the shaping output is being worked on; strategy doc path
-- **ace-context-to-memory** — Which file or folder is being converted/chunked; which memory is being refreshed; pipeline step (convert, chunk, sync)
-- **Other ace-skills** — Same pattern: slice, operation, artifact, or output section being worked on
+Infer scope from what part of the skill workflow is active:
+- **abd-shaping** — Which phase is being run (Phase 1, Phase 2, …); which stage of the skill (create strategy, generate phase, improve strategy); which epic or story in the shaping output is being worked on; strategy doc path
+- **abd-context-to-memory** — Which file or folder is being converted/chunked; which memory is being refreshed; pipeline step (convert, chunk, sync)
+- **Other abd-skills or bots** — Same pattern: phase, operation, artifact, or output section being worked on
 
-Chat context often reveals this: "running Slice 2", "improving strategy for epic X", "chunking the PDF we just converted", "adding DO/DO NOT to strategy". Use it.
+Chat context often reveals this: "running Phase 2", "improving strategy for epic X", "chunking the PDF we just converted", "adding DO/DO NOT to strategy". Use it.
 
 **Scope granularity (most specific wins):**
-- Ace-skill context (e.g. "Slice 2", "Create Shaping Strategy", "chunk markdown")
 - Feature/area name (e.g. "bot panel", "scope enrichment")
 - Document type (e.g. "prioritization", "story map increments")
 - Path-derived (e.g. "Invoke Bot" from `test/invoke_bot/`)
@@ -26,22 +25,11 @@ Chat context often reveals this: "running Slice 2", "improving strategy for epic
 
 ## Purpose
 
-ace-commit-msg produces **intelligent commit messages** based on what we are doing with ace-shaping, ace-context-to-memory, or any other ace-skill. All ace-skills follow similar structure (content/, rules/, scripts/, output paths). Commit messages should reflect the active skill, operation, and scope — not generic "update project artifacts".
+abd-commit-msg produces **intelligent commit messages** based on what we are doing with abd-skills or abd-bots.  Abd-skills / follow similar structure (content/, phases/, rules/, scripts/, output paths). Commit messages should reflect the active skill/bot, operation, and scope — not generic "update project artifacts".
 
 ## Behavior
 
-What kind of work the commit represents. Inferred from **changed files** first; fallback to `behavior_action_state.json` if present.
-
-| Changed content | Behavior |
-|-----------------|----------|
-| ace-shaping output (strategy, slices, interaction tree, state model) | `shaping` |
-| ace-context-to-memory (convert, chunk, memory) | `context` |
-| Application/source code | `code` |
-| Test files | `tests` |
-| Story structure (epics, sub-epics, stories) | `shaping` |
-| slices | `shaping` |
-| steps | `exploration` |
-| scenarios | `scenarios` |
+What kind of work the commit represents. Inferred from **changed files** first; fallback to `behavior_action_state.json of abd-bot` if present.
 
 ## Action
 
@@ -121,15 +109,15 @@ The generated message. Format: `{behavior}.{action}: {meaningful description bas
 shaping.{operation}: {meaningful description based on scope}
 ```
 
-**Other ace-skills** (one skill, no operation concept):
+**Other abd-skills** (one skill, no operation concept):
 ```
 {skill}: {meaningful description based on scope}
 ```
 
 **Examples:**
 - `shaping.strategy: Create strategy for Agile Context Engine`
-- `shaping.run.1: Add Slice 1 stories for Create Ace-Skill epic`
-- `shaping.run.2: Add Slice 2 stories for Initialize Engine`
+- `shaping.run.1: Add Phase 1 stories for Create Abd-Skill epic`
+- `shaping.run.2: Add Phase 2 stories for Initialize Engine`
 - `shaping.improve_strategy: Add DO/DO NOT for hierarchy rules`
 - `shaping.improve_skill: Promote corrections to base skill rules`
 - `context-to-memory: Chunk markdown for workspace memory`
@@ -145,11 +133,11 @@ When scope is inferred or updated, persist to `last_commit_scope.md`.
 | Operation | When |
 |-----------|------|
 | strategy | Create or update strategy doc |
-| run.1, run.2, … | Run slice N; produce 4–7 stories |
+| run.1, run.2, … | Run phase N; produce 4–7 stories |
 | improve_strategy | Add DO/DO NOT corrections to strategy |
 | improve_skill | Post-shaping; promote corrections to base skill |
 
-**Other ace-skills** (e.g. context-to-memory) have no operation concept — use `{skill}: {description}`.
+**Other abd-skills** (e.g. context-to-memory) have no operation concept — use `{skill}: {description}`.
 
 ---
 
@@ -159,10 +147,10 @@ When scope is inferred or updated, persist to `last_commit_scope.md`.
 
 Before executing the commit, verify:
 
-- [ ] **Format:** `shaping.{operation}: {description}` for shaping; `{skill}: {description}` for other ace-skills (no operation)
+- [ ] **Format:** `shaping.{operation}: {description}` for shaping; `{skill}: {description}` for other abd-skills (no operation)
 - [ ] **Shaping operations:** strategy, run.1, run.2, …, improve_strategy, improve_skill — not build/run/prioritize
 - [ ] **Scope** from last_commit_scope.md, scope, or inferred from conversation/changed files
-- [ ] **Context as scope** — When using ace-skills: which slice, operation, or output section? Chat often reveals this.
+- [ ] **Context as scope** — When using abd-skills: which phase, operation, or output section? Chat often reveals this.
 - [ ] **Description** uses present tense; describes WHAT changed; references scope when relevant
 - [ ] **Length** under 80 characters when possible
 - [ ] **No Co-authored-by** trailers
@@ -171,7 +159,7 @@ Before executing the commit, verify:
 
 When inferring scope:
 
-- [ ] **Conversation first** — What did the user ask? Which slice? Which strategy section? Which file or memory?
+- [ ] **Conversation first** — What did the user ask? Which phase? Which strategy section? Which file or memory?
 - [ ] **Changed files second** — Paths, directory names, document types
 - [ ] **Persist** inferred scope to last_commit_scope.md
 - [ ] **Confirm** to user: "Inferred scope as [name] from conversation" or "from changed files"

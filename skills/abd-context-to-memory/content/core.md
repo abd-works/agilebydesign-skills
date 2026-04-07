@@ -1,20 +1,18 @@
 # Core Definitions
 
-## State Concepts (Add Context to Memory)
+## Concepts
 
-- **ContextRoot** — Named entry in `roots/roots.json` with a folder `roots/<name>/` and optional junction `roots/<name>/chunked` → absolute `memory_path` (chunked output for indexing)
-- **ContentSource** — Original artifact (PDF, PPTX, DOCX, XLSX, etc.) in supported format
-- **Markdown** — Converted artifact; full fidelity; stored under **`<parent>/markdown/`** next to the original
-- **Chunk** — Split unit of markdown for retrieval; by slide, heading, or whole file
-- **Memory** — Single memory entry; one per file; points to original and markdown
-- **Memories** — Collection of memories; nested by source structure
-- **Workspace** — Root path containing content sources and memory output
+- **ContentSource** — Original artifact (PDF, PPTX, DOCX, XLSX, etc.) in a supported format
+- **Markdown** — Converted artifact; full fidelity; stored under `<source>/markdown/`
+- **Chunk** — Split unit of markdown for retrieval; one chunk per slide, heading section, or whole file
+- **Memory** — Chunked output; lives under `<source>/memory/`
+- **RAG Index** — FAISS vector index under `<source>/memory/rag/`
 
 ## Epic: Add Context to Memory
 
 - **Actor**: Developer
-- **Supporting**: ace-context-to-memory
-- **Required State**: Workspace with content sources
+- **Supporting**: abd-context-to-memory
+- **Required State**: Folder of documents (PDF, PPTX, DOCX, XLSX, etc.)
 - **Initiation**: Developer requests add to memory (convert and chunk, ingest, refresh)
-- **Response**: Skill converts each original to markdown; chunks markdown into memory; each file → one memory; memories nested; each memory points to original and markdown
-- **Resulting State**: Memories available for future reference
+- **Response**: Skill converts each document to markdown, chunks into memory, embeds into FAISS
+- **Resulting State**: `<source>/memory/rag/` ready for semantic search
