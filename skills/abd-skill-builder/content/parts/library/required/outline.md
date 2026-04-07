@@ -1,9 +1,11 @@
 ## Introduction
-This skill builds other skills with the layout and capability outlined below; including merge pipeline, checklists, rules, and scripts. Links point at **this** repo’s `[content/parts/](../content/parts/)`, [`skill-config.json`](../skill-config.json), `[scripts/](../scripts/)`, etc., as concrete examples.
+
+This skill builds other skills with the layout and capability outlined below; including merge pipeline, checklists, rules, and scripts. Links point at **this** repo’s `[content/parts/](../content/parts/)`, `[skill-config.json](../skill-config.json)`, `[scripts/](../scripts/)`, etc., as concrete examples.
 
 ---
 
 ## Capability Summary
+
 Skills built with the skill builderwill be able to solve the following problems with the following caabilities.
 
 ```
@@ -71,7 +73,7 @@ Sections follow the **How to read this** order above. Unless stated otherwise, �
 A **skill** reads or writes the wrong project, or paths are ambiguous between **that skill’s install directory** and the **workspace tree** where engagement work should live.
 
 **Solution**
-In **each skill**, store `**active_skill_workspace`** (and optional `**known_skill_workspaces`**, `**context_paths**`) under `**skill-config.json**` → `**workspace**`. Phases, library slices, `**build_strategy**`, and **`build`** (compile paths, pipeline, scanners) live in the **same** file. Use `**scripts/base/set_workspace.py`** to print or set the pointer. Example in this repo: `[skill-config.json](../skill-config.json)`.
+In **each skill**, store `**active_skill_workspace`** (and optional `**known_skill_workspaces`**, `**context_paths`**) under `**skill-config.json**` → `**workspace**`. Phases, library slices, `**build_strategy**`, and `build` (compile paths, pipeline, scanners) live in the same file. Use `**scripts/base/set_workspace.py**` to print or set the pointer. Example in this repo: `[skill-config.json](../skill-config.json)`.
 
 **What “workspace” means here** — That pointer chooses the **project root** for everything the skill produces or updates **outside** its own package: plans, pipeline checklists, generated docs, deliverables, and other engagement artifacts. Those paths resolve under **that** tree, not under the skill install (where `**SKILL.md`**, `**scripts/`**, and `**content/**` live). The pointer tells every script and instruction **which** tree is live.
 
@@ -124,22 +126,21 @@ Workflow position and steps are easy to lose across or even during sessions.
 
 **Each skill** using this layout defines the pipeline **in the install**, and tracks **checked** progress **under `active_skill_workspace`** — not by adding a `**library/process-checklist.md**` file to the repo (scaffold **does not** ship that path).
 
-1. **Overall workflow (which phase are we in?)** — `**content/parts/process.md`** defines phase order; `**skill-config.json` → `phase_files`** lists the slugs that drive generation. The **live** pipeline checklist is **`process-checklist.md`**, **created** under `**<active_skill_workspace>/<skill_name>/progress/`** on first `**python scripts/base/generate.py --phase <slug>`** (when that file is missing). It has one row per phase (`**- [ ]` / `- [x]`**). Normative explanation of how these files are created: **`content/parts/library/base/checklist.md`** in **abd-skill-builder** (this repo).
+1. **Overall workflow (which phase are we in?)** — `**content/parts/process.md`** defines phase order; `**skill-config.json` → `phase_files`** lists the slugs that drive generation. The **live** pipeline checklist is `**process-checklist.md`**, **created** under `**<active_skill_workspace>/<skill_name>/progress/`** on first `**python scripts/base/generate.py --phase <slug>`** (when that file is missing). It has one row per phase (`**- [ ]` / `- [x]`**). Normative explanation of how these files are created: `**content/parts/library/base/checklist.md`** in **abd-skill-builder** (this repo).
+2. **Per-phase steps (what to do inside this phase)** — Each `**content/parts/phases/<phase>.md`** may define `**## Action Checklist`** with `**- [ ]` / `- [x]`** steps. The **live** copy for tracking is `**<phase-slug>-checklist.md`** in the same `**progress/**` folder (generated from that section; not a file under `**library/**`). **Resume** = first unchecked step in the workspace copy.
 
-2. **Per-phase steps (what to do inside this phase)** — Each `**content/parts/phases/<phase>.md`** may define **`## Action Checklist`** with `**- [ ]` / `- [x]`** steps. The **live** copy for tracking is **`<phase-slug>-checklist.md`** in the same **`progress/`** folder (generated from that section; not a file under **`library/`**). **Resume** = first unchecked step in the workspace copy.
-
-**Stable reference:** **`content/parts/library/base/checklist.md`** (same in every scaffolded skill; see **[How checklists are created](base/checklist.md)**) documents **how** pipeline and phase checklists work. That is separate from the **workspace `progress/`** live checklists above.
+**Stable reference:** `**content/parts/library/base/checklist.md`** (same in every scaffolded skill; see **[How checklists are created](base/checklist.md)**) documents **how** pipeline and phase checklists work. That is separate from the **workspace `progress/`** live checklists above.
 
 ```
   SKILL REPO (install — no ticked pipeline file in library/)     WORKSPACE (live — generated)
   content/parts/                                               <active_skill_workspace>/
 
   ┌─ Map: which phase exists, in what order ─┐   ┌─ Pipeline position (generated file) ─────┐
-  │ process.md  →  TOC / links               │   │ progress/process-checklist.md           │
-  │ skill-config → phase_files (slugs)       │   │ - [x] workspace-and-config                │
-  │                                          │   │ - [ ] plan-script-build  ← you are here │
-  │ (no library/process-checklist.md template)│   │ - [ ] …                                   │
-  └──────────────────────────────────────────┘   └───────────────────────────────────────────┘
+  │ process.md  →  TOC / links               │   │ progress/process-checklist.md            │
+  │ skill-config → phase_files (slugs)       │   │ - [x] workspace-and-config               │
+  │                                          │   │ - [ ] plan-script-build  ← you are here  │
+  │ (no library/process-checklist.md template)│  │ - [ ] …                                  │
+  └──────────────────────────────────────────┘   └──────────────────────────────────────────┘
 
   ┌─ Per phase: ## Action Checklist in phase file ─┐   ┌─ Steps for current phase (generated) ─┐
   │ phases/shape.md                                │   │ progress/shape-checklist.md           │
@@ -147,8 +148,8 @@ Workflow position and steps are easy to lose across or even during sessions.
   │ - [ ] step one                                 │   │ - [ ] step two  (first unchecked = …) │
   └────────────────────────────────────────────────┘   └───────────────────────────────────────┘
          ▲                                                        ▲
-         │  generate.py + workspace_checklists.py create missing │
-         │  files under progress/; do not tick the repo copies   │
+         │  generate.py + workspace_checklists.py create missing  │
+         │  files under progress/; do not tick the repo copies    │
          └────────────────────────────────────────────────────────┘
 ```
 
@@ -164,7 +165,7 @@ Authors maintain skill content under `**content/parts/`** (**process.md**, **lib
 
 The individual **phase instructions files** from `**phases/<phase>.md`** are merged with  **pieces the phase needs** from `**library/`** and  `**rules/`**. 
 
-`**skill-config.json**` tells `**build.py**`  what phases use what library parts and what rules. The result is **per-phase built files**  under `content/parts/phases/built/`.
+`**skill-config.json`** tells `**build.py**`  what phases use what library parts and what rules. The result is **per-phase built files**  under `content/parts/phases/built/`.
 
 **Full bundle** — Everything rolls up into `**AGENTS.md`** at the repo root (the agent’s single merged view). 
 
@@ -188,7 +189,7 @@ Reference: `[scripts/base/build.py](../scripts/base/build.py)`, `[skill-config.j
 Output looks correct but breaks structure or naming. Manual review is slow; without machine-checkable checks, standards drift.
 
 **Solution**
-In **each skill**, `**rules/*.md`** holds normative prose the model follows; `**rules/scanners.json`** binds optional **scanner** scripts to rules. `**build.py`** runs `**build.build_pipeline`**; `**build.scanners**` aligns local runs with CI the same way. Example tree: `**[rules/](../rules/)**` in this repo.
+In **each skill**, `**rules/*.md`** holds normative prose the model follows; `**rules/scanners.json`** binds optional **scanner** scripts to rules. `**build.py`** runs `**build.build_pipeline`**; `**build.scanners`** aligns local runs with CI the same way. Example tree: `**[rules/](../rules/)**` in this repo.
 
 ```
 ┌──────────────┐   read at prompt time   ┌──────────────────┐
