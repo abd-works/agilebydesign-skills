@@ -51,7 +51,7 @@ An anchor is a concept you expect to be present in the model from scan through f
 | `domain-scan-results.md`   | Row in the anchors table: Module name, core class name, scan-visible supporting classes, basis                                  |
 | `domain-scan-model.md`     | Module section header + core class entry + supporting class entries with `[supporting class — ModuleName module]` annotation    |
 | `domain-scan-model.drawio` | One dashed frame per anchor; core class inside; supporting classes inside; cross-module relationships between core classes only |
-| `term-registry.md`         | Core class → `anchor` classification; supporting classes → `candidate` classification with Module? column naming their module   |
+| `term-registry.md`         | Core class of a module → Classification **`anchor (class + module)`**; supporting classes → **`class`** with owning module in **Notes** (e.g. `Supporting class — Character module`). Use **Status** for lifecycle (e.g. **Tension**, **Candidate**) — not a duplicate of Classification.   |
 
 
 ---
@@ -110,7 +110,7 @@ When the scan surfaces 3–4 closely related concepts from the same chapter but 
 
 - **Diagram:** a dashed frame labeled with the anchor name, containing the core class (same name) and any supporting classes you are confident belong to this module at scan fidelity
 - **Model.md:** the module's core class listed with its fields and the names of supporting classes noted inside it
-- **Term registry:** the core class row has Classification = `anchor`; supporting classes inside the frame have Classification = `candidate` with a note naming the module they belong to
+- **Term registry:** the core class row has Classification = `anchor (class + module)`; supporting classes inside the frame have Classification = `class` with a note naming the module they belong to (**Status** tracks Ambiguous / Tension / Candidate / etc.)
 
 ### Initial model sketch
 

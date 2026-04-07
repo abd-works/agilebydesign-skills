@@ -4,7 +4,7 @@
 Usage:
     python scripts/base/generate.py --phase <slug> [--mode static|dynamic] [--no-ensure-checklists]
 
---mode static   reads phases/built/<slug>.md when present; else assembles from sources.
+--mode static   reads content/built/phases/<slug>.md when present; else assembles from sources.
 --mode dynamic  always assembles from sources (default).
 
 Unless ``--no-ensure-checklists`` is passed, creates missing live checklists under
@@ -50,7 +50,7 @@ def main() -> int:
         "--mode",
         choices=("static", "dynamic"),
         default="dynamic",
-        help="static = use phases/built/<slug>.md when present; else assemble from sources. dynamic = always assemble.",
+        help="static = use content/built/phases/<slug>.md when present; else assemble from sources. dynamic = always assemble.",
     )
     p.add_argument(
         "--no-ensure-checklists",

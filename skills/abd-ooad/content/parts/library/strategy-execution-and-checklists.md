@@ -6,7 +6,7 @@ OOAD uses **three** checklist layers under **`<workspace>/abd-ooad/progress/`**.
 
 ## Workflow
 
-1. **Domain scan** — produce scan artifacts (see **`scan-artifacts-and-strategy`**).
+1. **Domain scan** — produce scan artifacts (see **`strategy-led-generation`**).
 2. **Strategy** — fill **`strategy.md`** from **`templates/strategy.md`**:
    - **Modeling scope** — chapters, anchors, files, in/out of scope.
    - **Execution plan (normative)** — ordered list of phase **slugs** (from **`skill-config.json` → `phase_files`**) plus **scope per step** (e.g. “nouns-verbs on Chapter 5 only”).

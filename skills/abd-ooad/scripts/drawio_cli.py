@@ -690,25 +690,48 @@ def cmd_verify(args):
         tx, ty, tw, th = _box_map[tgt_name]
         scx, scy = sx + sw / 2, sy + sh / 2
         tcx, tcy = tx + tw / 2, ty + th / 2
+
+        # Build the polyline: src_center → [waypoints] → tgt_center
+        # Waypoints in <Array as="points"><mxPoint x=… y=…/></Array> are
+        # absolute canvas coordinates and bend the otherwise-straight edge.
+        geo = cell.find("mxGeometry")
+        waypoints = []
+        if geo is not None:
+            pts_el = geo.find("Array[@as='points']")
+            if pts_el is not None:
+                for pt in pts_el.findall("mxPoint"):
+                    try:
+                        waypoints.append((float(pt.get("x", 0)),
+                                          float(pt.get("y", 0))))
+                    except (TypeError, ValueError):
+                        pass
+
+        poly = [(scx, scy)] + waypoints + [(tcx, tcy)]
+
         # Shrink test rects by 5 px to avoid false positives at shared borders
         MARGIN = 5
-        blockers = [
-            other for other, (ox, oy, ow, oh) in _box_map.items()
-            if other not in (src_name, tgt_name)
-            and _seg_rect_intersects(scx, scy, tcx, tcy,
-                                     ox + MARGIN, oy + MARGIN,
-                                     ow - 2 * MARGIN, oh - 2 * MARGIN)
-        ]
+        blockers = set()
+        for seg_i in range(len(poly) - 1):
+            p1x, p1y = poly[seg_i]
+            p2x, p2y = poly[seg_i + 1]
+            for other, (ox, oy, ow, oh) in _box_map.items():
+                if other in (src_name, tgt_name):
+                    continue
+                if _seg_rect_intersects(p1x, p1y, p2x, p2y,
+                                        ox + MARGIN, oy + MARGIN,
+                                        ow - 2 * MARGIN, oh - 2 * MARGIN):
+                    blockers.add(other)
+
         if blockers:
             issues.append({
                 "code": "V6",
                 "severity": "WARN",
                 "msg": (f"ARROW OVERLAP: straight edge {src_name}→{tgt_name} "
-                        f"passes through {', '.join(blockers)}"),
-                "detail": (f"  The straight dependency line from {src_name} to "
-                           f"{tgt_name} crosses: {', '.join(blockers)}.\n"
-                           f"  Fix: reposition the blocking class or add an "
-                           f"intermediate waypoint to route around it."),
+                        f"passes through {', '.join(sorted(blockers))}"),
+                "detail": (f"  The dependency line from {src_name} to "
+                           f"{tgt_name} crosses: {', '.join(sorted(blockers))}.\n"
+                           f"  Fix: run `fix-arrow-overlaps` — it picks the "
+                           f"shortest bypass waypoint around the blocking class."),
             })
 
     # ── Report ────────────────────────────────────────────────────────────────
@@ -960,6 +983,248 @@ def cmd_fix_shared_endpoints(args):
 
     save_diagram(tree, args.file)
     print(f"✓ fix-shared-endpoints: distributed {fixed} connection point(s).")
+
+
+def cmd_fix_arrow_overlaps(args):
+    """
+    Fix V6: add a single bypass waypoint to straight-line edges that cross
+    an unrelated class bounding box.
+
+    Algorithm:
+      For each offending edge (source → target that crosses blocker B):
+        1. Compute the centre of the blocker.
+        2. Try 4 bypass waypoints — just outside each side of B with a
+           configurable clearance gap (default 30 px).
+        3. Pick the candidate that minimises total path length
+           dist(src_centre, waypoint) + dist(waypoint, tgt_centre).
+        4. Write the chosen point as <Array as="points"><mxPoint …/></Array>
+           inside the edge's <mxGeometry>.
+
+    Only straight-line edges (no edgeStyle=orthogonalEdgeStyle) are processed;
+    orthogonal edges route themselves automatically.
+    """
+    import math as _math
+
+    DETECT_MARGIN = 5    # shrink blocker box for detection (matches verify V6)
+    BYPASS_GAP    = 30   # clearance past the blocker's edge for the waypoint
+
+    tree, root = load_diagram(args.file)
+    classes = get_all_classes(root)
+    id_to_name = {v.get("id"): k for k, v in classes.items()}
+
+    box_map = {}
+    for name, cls in classes.items():
+        g = cls.find("mxGeometry")
+        if g is not None:
+            box_map[name] = (float(g.get("x", 0)), float(g.get("y", 0)),
+                             float(g.get("width",  DEFAULT_WIDTH)),
+                             float(g.get("height", 100)))
+
+    def _seg_rect_intersects(x1, y1, x2, y2, rx, ry, rw, rh):
+        rx2, ry2 = rx + rw, ry + rh
+        def _in(px, py):
+            return rx < px < rx2 and ry < py < ry2
+        if _in(x1, y1) or _in(x2, y2):
+            return True
+        dx, dy = x2 - x1, y2 - y1
+        for sx1, sy1, sx2, sy2 in [
+            (rx, ry, rx2, ry), (rx, ry2, rx2, ry2),
+            (rx, ry, rx, ry2), (rx2, ry, rx2, ry2),
+        ]:
+            dxs, dys = sx2 - sx1, sy2 - sy1
+            cross = dx * dys - dy * dxs
+            if abs(cross) < 1e-10:
+                continue
+            t = ((sx1 - x1) * dys - (sy1 - y1) * dxs) / cross
+            u = ((sx1 - x1) * dy  - (sy1 - y1) * dx)  / cross
+            if 0.0 <= t <= 1.0 and 0.0 <= u <= 1.0:
+                return True
+        return False
+
+    fixed = 0
+
+    for cell in root.findall("mxCell"):
+        if cell.get("edge") != "1":
+            continue
+        src_id = cell.get("source", "")
+        tgt_id = cell.get("target", "")
+        if not src_id or not tgt_id:
+            continue
+        src_name = id_to_name.get(src_id)
+        tgt_name = id_to_name.get(tgt_id)
+        if src_name is None or tgt_name is None:
+            continue
+        style = cell.get("style", "")
+        if "edgeStyle=orthogonalEdgeStyle" in style:
+            continue  # orthogonal edges route themselves
+        if src_name not in box_map or tgt_name not in box_map:
+            continue
+
+        sx, sy, sw, sh = box_map[src_name]
+        tx, ty, tw, th = box_map[tgt_name]
+        scx, scy = sx + sw / 2, sy + sh / 2
+        tcx, tcy = tx + tw / 2, ty + th / 2
+
+        # Collect all blocking classes (shrunk by DETECT_MARGIN)
+        blockers = [
+            (bname, box_map[bname])
+            for bname in box_map
+            if bname not in (src_name, tgt_name)
+            and _seg_rect_intersects(
+                scx, scy, tcx, tcy,
+                box_map[bname][0] + DETECT_MARGIN,
+                box_map[bname][1] + DETECT_MARGIN,
+                box_map[bname][2] - 2 * DETECT_MARGIN,
+                box_map[bname][3] - 2 * DETECT_MARGIN,
+            )
+        ]
+
+        if not blockers:
+            continue
+
+        # Use the first (primary) blocker — usually only one
+        blocker_name, (rx, ry, rw, rh) = blockers[0]
+        rcx, rcy = rx + rw / 2, ry + rh / 2
+
+        # 8 candidate bypass waypoints: 4 edge-midpoints + 4 corners
+        # Placed just outside the blocker's bounding box with BYPASS_GAP clearance.
+        candidates = [
+            (rcx,                    ry  - BYPASS_GAP,       "above"),
+            (rcx,                    ry  + rh + BYPASS_GAP,  "below"),
+            (rx  - BYPASS_GAP,       rcy,                    "left"),
+            (rx  + rw + BYPASS_GAP,  rcy,                    "right"),
+            # corners
+            (rx  - BYPASS_GAP,       ry  - BYPASS_GAP,       "top-left"),
+            (rx  + rw + BYPASS_GAP,  ry  - BYPASS_GAP,       "top-right"),
+            (rx  - BYPASS_GAP,       ry  + rh + BYPASS_GAP,  "bottom-left"),
+            (rx  + rw + BYPASS_GAP,  ry  + rh + BYPASS_GAP,  "bottom-right"),
+        ]
+
+        # ── helper: does segment (ax,ay)→(bx,by) cross any unrelated class? ──
+        def _seg_free(ax, ay, bx, by):
+            shrink = DETECT_MARGIN
+            for oname, (ox, oy, ow, oh) in box_map.items():
+                if oname in (src_name, tgt_name):
+                    continue
+                ow2 = ow - 2 * shrink
+                oh2 = oh - 2 * shrink
+                if ow2 <= 0 or oh2 <= 0:
+                    continue
+                if _seg_rect_intersects(ax, ay, bx, by,
+                                        ox + shrink, oy + shrink, ow2, oh2):
+                    return False
+            return True
+
+        def _dist(ax, ay, bx, by):
+            return _math.hypot(bx - ax, by - ay)
+
+        # ── generate the 8 bypass candidates for a given blocker box ─────────
+        def _bypass_candidates(bx, by, bw, bh):
+            bcx, bcy = bx + bw / 2, by + bh / 2
+            return [
+                (bcx,              by  - BYPASS_GAP,       "above"),
+                (bcx,              by  + bh + BYPASS_GAP,  "below"),
+                (bx  - BYPASS_GAP, bcy,                    "left"),
+                (bx  + bw + BYPASS_GAP, bcy,               "right"),
+                (bx  - BYPASS_GAP,       by  - BYPASS_GAP,       "top-left"),
+                (bx  + bw + BYPASS_GAP,  by  - BYPASS_GAP,       "top-right"),
+                (bx  - BYPASS_GAP,       by  + bh + BYPASS_GAP,  "bottom-left"),
+                (bx  + bw + BYPASS_GAP,  by  + bh + BYPASS_GAP,  "bottom-right"),
+            ]
+
+        # ── first-blocker encountered along a segment ─────────────────────────
+        def _first_blocker_t(ax, ay, bx, by):
+            shrink = DETECT_MARGIN
+            best = None
+            dx, dy = bx - ax, by - ay
+            length_sq = dx * dx + dy * dy
+            for oname, (ox, oy, ow, oh) in box_map.items():
+                if oname in (src_name, tgt_name):
+                    continue
+                ow2 = ow - 2 * shrink
+                oh2 = oh - 2 * shrink
+                if ow2 <= 0 or oh2 <= 0:
+                    continue
+                if _seg_rect_intersects(ax, ay, bx, by,
+                                        ox + shrink, oy + shrink, ow2, oh2):
+                    # project blocker centre onto segment to get t
+                    bcx2 = ox + ow / 2
+                    bcy2 = oy + oh / 2
+                    t = 0.0
+                    if length_sq > 1e-10:
+                        t = ((bcx2 - ax) * dx + (bcy2 - ay) * dy) / length_sq
+                    if best is None or t < best[0]:
+                        best = (t, oname, (ox, oy, ow, oh))
+            return best  # None or (t, name, box)
+
+        # ── recursive path finder (max depth controls max extra waypoints) ─────
+        def _find_waypoints(ax, ay, bx, by, depth):
+            """Return list of (x,y) waypoints between (ax,ay) and (bx,by), or None."""
+            if _seg_free(ax, ay, bx, by):
+                return []          # direct segment is clear
+            if depth <= 0:
+                return None        # give up
+
+            hit = _first_blocker_t(ax, ay, bx, by)
+            if hit is None:
+                return []
+
+            _, _, (rx, ry, rw, rh) = hit
+            bypass = _bypass_candidates(rx, ry, rw, rh)
+
+            # Sort bypass candidates by total detour length
+            bypass.sort(key=lambda c: _dist(ax, ay, c[0], c[1]) +
+                                       _dist(c[0], c[1], bx, by))
+
+            for cwx, cwy, _ in bypass:
+                sub1 = _find_waypoints(ax, ay,  cwx, cwy, depth - 1)
+                if sub1 is None:
+                    continue
+                sub2 = _find_waypoints(cwx, cwy, bx, by,  depth - 1)
+                if sub2 is None:
+                    continue
+                return sub1 + [(cwx, cwy)] + sub2
+
+            return None  # no bypass found
+
+        # Try to find a clean path — up to 2 intermediate waypoints
+        waypoint_list = _find_waypoints(scx, scy, tcx, tcy, depth=2)
+
+        if not waypoint_list:
+            # Last resort: shortest of the 8 bypass candidates regardless
+            best = min(candidates,
+                       key=lambda c: _dist(scx, scy, c[0], c[1]) +
+                                     _dist(c[0], c[1], tcx, tcy))
+            waypoint_list = [(best[0], best[1])]
+            direction = "fallback"
+        else:
+            direction = f"{len(waypoint_list)}-pt"
+
+        # Ensure mxGeometry exists
+        geo = cell.find("mxGeometry")
+        if geo is None:
+            geo = ET.SubElement(cell, "mxGeometry")
+            geo.set("relative", "1")
+            geo.set("as", "geometry")
+
+        # Replace any existing points array
+        existing = geo.find("Array[@as='points']")
+        if existing is not None:
+            geo.remove(existing)
+
+        pts = ET.SubElement(geo, "Array")
+        pts.set("as", "points")
+        for pwx, pwy in waypoint_list:
+            pt = ET.SubElement(pts, "mxPoint")
+            pt.set("x", str(int(pwx)))
+            pt.set("y", str(int(pwy)))
+
+        coords = " → ".join(f"({int(x)},{int(y)})" for x, y in waypoint_list)
+        print(f"  ✓ {src_name}→{tgt_name}: routed via {coords} [{direction}]")
+        fixed += 1
+
+    save_diagram(tree, args.file)
+    print(f"✓ fix-arrow-overlaps: added {fixed} bypass waypoint(s).")
 
 
 # ─── Commands ─────────────────────────────────────────────────────────────────
@@ -1691,6 +1956,12 @@ Examples:
         help="Fix V5: distribute entryX/entryY (and exitX/exitY) when 2+ edges "
              "converge on the same class without explicit port constraints.")
 
+    # fix-arrow-overlaps
+    sub.add_parser("fix-arrow-overlaps",
+        help="Fix V6: add a bypass waypoint to straight-line edges that pass "
+             "through an unrelated class — picks the shortest of 4 candidates "
+             "(above / below / left / right of the blocking class).")
+
     return parser
 
 
@@ -1714,6 +1985,7 @@ COMMAND_MAP = {
     "verify":                cmd_verify,
     "fix-edge-styles":       cmd_fix_edge_styles,
     "fix-shared-endpoints":  cmd_fix_shared_endpoints,
+    "fix-arrow-overlaps":    cmd_fix_arrow_overlaps,
 }
 
 

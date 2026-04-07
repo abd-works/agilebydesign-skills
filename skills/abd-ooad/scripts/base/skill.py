@@ -116,8 +116,8 @@ class Skill:
         return self._instructions
 
     def prompt(self, slug: str, form: Literal["dynamic", "static"] = "dynamic") -> str:
-        """Assemble prompt for *slug*. static reads phases/built/<slug>.md when present."""
-        built = _resolve_parts_dir(self.path) / "phases" / "built" / f"{slug}.md"
+        """Assemble prompt for *slug*. static reads content/built/phases/<slug>.md when present."""
+        built = self.path / "content" / "built" / "phases" / f"{slug}.md"
         if form == "static" and built.is_file():
             return built.read_text(encoding="utf-8")
         return self.instructions.assemble_prompt(slug)

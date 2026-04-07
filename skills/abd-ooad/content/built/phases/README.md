@@ -1,4 +1,4 @@
-# parts/phases/built/ — derived per-phase prompts
+# content/built/phases/ — derived per-phase prompts
 
 Files here are **generated** by **`scripts/base/build.py`**. Sources of truth: **`skill-config.json`**
 (`library_files`, `phase_library`, `phase_rules`, `every_phase_rules`, `phase_bundle`, …) and **`parts/`** / **`rules/`**.

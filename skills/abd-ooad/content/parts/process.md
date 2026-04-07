@@ -58,4 +58,4 @@
 
 **Static vs dynamic delivery:**
 - **Dynamic (default):** `generate.py` assembles phase on each call
-- **Static:** `build.py` pre-assembles to `phases/built/`; `generate.py --mode static` reads cached version
+- **Static:** `build.py` pre-assembles to `content/built/phases/`; `generate.py --mode static` reads cached version

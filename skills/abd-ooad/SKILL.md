@@ -9,7 +9,7 @@ metadata:
   capabilities:
     - workspace: "Ability to specify project workspace directory where domain models are created"
     - diagram-templates: "Built-in Draw.io diagram generation via scripts/drawio_cli.py and templates/"
-    - actor-registry: "Track domain concepts through lifecycle with UML stereotypes (<<anchor>>, <<candidate>>, <<tension>>)"
+    - term-registry: "Track Terms with Classification (model role: anchor (class + module), class, property, …) and Status (OOAD scale: Ambiguous → … → Solidified) in term-registry.md"
 ---
 
 # Object Oriented Analysis and Design (OOAD)
@@ -39,7 +39,7 @@ The core process is **linear and methodical**: Steps 0 → 1 → 2 (Scan → Ext
 ## Where This Skill Fits
 
 This skill handles **model discovery, initial design, and diagram generation** end-to-end. Diagram tooling is built in:
-- `scripts/drawio_cli.py` — create, verify, relayout, fix-edge-styles
+- `scripts/drawio_cli.py` — create, verify, relayout, fix-edge-styles, fix-shared-endpoints, fix-arrow-overlaps
 - `templates/` — domain model and domain realization templates
 - `content/parts/library/` — class diagram and sequence diagram layout rules
 

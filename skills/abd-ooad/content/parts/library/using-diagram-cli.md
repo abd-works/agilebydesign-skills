@@ -69,6 +69,9 @@ python scripts/drawio_cli.py fix-edge-styles --file <output>.drawio
 # Fix shared connection points (V5) — always run after adding relationships
 python scripts/drawio_cli.py fix-shared-endpoints --file <output>.drawio
 
+# Fix arrow-class overlaps (V6) — routes edges around classes they cross
+python scripts/drawio_cli.py fix-arrow-overlaps --file <output>.drawio
+
 # Verify — check all rules V1–V6
 python scripts/drawio_cli.py verify --file <output>.drawio
 ```
@@ -77,6 +80,12 @@ The `fix-shared-endpoints` command detects classes where 2+ edges arrive or
 leave without explicit `entryX/Y` / `exitX/Y` constraints. It determines the
 dominant approach side (top / bottom / left / right) and distributes port
 coordinates evenly so arrowheads no longer pile up.
+
+The `fix-arrow-overlaps` command detects edges whose straight-line path passes
+through an unrelated class body (V6). It automatically inserts 1–2 waypoints to
+route the edge around all obstacles, using a recursive shortest-path algorithm
+with up to 2 bypass points. V4 info messages about explicit waypoints on
+previously-fixed edges are expected and can be ignored.
 
 After verify, address any remaining warnings:
 
@@ -87,21 +96,18 @@ After verify, address any remaining warnings:
 | V3 | WARN | Wrong edge style for relationship type | `fix-edge-styles` |
 | V4 | WARN | Explicit waypoints on orthogonal edges | `fix-edge-styles` |
 | V5 | WARN | 2+ edges share unconstrained connection point | `fix-shared-endpoints` |
-| V6 | WARN | Straight edge passes through unrelated class | Move class or add waypoint manually |
+| V6 | WARN | Straight edge passes through unrelated class | `fix-arrow-overlaps` |
 
 Then run the frame containment check (Python XML script) to confirm all classes are inside their frames.
 
 ### Step 7 — AI layout pass
 
 The programmatic build will produce correct structure but imperfect visual routing. After running verify (with 0 errors), open the diagram and inspect for:
-- Any remaining V6 warnings — move the blocking class or add a manual bend point
 - Labels obscured by other elements (drag to clear space)
 - Any class that is outside its frame boundary (fix with `add-frame` or XML edit)
+- Any remaining V6 warnings after `fix-arrow-overlaps` — move the blocking class manually as a last resort
 
-This step is required when V6 warnings remain. Code cannot automatically route
-straight-line dependencies around obstacles — this requires a human layout
-decision. Note what was corrected so the post-processed version reflects the
-final intent.
+`fix-arrow-overlaps` automatically routes edges around any class they pass through, inserting 1–2 waypoints using a recursive shortest-path algorithm. Re-run it if V6 warnings remain after the initial fix.
 
 ---
 
@@ -110,7 +116,7 @@ final intent.
 Every class diagram follows this sequence:
 
 ```
-new → add-class (×N) → add-field (×N) → add-method (×N) → add-relationships → relayout → verify
+new → add-class (×N) → add-field (×N) → add-method (×N) → add-relationships → fix-edge-styles → fix-shared-endpoints → fix-arrow-overlaps → verify
 ```
 
 ```bash
@@ -133,9 +139,10 @@ python scripts/drawio_cli.py add-association <From> <To> --label "<label>" --fro
 python scripts/drawio_cli.py add-inheritance <Subclass> <Superclass> --file <output>.drawio
 python scripts/drawio_cli.py add-dependency <From> <To> --stereotype "<label>" --file <output>.drawio
 
-# 6. Fix edge styles, spread shared endpoints, then verify
+# 6. Fix edge styles, spread shared endpoints, fix overlaps, then verify
 python scripts/drawio_cli.py fix-edge-styles --file <output>.drawio
 python scripts/drawio_cli.py fix-shared-endpoints --file <output>.drawio
+python scripts/drawio_cli.py fix-arrow-overlaps --file <output>.drawio
 python scripts/drawio_cli.py verify --file <output>.drawio
 ```
 
@@ -146,7 +153,7 @@ python scripts/drawio_cli.py verify --file <output>.drawio
 When the diagram represents anchor modules (domain-scan phase), each anchor needs a **dashed frame** enclosing its core class and any supporting classes. The module name = the frame title = the core class name.
 
 ```
-new → add-class (core classes + supporting classes) → add-field → add-frame (×N, one per module) → add-relationships → fix-edge-styles → verify
+new → add-class (core classes + supporting classes) → add-field → add-frame (×N, one per module) → add-relationships → fix-edge-styles → fix-shared-endpoints → fix-arrow-overlaps → verify
 ```
 
 ```bash
@@ -170,9 +177,10 @@ python scripts/drawio_cli.py add-frame "<ModuleName>" --classes "<CoreClass>,<Su
 python scripts/drawio_cli.py add-composition <CoreA> <CoreB> --file <output>.drawio
 python scripts/drawio_cli.py add-dependency <CoreA> <CoreB> --stereotype "<label>" --file <output>.drawio
 
-# 6. Fix edge styles, spread shared endpoints, then verify
+# 6. Fix edge styles, spread shared endpoints, fix overlaps, then verify
 python scripts/drawio_cli.py fix-edge-styles --file <output>.drawio
 python scripts/drawio_cli.py fix-shared-endpoints --file <output>.drawio
+python scripts/drawio_cli.py fix-arrow-overlaps --file <output>.drawio
 python scripts/drawio_cli.py verify --file <output>.drawio
 ```
 

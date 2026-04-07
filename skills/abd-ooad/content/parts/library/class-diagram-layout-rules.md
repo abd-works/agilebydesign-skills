@@ -266,6 +266,115 @@ where multiple arrowheads overlap and the diagram becomes unreadable.
 (top / bottom / left / right) and distributes `entryX`/`entryY` (or
 `exitX`/`exitY`) evenly across it for all unconstrained edges in the group.
 
+> **Preferred over bare entry-point spreading:** see Section 5a below — anchor
+> each composition to its specific field row instead. This fully eliminates V5
+> and produces a far more readable diagram.
+
+---
+
+## 5a. Field-anchored composition — the preferred routing pattern
+
+When a parent class (e.g. `Character`) owns several child classes through
+composition, the cleanest layout is to:
+
+1. **Add a field row** inside the parent for each owned type (e.g. `+ abilities: Ability`)  
+2. **Connect the diamond to that field row**, not to the parent class border  
+3. **Exit from the SIDE of the child class** (left or right, never top or bottom)  
+4. **Keep the diamond co-linear with the line** (diamond faces the same direction as the line segment it is part of — never sideways)  
+5. **Use as few waypoints as possible** — ideally zero or one  
+
+### Visual goal
+
+```
+[Character]                     [Ability]
+┌───────────────────────┐       ┌──────────────┐
+│ + powerLevel: int     │       │ + rank: int  │
+│─────────────────────  │       │              │
+│ + abilities: Ability ◆│───────│              │
+│ + skills: Skill      ◆│       └──────────────┘
+└───────────────────────┘
+```
+
+The diamond (`◆`) sits at the **field row** and points toward the child class.
+The line exits the **right or left side** of the child and enters the field row.
+
+### Layout recommendation
+
+Place child classes **to the left or right of the parent**, not directly below.
+This allows clean horizontal routing with zero or one waypoint and avoids
+long vertical runs that pass through other classes.
+
+```
+[Advantage]──────◆ advantages: Advantage  │
+[Ability]────────◆ abilities: Ability      │ Character
+[HeroPoint]──────◆ heroPoints: HeroPoint  │
+[Skill]──────────◆ skills: Skill          │
+```
+
+### ✓ Correct XML pattern
+
+```xml
+<!-- Source = child class; Target = field row cell inside parent;
+     endArrow=diamondThin places the diamond at the field row.
+     Child exits from its RIGHT side (exitX=1) toward the field row. -->
+<mxCell id="edge-ability" value=""
+        style="endArrow=diamondThin;endFill=1;endSize=24;
+               edgeStyle=orthogonalEdgeStyle;
+               exitX=1;exitY=0.5;exitDx=0;exitDy=0;"
+        parent="1" source="AbilityClass" target="AbilitiesFieldRow" edge="1">
+  <mxGeometry as="geometry" />
+</mxCell>
+
+<!-- The field row cell must have portConstraint=eastwest so the
+     diamond connects to its LEFT or RIGHT side, not top/bottom -->
+<mxCell id="AbilitiesFieldRow"
+        value="+ abilities: Ability"
+        style="text;...;portConstraint=eastwest;"
+        parent="CharacterClass" vertex="1">
+  <mxGeometry y="118" width="300" height="26" as="geometry"/>
+</mxCell>
+```
+
+Key style attributes:
+
+| Attribute | Value | Reason |
+|-----------|-------|--------|
+| `source` | child class cell id | composition originates at child |
+| `target` | field row cell id (inside parent) | diamond lands at the field |
+| `endArrow` | `diamondThin` | filled diamond at target (field row) |
+| `exitX=1;exitY=0.5` | right-side exit of child | side exit = clean orthogonal route |
+| `portConstraint=eastwest` | on field row | constrains diamond to left or right side |
+
+### ❌ Anti-pattern: diamond entering from the top or bottom
+
+```xml
+<!-- Diamond arrives at the parent's bottom edge — produces V5 pile-up
+     AND diamond appears sideways or flipped relative to the line -->
+<mxCell style="endArrow=diamondThin;endFill=1;
+               entryX=0.5;entryY=1;..."   <!-- ← bottom of CHARACTER class -->
+        target="CharacterClass" ...>
+```
+
+### Rule: diamond co-linearity
+
+The composition diamond must always face **in the same direction as the line
+segment it terminates**. If the last segment arrives from the left, the diamond
+opens to the left. A sideways diamond (arriving vertically but pointing
+horizontally) indicates a mismatched `exitX`/`exitY` or `entryX`/`entryY` and
+must be corrected.
+
+### Minimum-waypoint routing
+
+| Child position relative to parent | Typical exit | Waypoints needed |
+|------------------------------------|-------------|-----------------|
+| Directly left or right, same Y     | right/left   | 0 |
+| Left/right but offset vertically   | right/left   | 1 (adjust Y) |
+| Below or above (avoid)             | top/bottom   | 2+ (not ideal) |
+
+Prefer placing child classes **laterally** (left/right) so that routes remain
+single-segment or single-bend. Stacking child classes directly below the parent
+forces multi-waypoint routes and risks V6 overlaps.
+
 ---
 
 ## 6. Straight-line edges must not pass through unrelated classes (V6)
@@ -287,14 +396,14 @@ source-centre to target-centre against every third class's bounding box
 
 ### ✓ Resolved options
 
-1. **Reposition the blocking class** — move it off the arrow corridor; then
-   rerun `verify` to confirm V6 is clear.
-2. **Add an intermediate waypoint** manually in Draw.io to route the dependency
-   around the obstruction (add an `<Array as="points">` with one bend point,
-   or switch the edge to `edgeStyle=orthogonalEdgeStyle`).
+1. **Run `fix-arrow-overlaps`** — automatically inserts 1–2 waypoints using a
+   recursive shortest-path algorithm to route the dependency around all blockers;
+   then rerun `verify` to confirm V6 is clear.
+2. **Reposition the blocking class** — move it off the arrow corridor as a last
+   resort if `fix-arrow-overlaps` cannot find a clean path.
 
 > Note: V6 is a **WARN** (not ERROR) because the obstruction is a layout
-> decision that requires human judgment to resolve correctly.
+> issue. `fix-arrow-overlaps` resolves most cases automatically.
 
 ---
 

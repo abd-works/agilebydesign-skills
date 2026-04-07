@@ -34,228 +34,151 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 ## Phase
 
-# Add properties (semantically tight) — payments example
+# Phase: Workspace and Config
 
-**Skill:** abd-ooad — matches **Step 5: Add properties and keep them semantically tight** in `SKILL.md`.
-
-**Upstream:** `responsibilities-before-operations.md` (Step 4), `garbled-payments-spec.md`.
-
-Ask: **What must this object know to fulfill its responsibility?** — not “what fields appear in the document.”
-
-Use **contextual names** (like **OrderItem** vs **Item**): e.g. **CapturedPortion** or explicit `authorizedAmount` / `capturedAmount` instead of a vague `amount` when partial capture matters.
-
-> **Continual refinement:** Aligns with **abd-maps-models-specs** [`domain-model.md`](../../abd-maps-models-specs/content/parts/library/domain-model.md) (*Domain concept* template, *Continual refinement — class definition + diagram*). In this payments thread, **`**newly added**`** marks a property or operation line **first introduced in this step file** (Steps 1–4 stay pre-notation; formal `- <type> property` / `operation(...) → return` lines begin at Step 5).
+**Before beginning any OOAD work, establish the project workspace and configure routing.**
 
 ---
 
-## Payment (aggregate root)
+## Purpose
 
-| Property | Why it belongs here |
-|----------|---------------------|
-| `id` | Identity of **this** payment attempt. |
-| `idempotencyKey` | Correlate retries; enforce “no double success” for same client intent. |
-| `orderRef` | **OrderId** (external BC) — links checkout to payment **without** duplicating cart lines. |
-| `payerRef` | **PayerId** — who pays; sanctions check uses **context**, not a full `Customer` graph. |
-| `merchantRef` | **MerchantId** / account — routing and settlement context. |
-| `routing` | **RoutingContext** VO — dimensions that pick connector (currency, region, …). |
-| `presentmentMoney` | **Money** — what the payer authorizes in **their** currency (name clarifies vs settlement). |
-| `settlementMoney` | **Money** — if different from presentment (global); optional **nullable** if same. |
-| `feeBreakdown` | **FeeBreakdown** VO — fees **shown/charged for this attempt**, not tax (cart). |
-| `fxQuoteRef` | **FxQuoteRef?** — nullable handle for global flows. |
-| `methodSelection` | **PaymentMethodSelection** VO — **this attempt’s** chosen method snapshot (kind + safe metadata). |
-| `state` | **PaymentState** — lifecycle position. |
-| `authorizedMoney` / `capturedMoney` | **Money** (or single progression) — supports **partial capture** and remainder release **without** a vague `amount`. |
-| `midRateSnapshot` | **MidRateSnapshot?** — immutable receipt stamp when legal requires; **not** live FX. |
-| `connectorRef` | **ConnectorId** or rail handle — **which** integration served this attempt (debugging, capability checks). |
-| `redirectContext` | **RedirectContext?** VO — e.g. return/cancel URLs, PSP session id **if** 3DS/redirect — **not** the whole browser. |
-| `timestamps` | `createdAt`, `authorizedAt?`, `capturedAt?`, `settledAt?`, `failedAt?` — audit and SLA; **only** those needed for invariants you enforce. |
-
-**Deliberately omitted from Payment** (other BCs or adapters):
-
-- Tax lines, coupon state, cart items — **Order / cart**.
-- Full **Merchant** entity — only **merchantRef**.
-- PAN, CVV — **never**; tokens live at PSP.
-- “Frontend string copy” — **Failure mapping policy**, not properties on Payment.
+Make **`skill_workspace`** (your project root) unambiguous to abd-ooad so all generated domain models go to the right place.
 
 ---
 
-## Refund
+## Quick Start
 
-| Property | Why it belongs here |
-|----------|---------------------|
-| `id` | Distinct refund case. |
-| `paymentRef` | **PaymentId** — which payment is being undone/partially reversed. |
-| `refundMoney` | **Money** — amount **of this refund** (partial or full). |
-| `reason` | **ReasonCode** — chargeback prep / compliance. |
-| `state` | Refund lifecycle if distinct (requested → processing → completed / failed). |
-| `requestedAt`, `completedAt` | Traceability; align with “as fast as rail allows.” |
+```bash
+cd /sessions/kind-inspiring-cori/mnt/abd-ooad
+python scripts/base/set_workspace.py /path/to/your/project
+```
 
-**Naming note:** use **refundMoney**, not `amount`, if multiple money fields exist on related types — **contextual role** is “portion refunded in this case.”
-
----
-
-## Dispute (only if aggregate lives in this BC)
-
-| Property | Why |
-|----------|-----|
-| `id` | Case identity. |
-| `paymentRef` / `refundRef` | Links to money movements. |
-| `externalCaseId` | PSP or Risk system id. |
-| `ownership` | **enum** or tag: `platform` \| `merchantOfRecord` — **data** reflecting policy, not the decision logic. |
-| `state` | Open / won / lost / … as your process defines. |
-
-If Dispute is **external**, **Payment** might only hold `disputeIds: DisputeId[]` or nothing.
+This sets **`active_skill_workspace`** in **`skill-config.json`** so abd-ooad knows where to create:
+- `domain-scan-model.md` and `.drawio`
+- `step-1-extraction.md` and `.drawio`
+- All subsequent OOAD artifacts
 
 ---
 
-## AuditEntry (immutable row / event payload)
+## Key Concepts
 
-| Property | Why |
-|----------|-----|
-| `id` | Log line identity (or use event id). |
-| `paymentRef` | Which aggregate. |
-| `fromState`, `toState` | Transition (or single `eventType` if you prefer events). |
-| `actor` | **ActorKind** — `system` \| `user` \| `psp_webhook`. |
-| `occurredAt` | Ordering. |
-| `payloadRef?` | Optional pointer to raw PSP snippet id — **not** full card data. |
+### Skill Path vs Skill Workspace
 
----
+| Term | Meaning | Example |
+|------|---------|---------|
+| **`skill_path`** | Where abd-ooad is installed (SKILL.md, scripts/, phases/) | `/sessions/kind-inspiring-cori/mnt/abd-ooad/` |
+| **`skill_workspace`** | Your project root (where domain models go) | `/sessions/kind-inspiring-cori/mnt/mm3e-experiment/` |
 
-## Value objects — internal shape (properties are the VO’s fields)
+### Configuration File
 
-### Money
+**Location:** `<skill_path>/skill-config.json`
 
-- `amount` (scaled integer or decimal with scale)
-- `currency` — **Currency** code VO or ISO string with validation
-
-### RoutingContext
-
-- `storefrontCurrency` or `chargeCurrency`
-- `merchantRegion` (or legal entity id) — **whatever engineering uses to gate** connector per spec assumption
-
-### FeeBreakdown
-
-- `lines: FeeLine[]` or single `total: Money` — **minimum** structure to match “fees if any” on confirm
-
-### PaymentMethodSelection (contextual snapshot)
-
-- `kind: PaymentMethodKind`
-- `displayLabel` / `last4` / `brand` — **non-sensitive** display only
-
-### IdempotencyKey (if VO)
-
-- `value: string`
-- optionally `firstSeenAt` — if TTL policy applies to **this** key
-
-### FxQuoteRef
-
-- `opaqueId: string` (or URI) — **no** FX math here
-
-### MidRateSnapshot
-
-- `rate`, `pair`, `asOf` — **frozen** for receipt
-
-### RedirectContext (optional)
-
-- `returnUrl`, `cancelUrl`, `pspSessionId` — **whatever** your redirect flow needs to correlate callbacks
+**Key fields:**
+- **`active_skill_workspace`** — Path to your project root (absolute preferred)
+- **`known_skill_workspaces`** — List of projects you've worked on (for quick switching)
 
 ---
 
-## Contextual naming (payments)
+## Output Convention
 
-| Vague noun | Tighter name in this context |
-|------------|------------------------------|
-| Amount | `authorizedMoney`, `capturedMoney`, `refundMoney`, `presentmentMoney` |
-| Item | N/A — if you model line-level charges, use **PaymentLine** or **CaptureLine** with explicit role |
-| Session | Prefer **`Payment`** as aggregate name; **Session** in spec → alias in docs only |
-| User | **`payerRef`** / **PayerId** — role in this flow |
+All OOAD artifacts go under:
 
----
+```
+<skill_workspace>/abd-ooad/
+```
 
-## Formal domain concepts (Step 5)
+Examples for mm3e-experiment:
+```
+/sessions/kind-inspiring-cori/mnt/mm3e-experiment/abd-ooad/
+├── progress/
+│   ├── strategy-run-checklist.md   ← planned phases + scope (vs strategy.md); seeded from template on first generate
+│   ├── process-checklist.md       ← full pipeline (all phase_files)
+│   ├── domain-scan-checklist.md
+│   └── … (<phase>-checklist.md per phase run)
+├── domain-scan-model.md
+├── domain-scan-model.drawio
+├── step-1-extraction.md
+├── step-1-extraction.drawio
+├── ... (steps 2–20 outputs)
+```
 
-First typed **`- <type> property`** lines for core aggregates (see [`domain-model.md`](../../abd-maps-models-specs/content/parts/library/domain-model.md). Every line below is **`**newly added**`** at this step in the payments thread.
-
-### **Payment**
-
-- UniqueID id **newly added**
-- String idempotencyKey **newly added**
-- OrderId orderRef **newly added**
-- PayerId payerRef **newly added**
-- MerchantId merchantRef **newly added**
-- RoutingContext routing **newly added**
-- Money presentmentMoney **newly added**
-- Money settlementMoney **newly added**
-- FeeBreakdown feeBreakdown **newly added**
-- FxQuoteRef fxQuoteRef **newly added**
-- PaymentMethodSelection methodSelection **newly added**
-- PaymentState state **newly added**
-- Money authorizedMoney **newly added**
-- Money capturedMoney **newly added**
-- MidRateSnapshot midRateSnapshot **newly added**
-- ConnectorId connectorRef **newly added**
-- RedirectContext redirectContext **newly added**
-- PaymentTimestamps timestamps **newly added** (`createdAt`, `authorizedAt`, …)
-
-### **Refund**
-
-- UniqueID id **newly added**
-- PaymentId paymentRef **newly added**
-- Money refundMoney **newly added**
-- ReasonCode reason **newly added**
-- RefundState state **newly added**
-- Instant requestedAt **newly added**
-- Instant completedAt **newly added**
-
-### **Dispute** (only if aggregate lives in this BC)
-
-- UniqueID id **newly added**
-- PaymentId paymentRef **newly added**
-- RefundId refundRef **newly added**
-- String externalCaseId **newly added**
-- DisputeOwnership ownership **newly added**
-- DisputeState state **newly added**
-
-### **AuditEntry**
-
-- UniqueID id **newly added**
-- PaymentId paymentRef **newly added**
-- PaymentState fromState **newly added**
-- PaymentState toState **newly added**
-- ActorKind actor **newly added**
-- Instant occurredAt **newly added**
-- String payloadRef **newly added**
-
-VO shapes (**Money**, **RoutingContext**, **FeeBreakdown**, etc.) stay under the tables above; add typed property lines in **map-model-spec** / diagram when you promote those value objects.
+Live **checkboxes** belong only under **`progress/`** (see **`library/base/checklist.md`**). Do not duplicate tick tables in `strategy.md` or other normative docs under `abd-ooad/`.
 
 ---
 
-## Carry forward to Step 6 (operations)
+## Setting Your Workspace
 
-Next: map **verbs** from Step 1 and spec to **operations** on **Payment**, **Refund**, policies — and **challenge** each (e.g. does `Payer.placePayment()` belong here or in an application service?).
+### Check Current Workspace
+
+```bash
+cd /sessions/kind-inspiring-cori/mnt/abd-ooad
+python scripts/base/set_workspace.py
+```
+
+Shows current **`active_skill_workspace`** and its resolved absolute path.
+
+### Set New Workspace
+
+```bash
+python scripts/base/set_workspace.py /sessions/kind-inspiring-cori/mnt/mm3e-experiment
+```
+
+The script:
+1. Validates the directory exists
+2. Resolves the path intelligently (relative if portable, absolute otherwise)
+3. Updates **`skill-config.json`**
+4. Adds it to **`known_skill_workspaces`** if not already there
 
 ---
 
-## Continual refinement (this step)
+## Diagrams and Workspace
 
-- **Delta:** semantically tight **properties** for **Payment**, **Refund**, optional **Dispute**, **AuditEntry**, plus VO lists — all as **`- <type> property`** lines with **`**newly added**`** (first formal notation in this thread).
-- **Diagram:** when maintaining **`map-model-spec.json`**, re-run **`render_map_model_class_diagram.py`** so the class diagram stays the visual twin (see [class-diagram-from-spec.md](../../abd-maps-models-specs/content/parts/library/class-diagram-from-spec.md).
+All diagram files (`.drawio`) are generated by `scripts/drawio_cli.py` and written alongside their Markdown companions under `<workspace>/abd-ooad/`. Set the workspace once and all outputs — Markdown and diagrams — go to the same place.
+
+---
+
+## Troubleshooting
+
+**Q: "Path does not exist or is not a directory"**
+- Ensure the workspace directory exists before setting it
+- Use absolute paths if relative paths cause issues
+
+**Q: "active_skill_workspace not in skill-config.json"**
+- The file might be missing; create it with default content:
+  ```json
+  {
+    "active_skill_workspace": ".",
+    "known_skill_workspaces": []
+  }
+  ```
+
+**Q: Multiple projects?**
+- Use `known_skill_workspaces` to list them
+- Switch by running `set_workspace.py` with the path you want
+- Or edit **`skill-config.json`** directly
 
 ---
 
 ## Action Checklist
 
-- [ ] Have you written `- <type> property` lines for every entity and value object in scope?
-- [ ] Is every property semantically tight — does the object need it to fulfil its responsibility?
-- [ ] Have you removed any properties that are purely UI, infrastructure, or application-layer concerns?
-- [ ] Have you re-run `render_map_model_class_diagram.py` to keep the class diagram in sync?
-- [ ] Have you noted carry-forward items to Step 6 (operations)?
+- [ ] Have you run `python scripts/base/set_workspace.py <path>` to set `active_skill_workspace`?
+- [ ] Does `skill-config.json` now show the correct workspace path?
+- [ ] Is the workspace directory accessible and writable?
+- [ ] Have you confirmed where OOAD artifacts will be written (`<workspace>/abd-ooad/`)?
+- [ ] Are you ready to run `python scripts/base/generate.py --phase domain-scan` to start?
 
 ---
 
-## Prompt
+## Next Step
 
-> **Validate and fix when you find problems.** This step may surface bloat, unclear boundaries, missing invariants, naming drift, spec conflicts, or other robustness gaps. When you notice any of that in your work, **validate** and **fix** the model (or **map-model-spec.json** / class diagram) **before** moving on; record **explicit debt** only when you cannot fix yet, with a clear follow-up.
+Once workspace is set, proceed to **Phase 0a: Domain Scan** to begin OOAD.
+
+Run:
+```bash
+python scripts/base/generate.py --phase domain-scan
+```
+
+See **`content/parts/phases/domain-scan.md`** for details.
 
 
 ---
@@ -321,7 +244,7 @@ An anchor is a concept you expect to be present in the model from scan through f
 | `domain-scan-results.md`   | Row in the anchors table: Module name, core class name, scan-visible supporting classes, basis                                  |
 | `domain-scan-model.md`     | Module section header + core class entry + supporting class entries with `[supporting class — ModuleName module]` annotation    |
 | `domain-scan-model.drawio` | One dashed frame per anchor; core class inside; supporting classes inside; cross-module relationships between core classes only |
-| `term-registry.md`         | Core class → `anchor` classification; supporting classes → `candidate` classification with Module? column naming their module   |
+| `term-registry.md`         | Core class of a module → Classification **`anchor (class + module)`**; supporting classes → **`class`** with owning module in **Notes** (e.g. `Supporting class — Character module`). Use **Status** for lifecycle (e.g. **Tension**, **Candidate**) — not a duplicate of Classification.   |
 
 
 ---
@@ -349,9 +272,9 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 ---
 
-### `scan-artifacts-and-strategy.md`
+### `strategy-led-generation.md`
 
-# Scan artifacts and strategy
+# Strategy-led generation
 
 Domain scan (OOAD **phase 1**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
@@ -371,7 +294,7 @@ Created during domain scan under `<workspace>/abd-ooad/`:
 | `strategy.md` | **Living strategy:** **modeling scope**, **execution plan (normative)** — which phases in what order and on what slice of context — plus **approach** and **dated pivots**. | **Yes** — whenever scope, order, or focus changes. |
 | `domain-scan-model.md` | Class sketch (markdown) at scan fidelity. | Yes, in later phases — not only during scan. |
 | `domain-scan-model.drawio` | Diagram at scan fidelity. | Same as model.md. |
-| `term-registry.md` | Terms, classification, confidence — seeded at scan. | **Yes** — every later phase updates Step / classification. |
+| `term-registry.md` | Terms, **Classification** (model role), **Status** (OOAD scale), confidence — seeded at scan. | **Yes** — every later phase updates Step, Classification, and Status as the model evolves. |
 
 **Plus** (when workspace is configured): **`progress/`** checklists — see **`library/strategy-execution-and-checklists.md`**. **`generate.py`** creates **`process-checklist.md`**, **`<phase>-checklist.md`**, and (abd-ooad) **`strategy-run-checklist.md`** when templates exist and files are missing. Normative phase steps stay in **`content/parts/phases/<phase>.md`**. These are the **only** place for session tick marks.
 
@@ -407,7 +330,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 1. **Strategy** — Keep **`strategy.md`** aligned with reality; append *Ongoing strategic decisions* when you pivot.
 2. **Strategy execution** — Tick **`progress/strategy-run-checklist.md`** as you **complete** each phase for its declared scope.
 3. **Phase work** — For the active phase, run **`generate.py --phase <slug>`** and tick **`progress/<slug>-checklist.md`** for action steps.
-4. **Registry** — Keep `term-registry.md` aligned with the current phase (Step column).
+4. **Registry** — Keep `term-registry.md` aligned with the current phase (Step, Classification, Status).
 5. **Results** — Touch `domain-scan-results.md` only for corrections to the original scan snapshot.
 
 ---
@@ -433,7 +356,7 @@ OOAD uses **three** checklist layers under **`<workspace>/abd-ooad/progress/`**.
 
 ## Workflow
 
-1. **Domain scan** — produce scan artifacts (see **`scan-artifacts-and-strategy`**).
+1. **Domain scan** — produce scan artifacts (see **`strategy-led-generation`**).
 2. **Strategy** — fill **`strategy.md`** from **`templates/strategy.md`**:
    - **Modeling scope** — chapters, anchors, files, in/out of scope.
    - **Execution plan (normative)** — ordered list of phase **slugs** (from **`skill-config.json` → `phase_files`**) plus **scope per step** (e.g. “nouns-verbs on Chapter 5 only”).
@@ -522,36 +445,110 @@ Use these short names in the **Step** column of the registry when adding or upda
 | Column | Values | Notes |
 |--------|--------|-------|
 | **Term** | Concept name from the source | Exact word or phrase as found — rename in the NAMES step if needed |
-| **Classification** | anchor / candidate / tension / module | Lifecycle stage. Maps to UML stereotype in diagram once promoted to class |
-| **Step** | Short name from table above (SCAN, NOUNS, …) | Step that first identified this Term |
+| **Classification** | See **Classification** below | **What we want to model this as** — target shape in the domain model (not lifecycle) |
+| **Step** | Short name from table above (SCAN, NOUNS, …) | Step that first identified or last materially updated this Term |
 | **Confidence** | High / Medium / Low | How sure we are this belongs in the model |
-| **Status** | Active / Ambiguous / Deferred / Rejected / Promoted | Current state |
-| **Notes** | Free text | Why it was flagged, what needs investigating, decisions made |
-| **Module?** | Yes / No / Investigate | Will this eventually become a standalone module |
-
-**Classification values** (once a Term is confirmed as a class, this maps to its UML `<<stereotype>>` in the diagram):
-
-- `anchor` — High-confidence, core, stable. Identified at SCAN. Will definitely be in the model.
-- `candidate` — Plausible, needs validation. Added during extraction steps.
-- `tension` — Boundary ambiguous or conflicting. Needs resolution before model role can be assigned.
-- `module` — Ready to be promoted to a standalone module.
+| **Status** | See **Status (OOAD scale)** below | Where this Term sits in the modeling workflow |
+| **Notes** | Free text | Anchor-test results, owning module for supporting classes (`Supporting class — X module`), competing interpretations, pointers to tensions in `domain-scan-results.md`, and follow-ups |
 
 ---
 
-## Registry Format
+## Classification — what we want to model this as
+
+Use **one** value per row. This is the **intended model role**, not how “mature” the idea is (that is **Status**).
+
+| Value | Meaning |
+|--------|---------|
+| **anchor (class + module)** | Passes the anchor test: this concept is a **core class** and owns a **module** (dashed frame + same-named core class). Use only for backbone modules. |
+| **class** | A domain **class** that is not its own module yet — e.g. supporting class inside a frame, or a type you expect to become a class without its own module. |
+| **property** | Modeled as a **semantic property** (attribute / value on a class), not a separate type. |
+| **field** | Modeled as a **typed field / slot** (data member, possibly simple type or value object). |
+| **example (instance)** | An **illustrative instance**, sample, or scenario object — not a type in the model. |
+| **relationship** | An **association**, link, or dependency between concepts — may become an association, association class, or navigable role. |
+| **invariant (rule)** | A **domain rule**, constraint, or policy — often becomes behavior, guard, or explicit rule text on a class. |
+
+**Diagram mapping (when relevant):** `anchor (class + module)` → module frame + core class; `class` → class box; `relationship` → association; `invariant (rule)` → note, constraint, or operation; `property` / `field` → attributes on a class.
+
+---
+
+## Status (OOAD scale)
+
+**Status** is **lifecycle / confidence in the workflow**, not the model shape. Pick the value that best fits; states are **not** always a strict left-to-right pipeline.
+
+| Status | When to use |
+|--------|-------------|
+| **Ambiguous** | You cannot yet say what the Term is or how it sits next to others. |
+| **Tension** | Competing interpretations, overlapping boundaries, or conflicting source pulls — needs resolution before the model can commit. |
+| **Candidate** | Plausible model role; narrowed but not yet locked (often after scan, before THINGS/RELS). |
+| **Deferred** | Explicitly parked — revisit in a named later step or phase. |
+| **Active** | In current modeling scope; being updated in this pass. |
+| **Solidified** | Named, placed, and stable in the model for the current iteration — ready to treat as “done” unless source or scope changes. |
+
+**Typical (non-binding) progression:** Ambiguous → Tension or Candidate → Active → Solidified. **Deferred** can apply after any stage. A Term can return from Deferred to Active when scope returns to it.
+
+---
+
+## Registry format (wide Notes)
+
+**Prefer an HTML `<table>` with `<colgroup>`** so the **Notes** column gets most of the width (~50–55%). **Classification** labels can be long — give that column ~12–14% if needed. Plain Markdown pipe tables allocate columns evenly and make long Notes hard to read in the editor and in preview.
+
+Use this skeleton (adjust `width` percentages if needed):
+
+```html
+<table>
+<colgroup>
+  <col style="width:9%" />
+  <col style="width:14%" />
+  <col style="width:6%" />
+  <col style="width:9%" />
+  <col style="width:9%" />
+  <col style="width:53%" />
+</colgroup>
+<thead>
+<tr>
+  <th>Term</th>
+  <th>Classification</th>
+  <th>Step</th>
+  <th>Confidence</th>
+  <th>Status</th>
+  <th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Character</td>
+  <td>anchor (class + module)</td>
+  <td>SCAN</td>
+  <td>High</td>
+  <td>Active</td>
+  <td>Central entity; all rules attach to it</td>
+</tr>
+<tr>
+  <td>Power</td>
+  <td>class</td>
+  <td>SCAN</td>
+  <td>High</td>
+  <td>Active</td>
+  <td>Supporting class — Character module. Core capability unit.</td>
+</tr>
+<tr>
+  <td>Device</td>
+  <td>class</td>
+  <td>SCAN</td>
+  <td>Medium</td>
+  <td>Tension</td>
+  <td>Removable Power vs Equipment? Boundary unclear — see T2.</td>
+</tr>
+</tbody>
+</table>
+```
+
+For very small registries only, a Markdown pipe table is acceptable:
 
 ```markdown
-# Term Registry — {{project_name}}
-
-_Last updated: {{step_short_name}} — {{date}}_
-
-| Term       | Classification | Step  | Confidence | Status    | Notes | Module? |
-|------------|---------------|-------|------------|-----------|-------|---------|
-| Character  | anchor        | SCAN  | High       | Active    | Central entity; all rules attach to it | Yes |
-| Power      | anchor        | SCAN  | High       | Active    | Core superheroic capability unit | Yes |
-| Condition  | anchor        | SCAN  | High       | Active    | Named state applied after check resolution | Yes |
-| Device     | tension       | SCAN  | Medium     | Ambiguous | Removable Power or Equipment? Boundary unclear | Investigate |
-| ability    | candidate     | NOUNS | High       | Active    | One of six core scores; probably a property of Character, not a class | No |
+| Term | Classification | Step | Confidence | Status | Notes |
+|------|----------------|------|------------|--------|-------|
+| Character | anchor (class + module) | SCAN | High | Active | Short note only |
 ```
 
 
@@ -630,6 +627,9 @@ python scripts/drawio_cli.py fix-edge-styles --file <output>.drawio
 # Fix shared connection points (V5) — always run after adding relationships
 python scripts/drawio_cli.py fix-shared-endpoints --file <output>.drawio
 
+# Fix arrow-class overlaps (V6) — routes edges around classes they cross
+python scripts/drawio_cli.py fix-arrow-overlaps --file <output>.drawio
+
 # Verify — check all rules V1–V6
 python scripts/drawio_cli.py verify --file <output>.drawio
 ```
@@ -638,6 +638,12 @@ The `fix-shared-endpoints` command detects classes where 2+ edges arrive or
 leave without explicit `entryX/Y` / `exitX/Y` constraints. It determines the
 dominant approach side (top / bottom / left / right) and distributes port
 coordinates evenly so arrowheads no longer pile up.
+
+The `fix-arrow-overlaps` command detects edges whose straight-line path passes
+through an unrelated class body (V6). It automatically inserts 1–2 waypoints to
+route the edge around all obstacles, using a recursive shortest-path algorithm
+with up to 2 bypass points. V4 info messages about explicit waypoints on
+previously-fixed edges are expected and can be ignored.
 
 After verify, address any remaining warnings:
 
@@ -648,21 +654,18 @@ After verify, address any remaining warnings:
 | V3 | WARN | Wrong edge style for relationship type | `fix-edge-styles` |
 | V4 | WARN | Explicit waypoints on orthogonal edges | `fix-edge-styles` |
 | V5 | WARN | 2+ edges share unconstrained connection point | `fix-shared-endpoints` |
-| V6 | WARN | Straight edge passes through unrelated class | Move class or add waypoint manually |
+| V6 | WARN | Straight edge passes through unrelated class | `fix-arrow-overlaps` |
 
 Then run the frame containment check (Python XML script) to confirm all classes are inside their frames.
 
 ### Step 7 — AI layout pass
 
 The programmatic build will produce correct structure but imperfect visual routing. After running verify (with 0 errors), open the diagram and inspect for:
-- Any remaining V6 warnings — move the blocking class or add a manual bend point
 - Labels obscured by other elements (drag to clear space)
 - Any class that is outside its frame boundary (fix with `add-frame` or XML edit)
+- Any remaining V6 warnings after `fix-arrow-overlaps` — move the blocking class manually as a last resort
 
-This step is required when V6 warnings remain. Code cannot automatically route
-straight-line dependencies around obstacles — this requires a human layout
-decision. Note what was corrected so the post-processed version reflects the
-final intent.
+`fix-arrow-overlaps` automatically routes edges around any class they pass through, inserting 1–2 waypoints using a recursive shortest-path algorithm. Re-run it if V6 warnings remain after the initial fix.
 
 ---
 
@@ -671,7 +674,7 @@ final intent.
 Every class diagram follows this sequence:
 
 ```
-new → add-class (×N) → add-field (×N) → add-method (×N) → add-relationships → relayout → verify
+new → add-class (×N) → add-field (×N) → add-method (×N) → add-relationships → fix-edge-styles → fix-shared-endpoints → fix-arrow-overlaps → verify
 ```
 
 ```bash
@@ -694,9 +697,10 @@ python scripts/drawio_cli.py add-association <From> <To> --label "<label>" --fro
 python scripts/drawio_cli.py add-inheritance <Subclass> <Superclass> --file <output>.drawio
 python scripts/drawio_cli.py add-dependency <From> <To> --stereotype "<label>" --file <output>.drawio
 
-# 6. Fix edge styles, spread shared endpoints, then verify
+# 6. Fix edge styles, spread shared endpoints, fix overlaps, then verify
 python scripts/drawio_cli.py fix-edge-styles --file <output>.drawio
 python scripts/drawio_cli.py fix-shared-endpoints --file <output>.drawio
+python scripts/drawio_cli.py fix-arrow-overlaps --file <output>.drawio
 python scripts/drawio_cli.py verify --file <output>.drawio
 ```
 
@@ -707,7 +711,7 @@ python scripts/drawio_cli.py verify --file <output>.drawio
 When the diagram represents anchor modules (domain-scan phase), each anchor needs a **dashed frame** enclosing its core class and any supporting classes. The module name = the frame title = the core class name.
 
 ```
-new → add-class (core classes + supporting classes) → add-field → add-frame (×N, one per module) → add-relationships → fix-edge-styles → verify
+new → add-class (core classes + supporting classes) → add-field → add-frame (×N, one per module) → add-relationships → fix-edge-styles → fix-shared-endpoints → fix-arrow-overlaps → verify
 ```
 
 ```bash
@@ -731,9 +735,10 @@ python scripts/drawio_cli.py add-frame "<ModuleName>" --classes "<CoreClass>,<Su
 python scripts/drawio_cli.py add-composition <CoreA> <CoreB> --file <output>.drawio
 python scripts/drawio_cli.py add-dependency <CoreA> <CoreB> --stereotype "<label>" --file <output>.drawio
 
-# 6. Fix edge styles, spread shared endpoints, then verify
+# 6. Fix edge styles, spread shared endpoints, fix overlaps, then verify
 python scripts/drawio_cli.py fix-edge-styles --file <output>.drawio
 python scripts/drawio_cli.py fix-shared-endpoints --file <output>.drawio
+python scripts/drawio_cli.py fix-arrow-overlaps --file <output>.drawio
 python scripts/drawio_cli.py verify --file <output>.drawio
 ```
 
@@ -1296,6 +1301,115 @@ where multiple arrowheads overlap and the diagram becomes unreadable.
 (top / bottom / left / right) and distributes `entryX`/`entryY` (or
 `exitX`/`exitY`) evenly across it for all unconstrained edges in the group.
 
+> **Preferred over bare entry-point spreading:** see Section 5a below — anchor
+> each composition to its specific field row instead. This fully eliminates V5
+> and produces a far more readable diagram.
+
+---
+
+## 5a. Field-anchored composition — the preferred routing pattern
+
+When a parent class (e.g. `Character`) owns several child classes through
+composition, the cleanest layout is to:
+
+1. **Add a field row** inside the parent for each owned type (e.g. `+ abilities: Ability`)  
+2. **Connect the diamond to that field row**, not to the parent class border  
+3. **Exit from the SIDE of the child class** (left or right, never top or bottom)  
+4. **Keep the diamond co-linear with the line** (diamond faces the same direction as the line segment it is part of — never sideways)  
+5. **Use as few waypoints as possible** — ideally zero or one  
+
+### Visual goal
+
+```
+[Character]                     [Ability]
+┌───────────────────────┐       ┌──────────────┐
+│ + powerLevel: int     │       │ + rank: int  │
+│─────────────────────  │       │              │
+│ + abilities: Ability ◆│───────│              │
+│ + skills: Skill      ◆│       └──────────────┘
+└───────────────────────┘
+```
+
+The diamond (`◆`) sits at the **field row** and points toward the child class.
+The line exits the **right or left side** of the child and enters the field row.
+
+### Layout recommendation
+
+Place child classes **to the left or right of the parent**, not directly below.
+This allows clean horizontal routing with zero or one waypoint and avoids
+long vertical runs that pass through other classes.
+
+```
+[Advantage]──────◆ advantages: Advantage  │
+[Ability]────────◆ abilities: Ability      │ Character
+[HeroPoint]──────◆ heroPoints: HeroPoint  │
+[Skill]──────────◆ skills: Skill          │
+```
+
+### ✓ Correct XML pattern
+
+```xml
+<!-- Source = child class; Target = field row cell inside parent;
+     endArrow=diamondThin places the diamond at the field row.
+     Child exits from its RIGHT side (exitX=1) toward the field row. -->
+<mxCell id="edge-ability" value=""
+        style="endArrow=diamondThin;endFill=1;endSize=24;
+               edgeStyle=orthogonalEdgeStyle;
+               exitX=1;exitY=0.5;exitDx=0;exitDy=0;"
+        parent="1" source="AbilityClass" target="AbilitiesFieldRow" edge="1">
+  <mxGeometry as="geometry" />
+</mxCell>
+
+<!-- The field row cell must have portConstraint=eastwest so the
+     diamond connects to its LEFT or RIGHT side, not top/bottom -->
+<mxCell id="AbilitiesFieldRow"
+        value="+ abilities: Ability"
+        style="text;...;portConstraint=eastwest;"
+        parent="CharacterClass" vertex="1">
+  <mxGeometry y="118" width="300" height="26" as="geometry"/>
+</mxCell>
+```
+
+Key style attributes:
+
+| Attribute | Value | Reason |
+|-----------|-------|--------|
+| `source` | child class cell id | composition originates at child |
+| `target` | field row cell id (inside parent) | diamond lands at the field |
+| `endArrow` | `diamondThin` | filled diamond at target (field row) |
+| `exitX=1;exitY=0.5` | right-side exit of child | side exit = clean orthogonal route |
+| `portConstraint=eastwest` | on field row | constrains diamond to left or right side |
+
+### ❌ Anti-pattern: diamond entering from the top or bottom
+
+```xml
+<!-- Diamond arrives at the parent's bottom edge — produces V5 pile-up
+     AND diamond appears sideways or flipped relative to the line -->
+<mxCell style="endArrow=diamondThin;endFill=1;
+               entryX=0.5;entryY=1;..."   <!-- ← bottom of CHARACTER class -->
+        target="CharacterClass" ...>
+```
+
+### Rule: diamond co-linearity
+
+The composition diamond must always face **in the same direction as the line
+segment it terminates**. If the last segment arrives from the left, the diamond
+opens to the left. A sideways diamond (arriving vertically but pointing
+horizontally) indicates a mismatched `exitX`/`exitY` or `entryX`/`entryY` and
+must be corrected.
+
+### Minimum-waypoint routing
+
+| Child position relative to parent | Typical exit | Waypoints needed |
+|------------------------------------|-------------|-----------------|
+| Directly left or right, same Y     | right/left   | 0 |
+| Left/right but offset vertically   | right/left   | 1 (adjust Y) |
+| Below or above (avoid)             | top/bottom   | 2+ (not ideal) |
+
+Prefer placing child classes **laterally** (left/right) so that routes remain
+single-segment or single-bend. Stacking child classes directly below the parent
+forces multi-waypoint routes and risks V6 overlaps.
+
 ---
 
 ## 6. Straight-line edges must not pass through unrelated classes (V6)
@@ -1317,14 +1431,14 @@ source-centre to target-centre against every third class's bounding box
 
 ### ✓ Resolved options
 
-1. **Reposition the blocking class** — move it off the arrow corridor; then
-   rerun `verify` to confirm V6 is clear.
-2. **Add an intermediate waypoint** manually in Draw.io to route the dependency
-   around the obstruction (add an `<Array as="points">` with one bend point,
-   or switch the edge to `edgeStyle=orthogonalEdgeStyle`).
+1. **Run `fix-arrow-overlaps`** — automatically inserts 1–2 waypoints using a
+   recursive shortest-path algorithm to route the dependency around all blockers;
+   then rerun `verify` to confirm V6 is clear.
+2. **Reposition the blocking class** — move it off the arrow corridor as a last
+   resort if `fix-arrow-overlaps` cannot find a clean path.
 
 > Note: V6 is a **WARN** (not ERROR) because the obstruction is a layout
-> decision that requires human judgment to resolve correctly.
+> issue. `fix-arrow-overlaps` resolves most cases automatically.
 
 ---
 

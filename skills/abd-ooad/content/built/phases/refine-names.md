@@ -34,51 +34,53 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 ## Phase
 
-# Abstract classes and interfaces — payments example
+# Refine names — payments example
 
-**Skill:** abd-ooad — **Step 12:** **state + shared impl** vs **pure contract**.
+**Skill:** abd-ooad — **Step 19:** **ubiquitous language** alignment.
 
-**Upstream:** `inheritance-when-behavior-generalizes.md`.
+**Upstream:** `validate-with-scenarios.md`.
 
 > **Continual refinement:** Aligns with **abd-maps-models-specs** [`domain-model.md`](../../abd-maps-models-specs/content/parts/library/domain-model.md) (*Domain concept* template, *Continual refinement — class definition + diagram*). In this payments thread, **`**newly added**`** marks a property or operation line **first introduced in this step file** (Steps 1–4 stay pre-notation; formal `- <type> property` / `operation(...) → return` lines begin at Step 5).
 
 ---
 
-## Suggested split
+## Renames (candidates)
 
-| Construct | Use in payments |
-|-----------|-----------------|
-| **`interface PspConnector`** | `authorize`, `capture`, `refund`, `parseWebhook` — **implementations** per PSP; **mock** in tests. |
-| **`interface PaymentMethod`** (or abstract base) | Domain-facing **selection** + **capabilities**; optional **default** helpers in abstract class if shared. |
-| **`abstract class Payment`** | Rare — prefer **one** aggregate **Payment** with **state machine**; avoid subclass per status (**use state enum**, not `AuthorizedPayment extends Payment`). |
-
----
-
-## Anti-pattern here
-
-- **`class StripePayment extends Payment`** — **no**; **Payment** is one type; **Stripe** is **connector**.
+| Weak / vague | Stronger (payments) |
+|----------------|---------------------|
+| Processor / Handler | **PaymentOrchestrator** (use case), **PspConnector** (port) |
+| User | **Payer** / **Merchant** / **Actor** (audit) |
+| Status (string soup) | **PaymentState** enum + **RefundState** |
+| Data / Info | **FeeBreakdown**, **AuthorizationResult** (VOs) |
+| Thing | **Payment**, **Refund**, **AuditEntry** |
 
 ---
 
-## Carry forward → Step 13
+## Terms from spec to preserve
 
-**Prefer composition:** **Payment** holds **PaymentMethod** ref + **PspConnector** injected at application layer.
+- **Idempotency key**, **3DS**, **MoR**, **partial capture**, **settlement** — **glossary** in team wiki; model uses **same** spellings in **events** and **UI**.
+
+---
+
+## Carry forward → Step 20
+
+**Layer** the model — **domain vs application vs infra** + optional **ASCII** summary.
 
 ---
 
 ## Continual refinement (this step)
 
-- **Delta:** **`interface PspConnector`**, **`PaymentMethod`** contract vs **abstract** base — port **operations** (**authorize**, **capture**, **refund**, **parseWebhook**) **`**newly added**`** on the interface concept when first captured in **`map-model-spec.json`**.
+- **Delta:** **ubiquitous language** — rename weak terms (**Processor** → **PaymentOrchestrator**, **PspConnector**, **Payer**, …); keep **events** and **UI** aligned; no duplicate **`**newly added**`** unless a rename introduces a **new** concept line.
 
 ---
 
 ## Action Checklist
 
-- [ ] Have you identified every place where a port / plug-point is needed for external or swappable infrastructure?
-- [ ] Is each port defined as an interface (not an abstract class) when it has no shared implementation?
-- [ ] Have you defined all abstract base classes with shared domain behaviour and at least one abstract operation?
-- [ ] Have you verified that no concrete domain class directly depends on infrastructure types?
-- [ ] Have you noted carry-forward items to Step 13 (prefer composition)?
+- [ ] Have you replaced all generic or weak names (Manager, Handler, Processor) with specific domain terms?
+- [ ] Are all names aligned with the language used in the source material (spec, interviews, wiki)?
+- [ ] Have you updated the class diagram to reflect every rename?
+- [ ] Have you updated `term-registry.md` with the new canonical names and removed old entries?
+- [ ] Have you verified that events, UI labels, and API names use the same spelling?
 
 ---
 
@@ -150,7 +152,7 @@ An anchor is a concept you expect to be present in the model from scan through f
 | `domain-scan-results.md`   | Row in the anchors table: Module name, core class name, scan-visible supporting classes, basis                                  |
 | `domain-scan-model.md`     | Module section header + core class entry + supporting class entries with `[supporting class — ModuleName module]` annotation    |
 | `domain-scan-model.drawio` | One dashed frame per anchor; core class inside; supporting classes inside; cross-module relationships between core classes only |
-| `term-registry.md`         | Core class → `anchor` classification; supporting classes → `candidate` classification with Module? column naming their module   |
+| `term-registry.md`         | Core class of a module → Classification **`anchor (class + module)`**; supporting classes → **`class`** with owning module in **Notes** (e.g. `Supporting class — Character module`). Use **Status** for lifecycle (e.g. **Tension**, **Candidate**) — not a duplicate of Classification.   |
 
 
 ---
@@ -178,9 +180,9 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 ---
 
-### `scan-artifacts-and-strategy.md`
+### `strategy-led-generation.md`
 
-# Scan artifacts and strategy
+# Strategy-led generation
 
 Domain scan (OOAD **phase 1**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
@@ -200,7 +202,7 @@ Created during domain scan under `<workspace>/abd-ooad/`:
 | `strategy.md` | **Living strategy:** **modeling scope**, **execution plan (normative)** — which phases in what order and on what slice of context — plus **approach** and **dated pivots**. | **Yes** — whenever scope, order, or focus changes. |
 | `domain-scan-model.md` | Class sketch (markdown) at scan fidelity. | Yes, in later phases — not only during scan. |
 | `domain-scan-model.drawio` | Diagram at scan fidelity. | Same as model.md. |
-| `term-registry.md` | Terms, classification, confidence — seeded at scan. | **Yes** — every later phase updates Step / classification. |
+| `term-registry.md` | Terms, **Classification** (model role), **Status** (OOAD scale), confidence — seeded at scan. | **Yes** — every later phase updates Step, Classification, and Status as the model evolves. |
 
 **Plus** (when workspace is configured): **`progress/`** checklists — see **`library/strategy-execution-and-checklists.md`**. **`generate.py`** creates **`process-checklist.md`**, **`<phase>-checklist.md`**, and (abd-ooad) **`strategy-run-checklist.md`** when templates exist and files are missing. Normative phase steps stay in **`content/parts/phases/<phase>.md`**. These are the **only** place for session tick marks.
 
@@ -236,7 +238,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 1. **Strategy** — Keep **`strategy.md`** aligned with reality; append *Ongoing strategic decisions* when you pivot.
 2. **Strategy execution** — Tick **`progress/strategy-run-checklist.md`** as you **complete** each phase for its declared scope.
 3. **Phase work** — For the active phase, run **`generate.py --phase <slug>`** and tick **`progress/<slug>-checklist.md`** for action steps.
-4. **Registry** — Keep `term-registry.md` aligned with the current phase (Step column).
+4. **Registry** — Keep `term-registry.md` aligned with the current phase (Step, Classification, Status).
 5. **Results** — Touch `domain-scan-results.md` only for corrections to the original scan snapshot.
 
 ---
@@ -262,7 +264,7 @@ OOAD uses **three** checklist layers under **`<workspace>/abd-ooad/progress/`**.
 
 ## Workflow
 
-1. **Domain scan** — produce scan artifacts (see **`scan-artifacts-and-strategy`**).
+1. **Domain scan** — produce scan artifacts (see **`strategy-led-generation`**).
 2. **Strategy** — fill **`strategy.md`** from **`templates/strategy.md`**:
    - **Modeling scope** — chapters, anchors, files, in/out of scope.
    - **Execution plan (normative)** — ordered list of phase **slugs** (from **`skill-config.json` → `phase_files`**) plus **scope per step** (e.g. “nouns-verbs on Chapter 5 only”).
@@ -351,36 +353,110 @@ Use these short names in the **Step** column of the registry when adding or upda
 | Column | Values | Notes |
 |--------|--------|-------|
 | **Term** | Concept name from the source | Exact word or phrase as found — rename in the NAMES step if needed |
-| **Classification** | anchor / candidate / tension / module | Lifecycle stage. Maps to UML stereotype in diagram once promoted to class |
-| **Step** | Short name from table above (SCAN, NOUNS, …) | Step that first identified this Term |
+| **Classification** | See **Classification** below | **What we want to model this as** — target shape in the domain model (not lifecycle) |
+| **Step** | Short name from table above (SCAN, NOUNS, …) | Step that first identified or last materially updated this Term |
 | **Confidence** | High / Medium / Low | How sure we are this belongs in the model |
-| **Status** | Active / Ambiguous / Deferred / Rejected / Promoted | Current state |
-| **Notes** | Free text | Why it was flagged, what needs investigating, decisions made |
-| **Module?** | Yes / No / Investigate | Will this eventually become a standalone module |
-
-**Classification values** (once a Term is confirmed as a class, this maps to its UML `<<stereotype>>` in the diagram):
-
-- `anchor` — High-confidence, core, stable. Identified at SCAN. Will definitely be in the model.
-- `candidate` — Plausible, needs validation. Added during extraction steps.
-- `tension` — Boundary ambiguous or conflicting. Needs resolution before model role can be assigned.
-- `module` — Ready to be promoted to a standalone module.
+| **Status** | See **Status (OOAD scale)** below | Where this Term sits in the modeling workflow |
+| **Notes** | Free text | Anchor-test results, owning module for supporting classes (`Supporting class — X module`), competing interpretations, pointers to tensions in `domain-scan-results.md`, and follow-ups |
 
 ---
 
-## Registry Format
+## Classification — what we want to model this as
+
+Use **one** value per row. This is the **intended model role**, not how “mature” the idea is (that is **Status**).
+
+| Value | Meaning |
+|--------|---------|
+| **anchor (class + module)** | Passes the anchor test: this concept is a **core class** and owns a **module** (dashed frame + same-named core class). Use only for backbone modules. |
+| **class** | A domain **class** that is not its own module yet — e.g. supporting class inside a frame, or a type you expect to become a class without its own module. |
+| **property** | Modeled as a **semantic property** (attribute / value on a class), not a separate type. |
+| **field** | Modeled as a **typed field / slot** (data member, possibly simple type or value object). |
+| **example (instance)** | An **illustrative instance**, sample, or scenario object — not a type in the model. |
+| **relationship** | An **association**, link, or dependency between concepts — may become an association, association class, or navigable role. |
+| **invariant (rule)** | A **domain rule**, constraint, or policy — often becomes behavior, guard, or explicit rule text on a class. |
+
+**Diagram mapping (when relevant):** `anchor (class + module)` → module frame + core class; `class` → class box; `relationship` → association; `invariant (rule)` → note, constraint, or operation; `property` / `field` → attributes on a class.
+
+---
+
+## Status (OOAD scale)
+
+**Status** is **lifecycle / confidence in the workflow**, not the model shape. Pick the value that best fits; states are **not** always a strict left-to-right pipeline.
+
+| Status | When to use |
+|--------|-------------|
+| **Ambiguous** | You cannot yet say what the Term is or how it sits next to others. |
+| **Tension** | Competing interpretations, overlapping boundaries, or conflicting source pulls — needs resolution before the model can commit. |
+| **Candidate** | Plausible model role; narrowed but not yet locked (often after scan, before THINGS/RELS). |
+| **Deferred** | Explicitly parked — revisit in a named later step or phase. |
+| **Active** | In current modeling scope; being updated in this pass. |
+| **Solidified** | Named, placed, and stable in the model for the current iteration — ready to treat as “done” unless source or scope changes. |
+
+**Typical (non-binding) progression:** Ambiguous → Tension or Candidate → Active → Solidified. **Deferred** can apply after any stage. A Term can return from Deferred to Active when scope returns to it.
+
+---
+
+## Registry format (wide Notes)
+
+**Prefer an HTML `<table>` with `<colgroup>`** so the **Notes** column gets most of the width (~50–55%). **Classification** labels can be long — give that column ~12–14% if needed. Plain Markdown pipe tables allocate columns evenly and make long Notes hard to read in the editor and in preview.
+
+Use this skeleton (adjust `width` percentages if needed):
+
+```html
+<table>
+<colgroup>
+  <col style="width:9%" />
+  <col style="width:14%" />
+  <col style="width:6%" />
+  <col style="width:9%" />
+  <col style="width:9%" />
+  <col style="width:53%" />
+</colgroup>
+<thead>
+<tr>
+  <th>Term</th>
+  <th>Classification</th>
+  <th>Step</th>
+  <th>Confidence</th>
+  <th>Status</th>
+  <th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Character</td>
+  <td>anchor (class + module)</td>
+  <td>SCAN</td>
+  <td>High</td>
+  <td>Active</td>
+  <td>Central entity; all rules attach to it</td>
+</tr>
+<tr>
+  <td>Power</td>
+  <td>class</td>
+  <td>SCAN</td>
+  <td>High</td>
+  <td>Active</td>
+  <td>Supporting class — Character module. Core capability unit.</td>
+</tr>
+<tr>
+  <td>Device</td>
+  <td>class</td>
+  <td>SCAN</td>
+  <td>Medium</td>
+  <td>Tension</td>
+  <td>Removable Power vs Equipment? Boundary unclear — see T2.</td>
+</tr>
+</tbody>
+</table>
+```
+
+For very small registries only, a Markdown pipe table is acceptable:
 
 ```markdown
-# Term Registry — {{project_name}}
-
-_Last updated: {{step_short_name}} — {{date}}_
-
-| Term       | Classification | Step  | Confidence | Status    | Notes | Module? |
-|------------|---------------|-------|------------|-----------|-------|---------|
-| Character  | anchor        | SCAN  | High       | Active    | Central entity; all rules attach to it | Yes |
-| Power      | anchor        | SCAN  | High       | Active    | Core superheroic capability unit | Yes |
-| Condition  | anchor        | SCAN  | High       | Active    | Named state applied after check resolution | Yes |
-| Device     | tension       | SCAN  | Medium     | Ambiguous | Removable Power or Equipment? Boundary unclear | Investigate |
-| ability    | candidate     | NOUNS | High       | Active    | One of six core scores; probably a property of Character, not a class | No |
+| Term | Classification | Step | Confidence | Status | Notes |
+|------|----------------|------|------------|--------|-------|
+| Character | anchor (class + module) | SCAN | High | Active | Short note only |
 ```
 
 
@@ -459,6 +535,9 @@ python scripts/drawio_cli.py fix-edge-styles --file <output>.drawio
 # Fix shared connection points (V5) — always run after adding relationships
 python scripts/drawio_cli.py fix-shared-endpoints --file <output>.drawio
 
+# Fix arrow-class overlaps (V6) — routes edges around classes they cross
+python scripts/drawio_cli.py fix-arrow-overlaps --file <output>.drawio
+
 # Verify — check all rules V1–V6
 python scripts/drawio_cli.py verify --file <output>.drawio
 ```
@@ -467,6 +546,12 @@ The `fix-shared-endpoints` command detects classes where 2+ edges arrive or
 leave without explicit `entryX/Y` / `exitX/Y` constraints. It determines the
 dominant approach side (top / bottom / left / right) and distributes port
 coordinates evenly so arrowheads no longer pile up.
+
+The `fix-arrow-overlaps` command detects edges whose straight-line path passes
+through an unrelated class body (V6). It automatically inserts 1–2 waypoints to
+route the edge around all obstacles, using a recursive shortest-path algorithm
+with up to 2 bypass points. V4 info messages about explicit waypoints on
+previously-fixed edges are expected and can be ignored.
 
 After verify, address any remaining warnings:
 
@@ -477,21 +562,18 @@ After verify, address any remaining warnings:
 | V3 | WARN | Wrong edge style for relationship type | `fix-edge-styles` |
 | V4 | WARN | Explicit waypoints on orthogonal edges | `fix-edge-styles` |
 | V5 | WARN | 2+ edges share unconstrained connection point | `fix-shared-endpoints` |
-| V6 | WARN | Straight edge passes through unrelated class | Move class or add waypoint manually |
+| V6 | WARN | Straight edge passes through unrelated class | `fix-arrow-overlaps` |
 
 Then run the frame containment check (Python XML script) to confirm all classes are inside their frames.
 
 ### Step 7 — AI layout pass
 
 The programmatic build will produce correct structure but imperfect visual routing. After running verify (with 0 errors), open the diagram and inspect for:
-- Any remaining V6 warnings — move the blocking class or add a manual bend point
 - Labels obscured by other elements (drag to clear space)
 - Any class that is outside its frame boundary (fix with `add-frame` or XML edit)
+- Any remaining V6 warnings after `fix-arrow-overlaps` — move the blocking class manually as a last resort
 
-This step is required when V6 warnings remain. Code cannot automatically route
-straight-line dependencies around obstacles — this requires a human layout
-decision. Note what was corrected so the post-processed version reflects the
-final intent.
+`fix-arrow-overlaps` automatically routes edges around any class they pass through, inserting 1–2 waypoints using a recursive shortest-path algorithm. Re-run it if V6 warnings remain after the initial fix.
 
 ---
 
@@ -500,7 +582,7 @@ final intent.
 Every class diagram follows this sequence:
 
 ```
-new → add-class (×N) → add-field (×N) → add-method (×N) → add-relationships → relayout → verify
+new → add-class (×N) → add-field (×N) → add-method (×N) → add-relationships → fix-edge-styles → fix-shared-endpoints → fix-arrow-overlaps → verify
 ```
 
 ```bash
@@ -523,9 +605,10 @@ python scripts/drawio_cli.py add-association <From> <To> --label "<label>" --fro
 python scripts/drawio_cli.py add-inheritance <Subclass> <Superclass> --file <output>.drawio
 python scripts/drawio_cli.py add-dependency <From> <To> --stereotype "<label>" --file <output>.drawio
 
-# 6. Fix edge styles, spread shared endpoints, then verify
+# 6. Fix edge styles, spread shared endpoints, fix overlaps, then verify
 python scripts/drawio_cli.py fix-edge-styles --file <output>.drawio
 python scripts/drawio_cli.py fix-shared-endpoints --file <output>.drawio
+python scripts/drawio_cli.py fix-arrow-overlaps --file <output>.drawio
 python scripts/drawio_cli.py verify --file <output>.drawio
 ```
 
@@ -536,7 +619,7 @@ python scripts/drawio_cli.py verify --file <output>.drawio
 When the diagram represents anchor modules (domain-scan phase), each anchor needs a **dashed frame** enclosing its core class and any supporting classes. The module name = the frame title = the core class name.
 
 ```
-new → add-class (core classes + supporting classes) → add-field → add-frame (×N, one per module) → add-relationships → fix-edge-styles → verify
+new → add-class (core classes + supporting classes) → add-field → add-frame (×N, one per module) → add-relationships → fix-edge-styles → fix-shared-endpoints → fix-arrow-overlaps → verify
 ```
 
 ```bash
@@ -560,9 +643,10 @@ python scripts/drawio_cli.py add-frame "<ModuleName>" --classes "<CoreClass>,<Su
 python scripts/drawio_cli.py add-composition <CoreA> <CoreB> --file <output>.drawio
 python scripts/drawio_cli.py add-dependency <CoreA> <CoreB> --stereotype "<label>" --file <output>.drawio
 
-# 6. Fix edge styles, spread shared endpoints, then verify
+# 6. Fix edge styles, spread shared endpoints, fix overlaps, then verify
 python scripts/drawio_cli.py fix-edge-styles --file <output>.drawio
 python scripts/drawio_cli.py fix-shared-endpoints --file <output>.drawio
+python scripts/drawio_cli.py fix-arrow-overlaps --file <output>.drawio
 python scripts/drawio_cli.py verify --file <output>.drawio
 ```
 
@@ -1125,6 +1209,115 @@ where multiple arrowheads overlap and the diagram becomes unreadable.
 (top / bottom / left / right) and distributes `entryX`/`entryY` (or
 `exitX`/`exitY`) evenly across it for all unconstrained edges in the group.
 
+> **Preferred over bare entry-point spreading:** see Section 5a below — anchor
+> each composition to its specific field row instead. This fully eliminates V5
+> and produces a far more readable diagram.
+
+---
+
+## 5a. Field-anchored composition — the preferred routing pattern
+
+When a parent class (e.g. `Character`) owns several child classes through
+composition, the cleanest layout is to:
+
+1. **Add a field row** inside the parent for each owned type (e.g. `+ abilities: Ability`)  
+2. **Connect the diamond to that field row**, not to the parent class border  
+3. **Exit from the SIDE of the child class** (left or right, never top or bottom)  
+4. **Keep the diamond co-linear with the line** (diamond faces the same direction as the line segment it is part of — never sideways)  
+5. **Use as few waypoints as possible** — ideally zero or one  
+
+### Visual goal
+
+```
+[Character]                     [Ability]
+┌───────────────────────┐       ┌──────────────┐
+│ + powerLevel: int     │       │ + rank: int  │
+│─────────────────────  │       │              │
+│ + abilities: Ability ◆│───────│              │
+│ + skills: Skill      ◆│       └──────────────┘
+└───────────────────────┘
+```
+
+The diamond (`◆`) sits at the **field row** and points toward the child class.
+The line exits the **right or left side** of the child and enters the field row.
+
+### Layout recommendation
+
+Place child classes **to the left or right of the parent**, not directly below.
+This allows clean horizontal routing with zero or one waypoint and avoids
+long vertical runs that pass through other classes.
+
+```
+[Advantage]──────◆ advantages: Advantage  │
+[Ability]────────◆ abilities: Ability      │ Character
+[HeroPoint]──────◆ heroPoints: HeroPoint  │
+[Skill]──────────◆ skills: Skill          │
+```
+
+### ✓ Correct XML pattern
+
+```xml
+<!-- Source = child class; Target = field row cell inside parent;
+     endArrow=diamondThin places the diamond at the field row.
+     Child exits from its RIGHT side (exitX=1) toward the field row. -->
+<mxCell id="edge-ability" value=""
+        style="endArrow=diamondThin;endFill=1;endSize=24;
+               edgeStyle=orthogonalEdgeStyle;
+               exitX=1;exitY=0.5;exitDx=0;exitDy=0;"
+        parent="1" source="AbilityClass" target="AbilitiesFieldRow" edge="1">
+  <mxGeometry as="geometry" />
+</mxCell>
+
+<!-- The field row cell must have portConstraint=eastwest so the
+     diamond connects to its LEFT or RIGHT side, not top/bottom -->
+<mxCell id="AbilitiesFieldRow"
+        value="+ abilities: Ability"
+        style="text;...;portConstraint=eastwest;"
+        parent="CharacterClass" vertex="1">
+  <mxGeometry y="118" width="300" height="26" as="geometry"/>
+</mxCell>
+```
+
+Key style attributes:
+
+| Attribute | Value | Reason |
+|-----------|-------|--------|
+| `source` | child class cell id | composition originates at child |
+| `target` | field row cell id (inside parent) | diamond lands at the field |
+| `endArrow` | `diamondThin` | filled diamond at target (field row) |
+| `exitX=1;exitY=0.5` | right-side exit of child | side exit = clean orthogonal route |
+| `portConstraint=eastwest` | on field row | constrains diamond to left or right side |
+
+### ❌ Anti-pattern: diamond entering from the top or bottom
+
+```xml
+<!-- Diamond arrives at the parent's bottom edge — produces V5 pile-up
+     AND diamond appears sideways or flipped relative to the line -->
+<mxCell style="endArrow=diamondThin;endFill=1;
+               entryX=0.5;entryY=1;..."   <!-- ← bottom of CHARACTER class -->
+        target="CharacterClass" ...>
+```
+
+### Rule: diamond co-linearity
+
+The composition diamond must always face **in the same direction as the line
+segment it terminates**. If the last segment arrives from the left, the diamond
+opens to the left. A sideways diamond (arriving vertically but pointing
+horizontally) indicates a mismatched `exitX`/`exitY` or `entryX`/`entryY` and
+must be corrected.
+
+### Minimum-waypoint routing
+
+| Child position relative to parent | Typical exit | Waypoints needed |
+|------------------------------------|-------------|-----------------|
+| Directly left or right, same Y     | right/left   | 0 |
+| Left/right but offset vertically   | right/left   | 1 (adjust Y) |
+| Below or above (avoid)             | top/bottom   | 2+ (not ideal) |
+
+Prefer placing child classes **laterally** (left/right) so that routes remain
+single-segment or single-bend. Stacking child classes directly below the parent
+forces multi-waypoint routes and risks V6 overlaps.
+
 ---
 
 ## 6. Straight-line edges must not pass through unrelated classes (V6)
@@ -1146,14 +1339,14 @@ source-centre to target-centre against every third class's bounding box
 
 ### ✓ Resolved options
 
-1. **Reposition the blocking class** — move it off the arrow corridor; then
-   rerun `verify` to confirm V6 is clear.
-2. **Add an intermediate waypoint** manually in Draw.io to route the dependency
-   around the obstruction (add an `<Array as="points">` with one bend point,
-   or switch the edge to `edgeStyle=orthogonalEdgeStyle`).
+1. **Run `fix-arrow-overlaps`** — automatically inserts 1–2 waypoints using a
+   recursive shortest-path algorithm to route the dependency around all blockers;
+   then rerun `verify` to confirm V6 is clear.
+2. **Reposition the blocking class** — move it off the arrow corridor as a last
+   resort if `fix-arrow-overlaps` cannot find a clean path.
 
 > Note: V6 is a **WARN** (not ERROR) because the obstruction is a layout
-> decision that requires human judgment to resolve correctly.
+> issue. `fix-arrow-overlaps` resolves most cases automatically.
 
 ---
 

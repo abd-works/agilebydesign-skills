@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Merge library + process + phases into AGENTS.md; write phases/built/*.md (derived).
+"""Merge library + process + phases into AGENTS.md; write content/built/phases/*.md (derived).
 
 Merge order and delivery policy: skill root ``README.md`` — Delivery & merge order.
 
@@ -40,14 +40,16 @@ _DEFAULT_AGENTS_PREAMBLE: tuple[str, ...] = (
 from skill import _BuildTimeContext
 
 BUILT_DIR = ROOT / "content" / "built"
+PHASES_BUILT_DIR = BUILT_DIR / "phases"
 
 BUILT_README = """# content/built/ — static_built outputs
 
 This directory holds **pre-merged** agent instructions for **`static_built`** delivery.
 
-| File | Role |
+| Path | Role |
 | --- | --- |
 | **`AGENTS.md`** | Byte-for-byte same merge as repo root **`AGENTS.md`** produced by **`scripts/base/build.py`**. |
+| **`phases/<slug>.md`** | Per-phase snapshots for **`--mode static`** (see **`phases/README.md`**). |
 
 Sources and merge order: **`README.md`** (Delivery & merge order). Regenerate with:
 
@@ -56,7 +58,7 @@ python scripts/base/build.py
 ```
 """
 
-PHASES_BUILT_README = """# parts/phases/built/ — derived per-phase prompts
+PHASES_BUILT_README = """# content/built/phases/ — derived per-phase prompts
 
 Files here are **generated** by **`scripts/base/build.py`**. Sources of truth: **`skill-config.json`**
 (`library_files`, `phase_library`, `phase_rules`, `every_phase_rules`, `phase_bundle`, …) and **`parts/`** / **`rules/`**.
@@ -87,7 +89,7 @@ def _process_md_for_agents(process_text: str) -> str:
 
 
 class ContentAssembler:
-    """Single place for merge order: AGENTS + phases/built/*.md."""
+    """Single place for merge order: AGENTS + content/built/phases/*.md."""
 
     def __init__(self, skill_root: Path, skill_config: dict[str, Any]):
         self.root = Path(skill_root).resolve()
@@ -156,7 +158,7 @@ class ContentAssembler:
         return self._make_instructions().assemble_prompt(slug, include_context=False)
 
     def write_built_phases(self, out_dir: Path | None = None) -> list[Path]:
-        base = out_dir or (self.parts / "phases" / "built")
+        base = out_dir or PHASES_BUILT_DIR
         base.mkdir(parents=True, exist_ok=True)
         written: list[Path] = []
         for slug in self.phase_files:
@@ -191,8 +193,7 @@ def main() -> None:
     built_readme.write_text(BUILT_README, encoding="utf-8")
     print(f"Wrote {built_readme.relative_to(ROOT)}")
 
-    parts = asm.parts
-    built_phase_dir = parts / "phases" / "built"
+    built_phase_dir = PHASES_BUILT_DIR
     built_phase_dir.mkdir(parents=True, exist_ok=True)
     for p in asm.write_built_phases(built_phase_dir):
         print(f"Wrote {p.relative_to(ROOT)}")

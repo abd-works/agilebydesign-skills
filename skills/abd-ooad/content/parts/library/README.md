@@ -5,7 +5,7 @@ Optional reference material merged into the skill bundle. **Required** narrative
 | Shard | Purpose |
 |-------|---------|
 | [`anchors.md`](anchors.md) | Anchor definition and how to use them in scans |
-| [`scan-artifacts-and-strategy.md`](scan-artifacts-and-strategy.md) | Five domain-scan deliverables; **`strategy.md`** defines scope + ordered execution plan; **ticks** only under `abd-ooad/progress/` |
+| [`strategy-led-generation.md`](strategy-led-generation.md) | Five domain-scan deliverables; **`strategy.md`** defines scope + ordered execution plan; **ticks** only under `abd-ooad/progress/` |
 | [`strategy-execution-and-checklists.md`](strategy-execution-and-checklists.md) | **abd-ooad:** `strategy-run-checklist.md` + `process-checklist.md` + `<phase>-checklist.md` — three layers |
 | [`base/checklist.md`](base/checklist.md) | **Normative:** `progress/process-checklist.md` + `progress/<phase>-checklist.md` — copied from abd-skill-builder |
 | [`term-registry.md`](term-registry.md) | Canonical terms and naming discipline |
