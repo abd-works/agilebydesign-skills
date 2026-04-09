@@ -1,43 +1,22 @@
-# Domain scan
+﻿# Domain scan
 
-**Outcome:** You have a source map, 3–7 high-confidence **central modules** (each with a named core class), and a list of suspected tensions — enough orientation to begin extraction as a targeted pass rather than a mechanical word sweep.
+## Outcome:
+You have a list of initial terms, 3–7 high-confidence **central modules** (each with a named core class), and a list of suspected tensions — enough orientation to begin extraction as a targeted pass rather than a mechanical word sweep.
 
-For **which files the scan creates** (`domain-scan-results.md`, `strategy.md`, models, registry) and how they evolve after the scan — see **`strategy-led-generation`** in this library.
+A domain scan answers three questions - each maps to an artifact:
 
-**Live checkboxes** for pipeline position and per-phase steps live under **`<skill_workspace>/abd-ooad/progress/`** — see **`library/strategy-execution-and-checklists.md`**. Do not use `strategy.md` for tick lists.
+- *What kind of source material, and how do we parse it?* → `term-registry.md`
+- *Which concepts are clearly central?* → `term-registry.md` (Notes: `High Confidence Anchor`) and `domain-scan-model.md`
+- *Where is there complexity, ambiguity, or tension?* → `term-registry.md` (Notes: `Tension`) and `strategy.md`
 
-For canonical **module** terminology, the three-part stability test, and what to do when a cluster has no clear core class — see **`anchors`** in this library (detailed module framing is merged in when this phase is assembled).
-
----
-
-A domain scan is not extraction. It is orientation. Before reading line by line for nouns and verbs, you do a rapid pass to answer three questions:
-
-- What kind of source is this, and what technique fits it?
-- Which concepts are clearly central and stable?
-- Where is the complexity or ambiguity concentrated?
-
-The scan calibrates how you will approach extraction. Without it, you risk either over-extracting noise from low-signal sections or missing the most loaded concepts entirely.
+Without scan calibrates you risk either over-extracting noise from low-signal sections or missing the most loaded concepts entirely.
 
 ---
 
-## Work order (`domain-scan`)
+## Step 1: Scan
+Scan source material considering the best approach based on the nature of te source material.
 
-Do **analysis in domain markdown only**; **then** render Draw.io. (Refer to this phase by **phase-id** `domain-scan` — not “Phase 1” as a name.)
-
-| Order | Artifact | Role |
-|-------|----------|------|
-| 1 | `domain-scan-results.md` | Findings: source map, anchors, tensions. |
-| 2 | `domain-scan-model.md` | Integrated class-line listing per module — the **same** content the diagram will show. |
-| 3 | `strategy.md`, `term-registry.md` | Plan and term rows (see **strategy-led-generation**, **term-registry**). |
-| 4 | `domain-scan-model.drawio` | **After** 1–2 match: visual twin of the model — **using-diagram-cli**, not a separate analysis pass. |
-
-Do **not** duplicate the same anchor inventory as both a giant table in results **and** a full repeat in the model file. Split by purpose (map vs class lines), or keep one integrated file if the project prefers.
-
----
-
-## Techniques by source type
-
-### Specification or structured document
+### Specification or structured documents
 
 For each **major section** (chapter, top-level heading):
 - Read the section title and note it in the source map
@@ -76,25 +55,42 @@ Flag: "Manager", "Handler", "Service", "Factory", "Util" — these are often ove
 
 ---
 
-## Output
+## Step 2: Seed Terms 
+Seed key term from source into `term-registry.md` — the project's shared vocabulary file. At scan time, seed it with:
+   - **Core modules** — the 3–7 top-level concepts that appear to own the most behaviour
+   - **Anchor class candidates** — terms that look like the primary Class inside a module; mark with `<< Anchor >>` if confident, leave stereotype blank if uncertain
+   - **Sibling class candidates** — terms that appear alongside an anchor (subtypes, closely related entities within the same module)
+   - **Visible tensions** — terms that seem to belong to more than one module, or whose boundary is unclear
 
-After the scan, record:
+   Use Notes column labels for each entry (see **`library/term-capture`** for the full label list). At scan time the most common are:
+   - `High Confidence Anchor - {{why_this_module_or_class_is_central}}`
+   - `Sibling Candidate - {{anchor_term}} {{why_related}}`
+   - `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}`
 
-| Output | Description |
-|--------|-------------|
-| **Source map** | What sections, modules, or files exist, and which look heaviest |
-| **High-confidence central modules** | 3–7 modules that are clearly central and stable enough to start modeling from. Each is a **module**: a named thing with a clear core class you can identify by name. If you cannot name the core class, you have not found the module yet — see **`anchors`** in this library. |
-| **Suspected tensions** | 1–3 places where the material seems inconsistent, ambiguous, or overloaded |
-| **Strategy (in `strategy.md`)** | **Modeling scope**; **§1 source slices** (Goal, **Source**, Coverage, Importance); **§2 slice plan** (goal restated + phases per slice); **coverage across steps**; **cross-slice integration**; **anchor and subdomain elaboration**; **execution plan (normative)** — phase slugs with **slice IDs**; plus **approach** and **dated pivots** — see `strategy-led-generation` and `strategy-execution-and-checklists` in this library |
-| **Progress (under `abd-ooad/progress/`)** | **Ticks only:** `strategy-run-checklist.md` (your planned phases + scope), `process-checklist.md` (full pipeline map), `<phase>-checklist.md` (phase steps) — generated by `generate.py` when missing; see `library/strategy-execution-and-checklists.md` |
+   See below section on **Term Capture** below for details on term registry format and approach.
 
----
+   template: `templates/terms-template.md`
 
-## Term Registry
+## Step 2 - Map Source Sections - create a map that organizes and summarizes source material into cohesive sections based on topic categorization. Create `domain-scan-results.md`.
 
-The registry is maintained in its own file — see `term-registry` in this library for column definitions, step short-name reference, and update protocol.
+template: `templates/domain-scan-results.md`
 
-**At this step:** Add your 3–7 central modules using **Classification** (model role: `anchor (class + module)` vs `class`, etc.) and **Status** (OOAD scale: e.g. **Active**, **Tension**, **Candidate**) plus step codes from **`term-registry`** and **`anchors`**. Flag boundary conflicts with **Status = Tension** (not by overloading Classification). Do not bulk-add extraction terms yet — that happens at NOUNS/CANDS.
+## Step 3. `domain-scan-model.md` - initial model skeleton; class-line listing per module — exactly what the diagram will show.
+
+template: `templates/domain model template.md`
+
+Translate anchor and sibling candidates from `term-registry.md` into a module/class skeleton. This is not a deep model yet — it is a first-pass structural draft so anchor boundaries are visible.
+
+Add one module block with its anchor class and any sibling class candidates already identified. For each class add only properties and operations that are already evident from the scan — do not invent structure.
+
+**UML notes:** attach a `note:` line immediately after each class or module declaration for every term that has a row in `term-registry.md`. One sentence — term name, then why it exists. Tag with `[s1-p0]`. Deeper reasoning stays in the `term-registry.md` Notes column. See `templates/domain model template.md` for the full tag table and example.
+
+## Step 4
+4. `domain-scan-model.drawio` - visual twin of the model; render **after** 1-3 are complete using **using-diagram-cli**.
+template: `templates/domain model template.drawio`
+
+5. `strategy.md` - modeling scope, source slices, slice plan, execution plan (see **strategy-led-generation**). Progress ticks go in `abd-ooad/progress/` - not here.
+template: `templates/strategy.md`
 
 ---
 
@@ -102,32 +98,15 @@ The registry is maintained in its own file — see `term-registry` in this libra
 
 Before completing this step, verify all of these:
 
-- [ ] Have you identified which source type you are working with?
-- [ ] Do you have at least three central modules you are confident about?
-- [ ] Have you flagged at least one suspected tension or ambiguous boundary?
-- [ ] Have you recorded **`strategy.md`** with **§1 source slices**, **§2 slice plan**, **coverage across steps**, **cross-slice integration**, **anchor and subdomain elaboration** (every anchor’s attached types tied to **nouns-verbs / raw-candidate / responsibilities** — not only “Character”), and **execution plan (normative)**? See `strategy-led-generation` and `strategy-execution-and-checklists` in this library.
-- [ ] With `active_skill_workspace` set, have you run `python scripts/base/generate.py --phase domain-scan` so `abd-ooad/progress/process-checklist.md`, `abd-ooad/progress/domain-scan-checklist.md`, and (when seeded from template) `abd-ooad/progress/strategy-run-checklist.md` exist? Align `strategy-run-checklist.md` with your execution plan. (See `library/strategy-execution-and-checklists.md`.)
-- [ ] `domain-scan-results.md` is present and complete
-- [ ] `strategy.md` is present
-- [ ] `domain-scan-model.md` is present
-- [ ] `domain-scan-model.drawio` is present
-- [ ] `term-registry.md` exists, contains at least the scan's primary modules and terms, and every Term has a confidence level
+- [ ] `term-registry.md` — source type identified; core modules and anchor candidates present; tensions and high-confidence anchors labelled in Notes column.
+- [ ] `domain-scan-results.md` — source map and section anchors recorded; file present.
+- [ ] `domain-scan-model.md` — present; every module and class has a UML note linking back to its term-registry row with a one-sentence rationale.
+- [ ] `domain-scan-model.drawio` — present.
+- [ ] `strategy.md` — recorded with source slices, slice plan, coverage, cross-slice integration, anchor elaboration, and strategy-run-checklist plan and strategy-run-checklist exist and are aligned with your execution plan.
 
 If any of these are missing, extend the scan before proceeding.
 
 ---
-
-## Required Output Files
-
-**Five deliverables** under `<workspace>/abd-ooad/`:
-
-| File | Template | Content |
-|------|----------|---------|
-| `domain-scan-results.md` | `templates/domain-scan-results.md` | Source map, central modules, and tensions (scan findings; not the long extraction plan) |
-| `strategy.md` | `templates/strategy.md` | **§1 source slices**, **§2 slice plan**, **coverage**, **cross-slice integration**, **anchor and subdomain elaboration**, **execution plan**, **approach**, **dated pivots** — see `strategy-led-generation` in library |
-| `domain-scan-model.md` | `templates/domain model template.md` | Class notation listing for each central module — name, fields with cardinality notation, supporting classes |
-| `domain-scan-model.drawio` | built via `scripts/drawio_cli.py` | Modules as frames, core class + supporting classes inside each frame, intra-module and cross-module relationships |
-| `term-registry.md` | see `term-registry` in library | Seeded with primary modules and visible tensions from the scan |
 
 ### Notation in `domain-scan-model.md` (class lines)
 

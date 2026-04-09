@@ -1,12 +1,10 @@
-# Relationships and cardinality — payments example
+﻿# Relationships and cardinality — payments example
 
-**Skill:** abd-ooad — **Step 7:** structure + containment strength.
+**Skill:** abd-ooad — **Phase-id:** `relationships-and-cardinality` (Stage 2 — Structure, p7).
 
-**Upstream:** `turn-verbs-into-operations.md`, `add-properties-semantically-tight.md`.
+**Upstream:** `properties-and-operations` (p6) — every surviving class has typed properties and operations.
 
 Use ASCII glyphs from **`SKILL.md` → ASCII class diagrams — notation** (`----|>`, `..|>`, `*---`, `o---`, `- - ->`).
-
-> **Continual refinement:** Full notation is in **[Domain model Markdown](../library/domain-model.md)** (*Domain concept* template; class definition and diagram refined together). In this payments thread, **`**newly added**`** marks a property or operation line **first introduced in this step file** (Steps 1–4 stay pre-notation; formal `- <type> property` / `operation(...) → return` lines begin at Step 5).
 
 ---
 
@@ -60,11 +58,22 @@ Encode **invariants** on **Payment** / **Refund** operations (sanctions, partial
 
 ---
 
-## Continual refinement (this step)
+## Relationship decisions → term-registry.md
 
-- **Delta:** **associations and cardinality** (**Order** ↔ **Payment**, **Payment** ↔ **Refund**, **Payment** ↔ **AuditEntry**, composition vs association) — document in **Concept relationships** / diagram; **`**newly added**`** on new relationship edges when mirroring to **`map-model-spec.json`**.
+> Tag notes on the class model with `[p7]` — see `templates/domain model template.md` for the full tag table.
+
+Every cross-BC reference and significant relationship resolved or deferred in this phase belongs in `term-registry.md` Notes. Use Notes labels (see **`library/term-capture`** for the full label list).
+
+Common Notes labels added at this phase:
+
+- `Classified - {{kind}} {{reason}}` — when a term's relationship to another class is confirmed (composition, reference, association)
+- `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}` — when ownership or boundary between two aggregates is unclear
+- `Follow-up - {{question_or_action}}` — deferred cardinality or ownership decisions
+
+**Cross-BC references (e.g., `OrderId`, `PayerId`) must have a term row confirming they are references, not embedded aggregates.**
 
 ---
+
 
 ## Action Checklist
 
@@ -72,6 +81,7 @@ Encode **invariants** on **Payment** / **Refund** operations (sanctions, partial
 - [ ] Have you recorded cardinality (1..1, 1..*, 0..*) for each relationship?
 - [ ] Have you verified that composition correctly models ownership and lifecycle dependency?
 - [ ] Have you updated the class diagram with all relationships and cardinalities?
+- [ ] Have you updated `term-registry.md` with `Classified` notes for resolved relationships and `Tension` notes for any unclear cross-BC ownership?
 - [ ] Have you noted carry-forward items to Step 8 (invariants)?
 
 ---

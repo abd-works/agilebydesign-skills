@@ -250,7 +250,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |

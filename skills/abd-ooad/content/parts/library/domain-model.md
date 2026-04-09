@@ -8,7 +8,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 

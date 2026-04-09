@@ -1,12 +1,9 @@
-# Invariants in the model — payments example
+﻿# Invariants in the model — payments example
 
-**Skill:** abd-ooad — **Step 8:** rules live where they can be **enforced**, not only in docs/UI.
+**Skill:** abd-ooad — **Phase-id:** `invariants-in-the-model` (Stage 2 — Structure, p8).
 
-**Upstream:** `garbled-payments-spec.md`, `relationships-and-cardinality.md`.
+**Upstream:** `relationships-and-cardinality` (p7) — associations and cardinality are confirmed.
 
-> **Continual refinement:** Full notation is in **[Domain model Markdown](../library/domain-model.md)** (*Domain concept* template; class definition and diagram refined together). In this payments thread, **`**newly added**`** marks a property or operation line **first introduced in this step file** (Steps 1–4 stay pre-notation; formal `- <type> property` / `operation(...) → return` lines begin at Step 5).
-
----
 
 ## From spec → enforced behavior
 
@@ -29,10 +26,17 @@
 
 ---
 
-## Conflicts in spec (explicit debt)
+## Invariants and conflicts → term-registry.md
 
-- **Idempotency TTL 24h vs 72h** — invariant uses **configured** TTL until product decides.
-- **Digital vs physical emit timing** — **not** solvable inside Payment alone; **policy flag** or **event choreography** document.
+> Tag notes on the class model with `[p8]` — see `templates/domain model template.md` for the full tag table.
+
+Every invariant and every unresolved spec conflict belongs in `term-registry.md` Notes — not only in a spec comment. Use Notes labels (see **`library/term-capture`** for the full label list).
+
+Common Notes labels added at this phase:
+
+- `Invariant - {{rule_that_must_always_hold}}` — the enforced condition and where it lives (which operation/aggregate)
+- `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}` — configurable TTLs, cross-BC rules, timing conflicts
+- `Follow-up - {{question_or_action}}` — deferred invariant decisions awaiting product or architecture input
 
 ---
 
@@ -42,11 +46,6 @@ Watch **Payment** for bloat as more rules arrive — split policies if needed.
 
 ---
 
-## Continual refinement (this step)
-
-- **Delta:** **invariants** tied to **`Payment.initiate`**, **`capture`**, **`settle`**, **`Refund.request`**, append-only **AuditEntry** — add **`Invariant:`** lines under the matching **property** / **operation** in the spec (see [Domain model Markdown](../library/domain-model.md)); mark **`**newly added**`** when first attaching each invariant to a member line.
-
----
 
 ## Action Checklist
 
@@ -54,6 +53,7 @@ Watch **Payment** for bloat as more rules arrive — split policies if needed.
 - [ ] Is each invariant expressed as a condition that must always be true, not a procedure?
 - [ ] Are all invariants attached to the relevant `property` or `operation` line in the spec?
 - [ ] Have you documented open decisions (e.g. configurable TTLs) where invariants are not yet fully defined?
+- [ ] Have you added `Invariant` notes to `term-registry.md` for each enforced rule, and `Tension` notes for spec conflicts?
 - [ ] Have you noted carry-forward items to Step 9 (watch for bloat)?
 
 ---

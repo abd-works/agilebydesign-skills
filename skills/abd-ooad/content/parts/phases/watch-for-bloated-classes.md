@@ -1,4 +1,4 @@
-# Watch for bloated classes — payments example
+﻿# Watch for bloated classes — payments example
 
 **Skill:** abd-ooad — **Step 9:** danger signals for **Payment** growing into a god object.
 
@@ -8,33 +8,25 @@
 
 ---
 
-## Signs to monitor on `Payment`
+## Bloat signals → term-registry.md
 
-| Signal | In this domain |
-|--------|----------------|
-| Unrelated property clusters | Mixing **redirect URLs**, **dispute scores**, **marketing campaign ids** with core money state. |
-| Methods touching different clusters | `calculateTax()`, `reserveInventory()`, `emailReceipt()` on **Payment**. |
-| Many `if (methodKind == …)` | Long-term: **strategy** per rail (Step 12–13); short-term acceptable with debt noted. |
-| Name smell | **`PaymentProcessor`**, **`PaymentManager`** — likely hiding services. |
+> Tag notes on the class model with `[s1-p9]` — see `templates/domain model template.md` for the full tag table.
 
----
+Record every bloat signal and proposed extraction in `term-registry.md` Notes, not in a separate table. Use Notes labels (see **`library/term-capture`** for the full label list).
 
-## Splits if bloat appears
+Common Notes labels added at this phase:
 
-| Extract | Responsibility |
-|---------|----------------|
-| **PricingQuoteService** (app) | FX display, fee quotes — **inputs** to Payment, not fields forever. |
-| **RedirectSession** VO + adapter | 3DS / bank login — keep **Payment** to `awaitingRedirect` + correlation id. |
-| **RefundPolicy** | Eligibility windows, reason-code matrix. |
-| **SettlementNotifier** | Emitting events — or stay **domain events** from Payment if thin. |
+- `Bloat Signal - {{what_clusters_are_mixed}} suggest: {{extract}}` — when a class mixes unrelated property or operation clusters
+- `Role Separation - {{merged_role}} splits into: {{role_a}}, {{role_b}}` — when a class is doing two distinct jobs
+- `Follow-up - {{question_or_action}}` — deferred extractions or design debt
 
-**Payment** should stay: **one payment attempt’s truth**, rail outcomes, settlement emission.
+**Signs to watch for:** unrelated property clusters, methods touching different responsibility areas, long conditional chains on kind/type, name smells like `*Manager` or `*Processor`.**
 
 ---
 
 ## Carry forward → Step 10
 
-Ask whether **“user”** / **payer** / **admin** are one abstraction or **smashed roles**.
+Ask whether **"user"** / **payer** / **admin** are one abstraction or **smashed roles**.
 
 ---
 
@@ -49,6 +41,7 @@ Ask whether **“user”** / **payer** / **admin** are one abstraction or **smas
 - [ ] Have you identified any class with more than two distinct responsibilities?
 - [ ] Have you identified any class that contains both state management and policy enforcement?
 - [ ] Have you proposed concrete extractions (new types) for each bloat signal found?
+- [ ] Have you added `Bloat Signal` notes to `term-registry.md` for the bloated class and `Follow-up` notes for each deferred extraction?
 - [ ] Have you logged any deferral as explicit design debt with a rationale?
 - [ ] Have you noted carry-forward items to Step 10 (smashed abstractions)?
 

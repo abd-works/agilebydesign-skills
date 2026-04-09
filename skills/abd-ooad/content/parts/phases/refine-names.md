@@ -1,4 +1,4 @@
-# Refine names — illustrative thread
+﻿# Refine names — illustrative thread
 
 **Phase ID:** `refine-names`
 
@@ -10,21 +10,19 @@
 
 ---
 
-## Renames (candidates)
+## Renames and preserved terms → term-registry.md
 
-| Weak / vague | Stronger (payments) |
-|----------------|---------------------|
-| Processor / Handler | **PaymentOrchestrator** (use case), **PspConnector** (port) |
-| User | **Payer** / **Merchant** / **Actor** (audit) |
-| Status (string soup) | **PaymentState** enum + **RefundState** |
-| Data / Info | **FeeBreakdown**, **AuthorizationResult** (VOs) |
-| Thing | **Payment**, **Refund**, **AuditEntry** |
+> Tag notes on the class model with `[s1-p19]` — see `templates/domain model template.md` for the full tag table.
 
----
+All rename decisions and terms-to-preserve belong in `term-registry.md` Notes. Use Notes labels (see **`library/term-capture`** for the full label list).
 
-## Terms from spec to preserve
+Common Notes labels added at this phase:
 
-- **Idempotency key**, **3DS**, **MoR**, **partial capture**, **settlement** — **glossary** in team wiki; model uses **same** spellings in **events** and **UI**.
+- `Renamed - {{old_name}} → {{new_name}} {{reason}}` — every rename from weak/generic to domain-specific
+- `Promoted - {{from_target}} → {{to_target}} {{reason}}` — when a rename also changes a term's target (e.g., property promoted to class)
+- `Follow-up - {{question_or_action}}` — names deferred pending spec or team alignment
+
+Terms from spec that must be preserved verbatim (e.g., `idempotency key`, `3DS`, `MoR`, `partial capture`, `settlement`) get a row in `term-registry.md` confirming the canonical spelling used in events and UI.
 
 ---
 
@@ -45,7 +43,7 @@
 - [ ] Have you replaced all generic or weak names (Manager, Handler, Processor) with specific domain terms?
 - [ ] Are all names aligned with the language used in the source material (spec, interviews, wiki)?
 - [ ] Have you updated the class diagram to reflect every rename?
-- [ ] Have you updated `term-registry.md` with the new canonical names and removed old entries?
+- [ ] Have you updated `term-registry.md` with `Renamed` notes for each rename and `Promoted` notes where targets changed?
 - [ ] Have you verified that events, UI labels, and API names use the same spelling?
 
 ---

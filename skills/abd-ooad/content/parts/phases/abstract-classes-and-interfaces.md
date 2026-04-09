@@ -1,4 +1,4 @@
-# Abstract classes and interfaces — payments example
+﻿# Abstract classes and interfaces — payments example
 
 **Skill:** abd-ooad — **Step 12:** **state + shared impl** vs **pure contract**.
 
@@ -24,6 +24,23 @@
 
 ---
 
+## Interface and abstract class decisions → term-registry.md
+
+> Tag notes on the class model with `[s1-p12]` — see `templates/domain model template.md` for the full tag table.
+
+Record every port, interface, and abstract class decision in `term-registry.md` Notes. Use Notes labels (see **`library/term-capture`** for the full label list).
+
+Common Notes labels added at this phase:
+
+- `Classified - {{kind}} {{reason}}` — when a term is resolved to interface or abstract class
+- `Promoted - {{from_target}} → {{to_target}} {{reason}}` — when a term is elevated from a property reference to a formal interface
+- `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}` — when it is unclear whether a shared base or interface is appropriate
+- `Follow-up - {{question_or_action}}` — deferred port definitions
+
+**Every external integration point should map to an interface in `term-registry.md` — not buried in narrative.**
+
+---
+
 ## Carry forward → Step 13
 
 **Prefer composition:** **Payment** holds **PaymentMethod** ref + **PspConnector** injected at application layer.
@@ -42,6 +59,7 @@
 - [ ] Is each port defined as an interface (not an abstract class) when it has no shared implementation?
 - [ ] Have you defined all abstract base classes with shared domain behaviour and at least one abstract operation?
 - [ ] Have you verified that no concrete domain class directly depends on infrastructure types?
+- [ ] Have you added `Classified` or `Promoted` notes to `term-registry.md` for each interface or abstract class, and `Tension` notes for unresolved base-vs-interface decisions?
 - [ ] Have you noted carry-forward items to Step 13 (prefer composition)?
 
 ---

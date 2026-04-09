@@ -54,7 +54,7 @@
 
 - **Slice goal (restated):** {{One sentence — same intent as the Goal column in §1, expanded if needed.}}
 - **Unit kind:** {{chapter \| directory \| anchor \| module \| file \| API surface \| …}}
-- **Phase-ids (execution — use slugs from `process.md`):** {{e.g. `domain-scan`; `nouns-verbs-rules-and-states` → `raw-candidate-list`; …}} — or **stages** (A–F) if you batch by stage.
+- **Phase-ids (execution — use slugs from `process.md`):** {{e.g. `domain-scan`; `nouns-verbs-rules-and-states` → `raw-candidates`; …}} — or **stages** (A–F) if you batch by stage.
 - **Produces / updates:** {{artifacts, term-registry rows, diagram}}
 - **Reads / depends on:** {{other slice IDs}}
 
@@ -103,7 +103,7 @@
 
 - Every **subdomain row** must map to **at least one phase-id** in the execution plan where nouns/candidates/responsibilities/properties are **explicit** (not only “implied by anchor”).
 - **Codebases:** subdomains may be **packages** under an anchor module — same table, different slice IDs.
-- If **nouns-verbs** / **raw-candidate-list** names only one slice while others stay at scan fidelity, **widen** those steps’ slice IDs or add **separate execution lines** per subdomain.
+- If **nouns-verbs** / **raw-candidates** names only one slice while others stay at scan fidelity, **widen** those steps’ slice IDs or add **separate execution lines** per subdomain.
 
 ---
 
@@ -113,7 +113,7 @@
 
 1. **`domain-scan`** — slices: {{all S\* or listed IDs}} — {{what the scan bounded}}
 2. **`nouns-verbs-rules-and-states`** — slices: {{…}} — {{what you extract}}
-3. **`raw-candidate-list`** — slices: {{…}} — {{…}}
+3. **`raw-candidates`** — slices: {{…}} — {{…}}
 4. {{continue until the pass is fully described}}
 
 *Patterns:* single vertical slice; package ladder; breadth-then-depth; anchor + subdomains (see template **Anchor** section above).

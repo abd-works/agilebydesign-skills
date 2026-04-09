@@ -102,7 +102,7 @@ Top row runs first. **Link** = phase document under `content/parts/phases/`. **S
 | `workspace-and-config` | [Workspace and config](phases/workspace-and-config.md) | Set active skill workspace; configure project root | A |
 | `domain-scan` | [Domain scan](phases/domain-scan.md) | Scan source, identify anchors, flag tensions, initial sketch | A |
 | `nouns-verbs-rules-and-states` | [Nouns, verbs, rules, and states](phases/nouns-verbs-rules-and-states.md) | Per-slice extraction: nouns, verbs, rules, states; update **`terms.md`**, **`term-registry.md`** | B |
-| `raw-candidate-list` | [Raw candidate list](phases/raw-candidate-list.md) | Sort findings into entities, values, processes, policies, roles, events | B |
+| `raw-candidates` | [Raw candidate list](phases/raw-candidates.md) | Sort findings into entities, values, processes, policies, roles, events | B |
 | `thing-vs-data-about-a-thing` | [Thing vs data about a thing](phases/thing-vs-data-about-a-thing.md) | Separate entities from value objects, enums, properties | C |
 | `responsibilities-before-operations` | [Responsibilities before operations](phases/responsibilities-before-operations.md) | Define what each class is responsible for (before methods) | C |
 | `add-properties-semantically-tight` | [Add properties semantically tight](phases/add-properties-semantically-tight.md) | Give each class only the properties it needs | C |
@@ -150,7 +150,7 @@ flowchart LR
 | Stage | Phase IDs (in order) |
 |-------|----------------------|
 | **A** | `workspace-and-config`, `domain-scan` |
-| **B** | `nouns-verbs-rules-and-states`, `raw-candidate-list` |
+| **B** | `nouns-verbs-rules-and-states`, `raw-candidates` |
 | **C** | `thing-vs-data-about-a-thing`, `responsibilities-before-operations`, `add-properties-semantically-tight`, `turn-verbs-into-operations`, `relationships-and-cardinality`, `invariants-in-the-model` |
 | **D** | `watch-for-bloated-classes`, `smashed-abstractions-and-hidden-roles`, `inheritance-when-behavior-generalizes`, `abstract-classes-and-interfaces`, `prefer-composition` |
 | **E** | `model-state-transitions`, `iterative-refinement`, `tension-as-a-signal`, `what-changes-together`, `validate-with-scenarios` |
@@ -168,7 +168,7 @@ Name phases **only** by **phase-id**. Never “Phase 1 vs Phase 2” as step nam
 
 - **`workspace-and-config`** (when present): workspace layout, config, paths — enables later runs.
 - **`domain-scan`**: First **overall** workspace capture: source type, map, **anchors**, tensions, initial sketch (`domain-scan-results.md`, `domain-scan-model.md`, diagram, seeded **`term-registry.md`**). Not the deep per-module extraction against a full slice — that belongs under later IDs.
-- **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** (in **table order**): First **detailed, module-specific** capture on a **section of source** (per **slice** in `strategy.md`): **`domain-noun-verb.md`**, **`## [Anchor module]`**, candidates — aligned to locators. **`terms.md`** (per slice) and **`term-registry.md`** evolve from here onward for that slice.
+- **`nouns-verbs-rules-and-states`** and **`raw-candidates`** (in **table order**): First **detailed, module-specific** capture on a **section of source** (per **slice** in `strategy.md`): **`domain-noun-verb.md`**, **`## [Anchor module]`**, candidates — aligned to locators. **`terms.md`** (per slice) and **`term-registry.md`** evolve from here onward for that slice.
 - **Stages C–F**: Structural and behavioral modeling per phase doc; keep coarse verbatim evidence in **`terms.md`**; keep **registry** and **domain model** structural with **`*[Sn · phase-id]*`** tags — see **`library/term-registry.md`**.
 
 For a slice, **`domain-scan`** seeds **global** orientation and anchor set; per-slice registry and **`terms.md`** deepen from **`nouns-verbs-rules-and-states`** onward.
@@ -241,7 +241,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -427,7 +427,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -603,7 +603,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -633,7 +633,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -913,7 +913,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -1180,7 +1180,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -1373,7 +1373,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -2183,7 +2183,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -2309,7 +2309,7 @@ Before completing this step, verify all of these:
 - [ ] Have you identified which source type you are working with?
 - [ ] Do you have at least three central modules you are confident about?
 - [ ] Have you flagged at least one suspected tension or ambiguous boundary?
-- [ ] Have you recorded **`strategy.md`** with **§1 source slices**, **§2 slice plan**, **coverage across steps**, **cross-slice integration**, **anchor and subdomain elaboration** (every anchor’s attached types tied to **nouns-verbs / raw-candidate / responsibilities** — not only “Character”), and **execution plan (normative)**? See `strategy-led-generation` and `strategy-execution-and-checklists` in this library.
+- [ ] Have you recorded **`strategy.md`** with **§1 source slices**, **§2 slice plan**, **coverage across steps**, **cross-slice integration**, **anchor and subdomain elaboration** (every anchor’s attached types tied to **nouns-verbs / raw-candidates / responsibilities** — not only “Character”), and **execution plan (normative)**? See `strategy-led-generation` and `strategy-execution-and-checklists` in this library.
 - [ ] With `active_skill_workspace` set, have you run `python scripts/base/generate.py --phase domain-scan` so `abd-ooad/progress/process-checklist.md`, `abd-ooad/progress/domain-scan-checklist.md`, and (when seeded from template) `abd-ooad/progress/strategy-run-checklist.md` exist? Align `strategy-run-checklist.md` with your execution plan. (See `library/strategy-execution-and-checklists.md`.)
 - [ ] `domain-scan-results.md` is present and complete
 - [ ] `strategy.md` is present
@@ -2377,7 +2377,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -2610,7 +2610,7 @@ Example: `Character` module has a `Character` core class with `abilities: Abilit
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -2640,7 +2640,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -2920,7 +2920,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -3187,7 +3187,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -3380,7 +3380,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -4190,7 +4190,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -4235,7 +4235,7 @@ For the full anchor definition and the three-part anchor test — see `anchors` 
 | **Artifact body** | Domain content only — no skill paths, template filenames, or process meta in the file. |
 | **Elsewhere** | Methodology and plans stay in **strategy.md** / **term-registry.md** / phase docs — not in the slice artifact. |
 | **`terms.md`** | Same slice folder; evidence quotes and promotion log — see **`library/term-registry.md`**. |
-| **`raw-candidate-list` in the same file** | Optional: append bucket roll-up, watch list, and tensions to **domain-noun-verb.md** (see **`raw-candidate-list`** phase-id) instead of a second markdown file. |
+| **`raw-candidates` in the same file** | Optional: append bucket roll-up, watch list, and tensions to **domain-noun-verb.md** (see **`raw-candidates`** phase-id) instead of a second markdown file. |
 
 
 Align **term-registry.md** (slice / anchor context in **Notes**; **Targets** bullets per **`library/term-registry.md`**) with the **`## [… module]`** headings in **domain-noun-verb.md** and **`terms.md`**.
@@ -4265,7 +4265,7 @@ This phase-id is the first time anchors are tested by the full vocabulary of the
 - **Evidence that challenges an anchor** — a term that is referenced independently by multiple other concepts, suggesting it may need to be elevated to its own anchor
 - **Evidence that an anchor should be split** — the core class is doing two different things and the nouns in this pass separate cleanly into two groups
 
-Keep the anchor set stable for this phase. Record boundary questions in the term registry (`Status: Ambiguous`, note the challenge); resolve at **Phase 3** (`raw-candidate-list` / **CANDS**).
+Keep the anchor set stable for this phase. Record boundary questions in the term registry (`Status: Ambiguous`, note the challenge); resolve at **Phase 3** (`raw-candidates` / **CANDS**).
 
 **At the end of Phase 2, re-apply the anchor test** (from **`anchors`**) to any anchor whose boundary was challenged. Promote, demote, or split if the test now fails. Update **`term-registry.md`** and any scan diagram if the workspace still uses them.
 
@@ -4279,7 +4279,7 @@ Analysis lives in **`domain-noun-verb.md`** (per slice) — **only**. Methodolog
 
 ## Illustrative shape (short)
 
-Work **section-by-section** in the source. Under each **`## [Anchor module]`**, list **Candidate** nouns, verbs, rules, states; add **`### ClassName`** boxes when the text supports it. The **raw-candidate-list** phase doc shows a tiny **Check**-anchor excerpt for bucket shape.
+Work **section-by-section** in the source. Under each **`## [Anchor module]`**, list **Candidate** nouns, verbs, rules, states; add **`### ClassName`** boxes when the text supports it. The **raw-candidates** phase doc shows a tiny **Check**-anchor excerpt for bucket shape.
 
 ---
 
@@ -4327,7 +4327,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -4503,7 +4503,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -4533,7 +4533,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -4813,7 +4813,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -5080,7 +5080,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -5273,7 +5273,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -6083,7 +6083,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -6104,7 +6104,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 # Raw candidate list
 
-**Skill:** abd-ooad — **Phase-id:** `raw-candidate-list` (follows **`nouns-verbs-rules-and-states`** in the chronicle).
+**Skill:** abd-ooad — **Phase-id:** `raw-candidates` (follows **`nouns-verbs-rules-and-states`** in the chronicle).
 
 **What this phase does:** Sort vocabulary into **candidate kinds** — **entities**, **value objects**, **processes**, **policies**, **roles**, **events** — record **why** each candidate matters, early class smell, watch list, and tensions. Update **`term-registry.md`** (**Targets** / **Notes**) and **`terms.md`** under the same anchor modules when needed.
 
@@ -6112,9 +6112,9 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 ---
 
-## Work order (`raw-candidate-list`)
+## Work order (`raw-candidates`)
 
-Do **analysis in domain markdown** — **`domain-raw-candidates.md`** (preferred) or **one** tabular file (**`raw-candidate-list.md`** *or* roll-up appended to **`domain-noun-verb.md`**). **Do not** paste the same bucket tables in two places. When the project keeps a class diagram for the slice, update it **after** the markdown matches (**visual twin**).
+Do **analysis in domain markdown** — **`domain-raw-candidates.md`** (preferred) or **one** tabular file (**`raw-candidates.md`** *or* roll-up appended to **`domain-noun-verb.md`**). **Do not** paste the same bucket tables in two places. When the project keeps a class diagram for the slice, update it **after** the markdown matches (**visual twin**).
 
 ---
 
@@ -6122,7 +6122,7 @@ Do **analysis in domain markdown** — **`domain-raw-candidates.md`** (preferred
 
 **Preferred:** **`domain-raw-candidates.md`** — every candidate is **`### Name : << kind >>`** under **`## [Anchor module]`**, with **`#### Note :`** lines and **`templates/domain-raw-candidates-template.md`**. Candidate “tables” are **rows in the model** (per class), not a second global grid elsewhere.
 
-**Alternate:** A single **tabular** roll-up (**`raw-candidate-list.md`** *or* appendix to **`domain-noun-verb.md`**) using **`templates/raw-candidate-list-template.md`** — only if the team explicitly wants buckets as one big table. **Do not** also maintain **`domain-raw-candidates.md`** with the **same** bucket blocks repeated.
+**Alternate:** A single **tabular** roll-up (**`raw-candidates.md`** *or* appendix to **`domain-noun-verb.md`**) using **`templates/raw-candidates-template.md`** — only if the team explicitly wants buckets as one big table. **Do not** also maintain **`domain-raw-candidates.md`** with the **same** bucket blocks repeated.
 
 **Cross-anchor / overflow:** **`## Cross-anchor`** at the **end** of **`domain-raw-candidates.md`** for items that do not fit a module — not a second appendix file with duplicated tables.
 
@@ -6196,7 +6196,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -6372,7 +6372,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -6402,7 +6402,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -6682,7 +6682,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -6949,7 +6949,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -7142,7 +7142,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -7952,7 +7952,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -7977,7 +7977,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 **Skill:** abd-ooad — **Stage C** — separate **thing** from **data about a thing**.
 
-**Upstream:** **`raw-candidate-list`** (phase-id), slice specs.
+**Upstream:** **`raw-candidates`** (phase-id), slice specs.
 
 For each concept, ask:
 
@@ -8159,7 +8159,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -8335,7 +8335,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -8365,7 +8365,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -8645,7 +8645,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -8912,7 +8912,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -9105,7 +9105,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -9915,7 +9915,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -10089,7 +10089,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -10265,7 +10265,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -10295,7 +10295,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -10575,7 +10575,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -10842,7 +10842,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -11035,7 +11035,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -11845,7 +11845,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -12108,7 +12108,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -12284,7 +12284,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -12314,7 +12314,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -12594,7 +12594,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -12861,7 +12861,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -13054,7 +13054,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -13864,7 +13864,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -14011,7 +14011,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -14187,7 +14187,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -14217,7 +14217,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -14497,7 +14497,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -14764,7 +14764,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -14957,7 +14957,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -15767,7 +15767,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -15889,7 +15889,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -16065,7 +16065,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -16095,7 +16095,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -16375,7 +16375,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -16642,7 +16642,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -16835,7 +16835,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -17645,7 +17645,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -17749,7 +17749,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -17925,7 +17925,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -17955,7 +17955,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -18235,7 +18235,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -18502,7 +18502,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -18695,7 +18695,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -19505,7 +19505,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -19605,7 +19605,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -19781,7 +19781,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -19811,7 +19811,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -20091,7 +20091,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -20358,7 +20358,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -20551,7 +20551,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -21361,7 +21361,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -21459,7 +21459,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -21635,7 +21635,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -21665,7 +21665,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -21945,7 +21945,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -22212,7 +22212,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -22405,7 +22405,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -23215,7 +23215,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -23312,7 +23312,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -23488,7 +23488,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -23518,7 +23518,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -23798,7 +23798,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -24065,7 +24065,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -24258,7 +24258,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -25068,7 +25068,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -25160,7 +25160,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -25336,7 +25336,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -25366,7 +25366,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -25646,7 +25646,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -25913,7 +25913,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -26106,7 +26106,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -26916,7 +26916,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -27013,7 +27013,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -27189,7 +27189,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -27219,7 +27219,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -27499,7 +27499,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -27766,7 +27766,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -27959,7 +27959,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -28769,7 +28769,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -28871,7 +28871,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -29047,7 +29047,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -29077,7 +29077,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -29357,7 +29357,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -29624,7 +29624,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -29817,7 +29817,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -30627,7 +30627,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -30722,7 +30722,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -30898,7 +30898,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -30928,7 +30928,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -31208,7 +31208,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -31475,7 +31475,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -31668,7 +31668,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -32478,7 +32478,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -32564,7 +32564,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -32740,7 +32740,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -32770,7 +32770,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -33050,7 +33050,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -33317,7 +33317,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -33510,7 +33510,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -34320,7 +34320,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -34410,7 +34410,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -34586,7 +34586,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -34616,7 +34616,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -34896,7 +34896,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -35163,7 +35163,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -35356,7 +35356,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -36166,7 +36166,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -36262,7 +36262,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -36438,7 +36438,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -36468,7 +36468,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -36748,7 +36748,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -37015,7 +37015,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -37208,7 +37208,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -38018,7 +38018,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -38114,7 +38114,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -38290,7 +38290,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -38320,7 +38320,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -38600,7 +38600,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -38867,7 +38867,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -39060,7 +39060,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation
@@ -39870,7 +39870,7 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 3. **Nouns → verbs → structure** — Extract domain concepts (nouns) as candidates, turn relevant verbs into operations, then build relationships and invariants that encode domain rules.
 
-4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidate-list, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
+4. **Model incrementally, validate constantly** — Build the model phase by phase, consulting key scenarios and use cases at domain-scan, raw-candidates, add-properties-semantically-tight, smashed-abstractions-and-hidden-roles, and model-in-layers. Tensions and contradictions are signals for refinement.
 
 5. **Diagram and Markdown stay synchronized** — Maintain both class diagram (.drawio) and Markdown documentation side-by-side. Changes to one must be reflected in the other.
 
@@ -39980,7 +39980,7 @@ The **domain model** lives in workspace **`domain*.md`** files; **Draw.io** diag
 
 **`nouns-verbs-rules-and-states` — `domain-noun-verb.md`:** anchor sections, **Candidate …** lists, class boxes. Slice files are **domain content only** — no skill paths or process boilerplate in the artifact body.
 
-**`raw-candidate-list`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidate-list.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
+**`raw-candidates`:** Prefer **`domain-raw-candidates.md`** — classes under anchors with notes. Optional single tabular roll-up (**`raw-candidates.md`** or appendix to **`domain-noun-verb.md`**) — **not** the same tables twice plus an integrated file.
 
 **Templates:** **`templates/domain model template.md`**, **`templates/domain-raw-candidates-template.md`**, **`templates/domain-model-integrated.md`**.
 
@@ -40156,7 +40156,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 
 Domain scan (phase-id **`domain-scan`**) does not only produce a single “results” file. It establishes a **small set of workspace files** under `<workspace>/abd-ooad/` that work together. Some are **frozen findings** from the scan; others are **living documents** you update as modeling continues.
 
-**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidate-list`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
+**Per-slice extraction** after scan uses the **same phase-id chronicle** as **`process.md`**. The **first** detailed per-slice capture is **`nouns-verbs-rules-and-states`** (then **`raw-candidates`**, …) — **not** a second **`domain-scan`**. Use **phase-id** names in strategy and registry (and **`*[Sn · phase-id]*`** tags in the model), not “Phase 1 / Phase 2” as step names. See **`term-registry.md`** and **`process.md` → Capture ladder**.
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
@@ -40186,7 +40186,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 ## What `strategy.md` is for
 
 - Created at the end of domain scan as a **workspace file**, then **kept current** through extraction and later phases.
-- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidate-list** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
+- **Purpose:** (1) **scope** — what product or corpus you model; (2) **§1 source slices** — ordered table (**Goal**, **Source**, **Coverage**, **Importance**); **Source** is any locator (chapters, page ranges, repo paths, modules — not only document sections); (3) **§2 slice plan** — per slice, **goal restated** and **phases** (execution steps); (4) **coverage across steps** — matrix proving every in-scope slice is addressed or deferred; (5) **cross-slice integration** — handoffs between slices; (6) **anchor and subdomain elaboration** — attached types (e.g. Ability, Skill, Advantage) mapped to **slice IDs** and execution **§**; (7) **execution plan** — each line names **slice IDs**; breadth steps must **include** subdomain slices in **nouns-verbs** / **raw-candidates** where relevant; (8) **Approach** + **Ongoing strategic decisions**. Scan mechanics stay in **`domain-scan-results.md`**.
 - **Template:** `templates/strategy.md`. Install as **`strategy.md`** (lowercase; avoid duplicate `STRATEGY.md` on case-insensitive disks).
 - After you finalize the execution plan, align **`progress/strategy-run-checklist.md`** with it (same phases and scope); that file holds **checkboxes** for “which phase is done,” while **`strategy.md`** stays **normative text** (no `- [ ]`).
 
@@ -40466,7 +40466,7 @@ If you have **Step**, **Confidence**, **Status**, and **Classification** columns
 ## Slices and `domain-scan` vs per-slice work
 
 - **`domain-scan`** runs **workspace-wide** (or once per strategy engagement): seeds **`term-registry.md`**, anchors, **`strategy.md`**, scan artifacts. It is **not** “each slice’s first phase” by name — use **phase-id** `domain-scan` only.
-- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidate-list`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
+- Per-slice deep extraction aligns with **`nouns-verbs-rules-and-states`** and **`raw-candidates`** in **chronicle order** after scan. **`terms.md`** evolves from those phase-ids onward for that slice.
 
 ---
 
@@ -40733,7 +40733,7 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 | Phase | What to Show | Properties | Methods | Relationships |
 |-------|-------------|------------|---------|---------------|
 | domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidate-list | Candidates added | None | None | Structural only |
+| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
 | responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
 | relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
 | iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
@@ -40926,7 +40926,7 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 |-------|----------------|
 | domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
 | domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidate-list through responsibilities | Yes — as invariants become confirmed, add to diagram |
+| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
 | Full model phases | Yes — invariants are a required part of the final model |
 
 ### Markdown companion notation

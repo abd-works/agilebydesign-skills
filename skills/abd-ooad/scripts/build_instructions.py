@@ -24,7 +24,7 @@ LIBRARY = ROOT / "content" / "library"
 # Order matters: parts first (methodology), then library (constraints/requirements)
 PART_FILES = [
     "domain-scan.md",
-    "raw-candidate-list.md",
+    "raw-candidates.md",
     "nouns-verbs-rules-and-states.md",
     "responsibilities-before-operations.md",
     "relationships-and-cardinality.md",

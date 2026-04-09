@@ -1,4 +1,4 @@
-# Tension as a signal — payments example
+﻿# Tension as a signal — payments example
 
 **Skill:** abd-ooad — **Step 16:** discomfort → **design choice** or **explicit debt**.
 
@@ -8,14 +8,19 @@
 
 ---
 
-## Tensions → responses
+## Tensions → term-registry.md
 
-| Tension | Signal | Response |
-|---------|--------|----------|
-| Risk owns dispute vs Support | **Two orgs**, one noun “dispute” | **Dispute** aggregate in **risk BC**; Support **reads** or **opens ticket** — link by id. |
-| Digital ship on auth vs physical on settle | **Different fulfillment triggers** | **Policy** per **product type** — **not** one rule inside Payment. |
-| Local vs global product matrix | **Same UI**, different **constraints** | **RegionProfile** + **catalog** refs — **composition** at checkout. |
-| Sanctions “before method” vs “before money moves” | **Two compliance checkpoints** | **Gate A** (browse) vs **Gate B** (capture) — name both in model narrative. |
+> Tag notes on the class model with `[s1-p16]` — see `templates/domain model template.md` for the full tag table.
+
+All tension analysis — signal, response, and resolution status — belongs in `term-registry.md` Notes, not in a separate table. Use Notes labels (see **`library/term-capture`** for the full label list).
+
+Common Notes labels added at this phase:
+
+- `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}` — the core tension; update or close the entry when resolved
+- `Renamed - {{old_name}} → {{new_name}} {{reason}}` — when a tension resolves by renaming or splitting a concept
+- `Follow-up - {{question_or_action}}` — unresolved tensions deferred to architecture or product
+
+**Every tension log entry is a term row update, not a separate document.**
 
 ---
 
@@ -36,6 +41,7 @@
 - [ ] Have you reviewed all tensions logged since Step 1 and resolved or escalated each one?
 - [ ] Does each resolved tension either produce a new concept boundary or an explicit debt entry?
 - [ ] Have you updated the spec modules / Interactions for any tension that resolved into a new concept?
+- [ ] Have you updated `term-registry.md` Notes with `Tension` entries for each signal and their resolution status?
 - [ ] Have you noted carry-forward items to Step 17 (cohesion / what changes together)?
 
 ---

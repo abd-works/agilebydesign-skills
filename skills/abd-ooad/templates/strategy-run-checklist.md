@@ -22,7 +22,7 @@ Edit the rows below to match **`strategy.md` → Execution plan (normative)**. *
 
 - [ ] **`domain-scan`** — slices: {{S1…Sn \| all}} — {{short scope note}}
 - [ ] **`nouns-verbs-rules-and-states`** — slices: {{e.g. S6, S1}} — {{what}}
-- [ ] **`raw-candidate-list`** — slices: {{…}} — {{…}}
+- [ ] **`raw-candidates`** — slices: {{…}} — {{…}}
 - [ ] *(add next phase-ids or delete unused rows)*
 
 ---

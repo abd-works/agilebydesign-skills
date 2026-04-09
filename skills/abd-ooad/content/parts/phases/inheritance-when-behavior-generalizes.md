@@ -1,4 +1,4 @@
-# Inheritance when behavior generalizes — payments example
+﻿# Inheritance when behavior generalizes — payments example
 
 **Skill:** abd-ooad — **Step 11:** subtype only when **substitutable** behavior differs.
 
@@ -29,6 +29,23 @@
 
 ---
 
+## Inheritance decisions → term-registry.md
+
+> Tag notes on the class model with `[s1-p11]` — see `templates/domain model template.md` for the full tag table.
+
+Record subtype decisions and rejected inheritance in `term-registry.md` Notes. Use Notes labels (see **`library/term-capture`** for the full label list).
+
+Common Notes labels added at this phase:
+
+- `Classified - {{kind}} {{reason}}` — when a term is confirmed as a subtype (kind: `Entity`, `Role`, etc.) or ruled out
+- `Promoted - {{from_target}} → {{to_target}} {{reason}}` — when a term moves from property to class due to substitutable behavior
+- `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}` — when it is unclear whether behavioral difference warrants inheritance
+- `Follow-up - {{question_or_action}}` — deferred hierarchy decisions
+
+**If callers don't use polymorphism, inheritance is likely wrong — record the tension and keep it flat.**
+
+---
+
 ## Carry forward → Step 12
 
 Formalize **abstract class vs interface** for **PaymentMethod** and **ports** for PSP.
@@ -47,6 +64,7 @@ Formalize **abstract class vs interface** for **PaymentMethod** and **ports** fo
 - [ ] Is each subtype genuinely behaviorally different from its siblings, not just data-different?
 - [ ] Have you avoided inheritance where composition would be a cleaner boundary?
 - [ ] Have you added subtype concept headings to the spec for every hierarchy introduced?
+- [ ] Have you added `Classified` or `Promoted` notes to `term-registry.md` for subtype decisions, and `Tension` notes for any deferred or contested hierarchy choices?
 - [ ] Have you noted carry-forward items to Step 12 (abstract classes and interfaces)?
 
 ---

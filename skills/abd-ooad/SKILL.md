@@ -42,6 +42,19 @@ This skill handles **model discovery, initial design, and diagram generation** e
 - `scripts/drawio_cli.py` — create, verify, relayout, fix-edge-styles, fix-shared-endpoints, fix-arrow-overlaps
 - `templates/` — domain model and domain realization templates
 - `content/parts/library/` — class diagram and sequence diagram layout rules
+- `runs/` — **reference runs** showing complete real-world OOAD output (format, notation, structure). Use as gold-standard examples before starting a new project run.
+
+## Reference Runs
+
+`runs/run-0/` contains the baseline reference for MM3E Heroes Handbook OOAD — a complete real session output:
+- `domain-scan-model.md` / `.drawio` — Step 0 anchors + tensions in canonical format
+- `domain-scan-results.md` — source map, anchor justification, tension table
+- `1 - basics-checks-conditions/` — Phase 2 (`domain-noun-verb.md`) and Phase 3 (`domain-raw-candidates.md`) slice work
+- `progress/` — process and strategy checklists
+- `skill/` — snapshot of skill files (SKILL.md, process.md, templates) that governed this run
+- `README.md` — reverse-engineered format conventions, notation rules, anchor/tension summary
+
+**Before starting a new project run:** read `runs/run-0/README.md` and `runs/run-0/domain-scan-model.md` to align on the expected output format and notation.
 
 ## Workspace Capability
 
@@ -55,7 +68,7 @@ This workspace becomes the default location for:
 - `domain-scan-model.md` — Step 0 (source map, anchors, tensions, actor registry)
 - `domain-scan-model.drawio` — Step 0 diagram
 - **`domain-noun-verb.md`** — **Phase 2** per slice folder only (nouns / verbs / rules / candidate blocks). **Do not** append Phase 3 bucket tables to the end of this file.
-- *(Optional)* **`domain-raw-candidates.md`** — **Phase 3 integrated** model: **`### Class : << kind >>`** under anchor modules — **`templates/domain-raw-candidates-template.md`**. Tabular **`raw-candidate-list.md`** is **deprecated** (see **`templates/raw-candidate-list-template.md`**).
+- *(Optional)* **`domain-raw-candidates.md`** — **Phase 3 integrated** model: **`### Class : << kind >>`** under anchor modules — **`templates/domain-raw-candidates-template.md`**. Tabular **`raw-candidates.md`** is **deprecated** (see **`templates/raw-candidates-template.md`**).
 - Any subsequent step outputs
 
 Authoring shapes for Phase 2/3 live under **`templates/`** in this skill — do not paste those paths into slice artifacts.
@@ -91,7 +104,7 @@ Continue with **Step 1 (Extraction)** and **Step 2 (Refinement)** for deeper mod
 | Step 0 (workspace) | `domain-scan-model.md` | — | `domain-scan-model.drawio` |
 | **Phase 2** | **`domain-noun-verb.md`** — H1 `# <SliceLabel>: Noun Verb Domain`; anchors + Candidate lists + optional Phase 2 class sketches **only** | **`templates/domain-noun-verb-template.md`** | *(optional)* |
 | **Phase 3 (integrated, optional)** | **`domain-raw-candidates.md`** — modules + classes + typed **`#### Note :`** | **`templates/domain-raw-candidates-template.md`** | — |
-| **Deprecated** | **`raw-candidate-list.md`** (tabular buckets) — **do not create** for new work | **`templates/raw-candidate-list-template.md`** (stub) | — |
+| **Deprecated** | **`raw-candidates.md`** (tabular buckets) — **do not create** for new work | **`templates/raw-candidates-template.md`** (stub) | — |
 | Later (per `process.md`) | Refined model markdown in slice / project layout | varies | Companion `.drawio` per **`templates/domain model template.*`** |
 
 Always maintain **both** Markdown and diagram side-by-side where your project uses diagrams; keep them synchronized as you refine.

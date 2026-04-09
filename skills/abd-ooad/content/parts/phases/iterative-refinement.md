@@ -1,4 +1,4 @@
-# Iterative refinement — payments example
+﻿# Iterative refinement — payments example
 
 **Skill:** abd-ooad — **Step 15:** second pass on **garbled** spec.
 
@@ -14,7 +14,7 @@
 - [ ] Have you resolved contradictions between the spec and the model?
 - [ ] Have you updated class names, responsibilities, or relationships found to be inaccurate?
 - [ ] Have you logged any open questions or unresolvable contradictions as explicit design debt with a clear follow-up?
-- [ ] Have you updated the term registry with any name or classification changes?
+- [ ] Have you updated `term-registry.md` with `Renamed` notes for name changes, `Classified` notes for revised classifications, and `Tension` notes for unresolvable contradictions?
 - [ ] Have you updated the class diagram to reflect all refinements from this pass?
 
 ---
@@ -35,6 +35,23 @@
 
 - Add **`FailureKind`** enum if support taxonomy stabilizes.
 - Split **redirect** concerns if **3DS** and **bank login** diverge further.
+
+---
+
+## Refinement changes → term-registry.md
+
+> Tag notes on the class model with `[s1-p15]` — see `templates/domain model template.md` for the full tag table.
+
+Every name change, classification update, or resolved contradiction found during this pass belongs in `term-registry.md` Notes. Use Notes labels (see **`library/term-capture`** for the full label list).
+
+Common Notes labels added at this phase:
+
+- `Renamed - {{old_name}} → {{new_name}} {{reason}}` — any name corrected against spec language
+- `Classified - {{kind}} {{reason}}` — when a classification is confirmed or revised
+- `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}` — contradictions in spec that cannot be resolved yet
+- `Follow-up - {{question_or_action}}` — open questions logged as explicit design debt
+
+**If you updated a name or classification — update the term row. Do not leave the registry behind the model.**
 
 ---
 

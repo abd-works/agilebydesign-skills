@@ -1,4 +1,4 @@
-# Validate with scenarios — payments example
+﻿# Validate with scenarios — payments example
 
 **Skill:** abd-ooad — **Step 18:** walk instances; find **gaps** and **absurdities**.
 
@@ -18,6 +18,22 @@
 6. **Webhook arrives late** — **Idempotent** application to aggregate; no double settle.
 7. **Physical goods** — **No** pick until **settled** (cross-BC assertion or integration test).
 8. **Refund after partial capture** — Refund ≤ captured; multiple refunds sum correctly.
+
+---
+
+## Scenario gaps → term-registry.md
+
+> Tag notes on the class model with `[s1-p18]` — see `templates/domain model template.md` for the full tag table.
+
+Every gap, missing responsibility, or model weakness exposed by a scenario walk belongs in `term-registry.md` Notes, not only in a backlog comment. Use Notes labels (see **`library/term-capture`** for the full label list).
+
+Common Notes labels added at this phase:
+
+- `Scenario Gap - {{scenario}} exposes: {{missing_responsibility_or_operation}}` — when a scenario step has no matching class responsibility
+- `Invariant - {{rule_that_must_always_hold}}` — new invariants confirmed by walking edge cases
+- `Follow-up - {{question_or_action}}` — gaps deferred to backlog or architecture
+
+**Any gap that reveals a missing term or responsibility gets a row in `term-registry.md` — not just a comment.**
 
 ---
 
@@ -45,6 +61,7 @@
 - [ ] Have you walked at least one happy-path scenario end-to-end through the model?
 - [ ] Have you walked at least one failure / edge-case scenario (e.g., sanctions, partial capture, idempotency replay)?
 - [ ] Did every scenario step map to at least one class responsibility in the model?
+- [ ] Have you added `Scenario Gap` notes to `term-registry.md` for every step that had no matching class responsibility?
 - [ ] Have you logged any gaps or missing responsibilities as explicit debt with a clear follow-up?
 - [ ] Have you noted carry-forward items to **`refine-names`** (refine names)?
 

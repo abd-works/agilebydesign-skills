@@ -1,4 +1,4 @@
-# What changes together — payments example
+﻿# What changes together — payments example
 
 **Skill:** abd-ooad — **Step 17:** **cohesion** and **bounded context** hints.
 
@@ -8,17 +8,19 @@
 
 ---
 
-## Clusters
+## Cohesion clusters → term-registry.md
 
-| Cluster | Changes when | Stable boundary hint |
-|---------|--------------|----------------------|
-| **Payment** | PSP outcome, settlement, refunds | **Payments BC** — core aggregate. |
-| **Order / cart** | Line items, locks | **Checkout / order BC** — **refs** Payment by id. |
-| **Catalog / price** | SKUs, regional rules | **Catalog BC** — **not** embedded in Payment row. |
-| **Compliance** | Sanctions list, country rules | **Policy** service — **updates** independent of Payment schema. |
-| **Warehouse** | Pick, ship | **Fulfillment BC** — reacts to **payment.settled** / order events. |
+> Tag notes on the class model with `[s1-p17]` — see `templates/domain model template.md` for the full tag table.
 
-**Payment** should **not** own **SKU** or **inventory** — **correlation ids** only.
+Record cohesion clusters — what changes together and what belongs in a different BC — in `term-registry.md` Notes, not in a separate table. Use Notes labels (see **`library/term-capture`** for the full label list).
+
+Common Notes labels added at this phase:
+
+- `Cohesion Group - {{group_name}} changes with: {{related_terms}}` — terms that form a stable co-change cluster
+- `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}` — when a term appears in more than one cluster
+- `Follow-up - {{question_or_action}}` — boundary decisions deferred to architecture
+
+**Any term whose BC ownership is unclear or disputed gets a `Tension` note here.**
 
 ---
 
@@ -39,6 +41,7 @@
 - [ ] Have you identified distinct cohesion clusters (groups of classes that change together)?
 - [ ] Have you confirmed that each cluster maps to a clear bounded context or module boundary?
 - [ ] Have you verified that no cluster has cross-cutting dependencies that violate the module boundary?
+- [ ] Have you added `Cohesion Group` notes to `term-registry.md` for each cluster, and `Tension` notes for terms that span multiple clusters?
 - [ ] Have you updated `map-model-spec.json` `depends_on` entries to reflect cohesion findings?
 - [ ] Have you noted carry-forward items to Step 18 (validate with scenarios)?
 

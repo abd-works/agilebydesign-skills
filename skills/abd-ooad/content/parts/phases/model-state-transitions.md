@@ -1,4 +1,4 @@
-# Model state transitions — payments example
+﻿# Model state transitions — payments example
 
 **Skill:** abd-ooad — **Step 14:** illegal transitions are **unrepresentable** or **rejected**.
 
@@ -8,22 +8,29 @@
 
 ---
 
+## State transitions → term-registry.md
+
+> Tag notes on the class model with `[s1-p14]` — see `templates/domain model template.md` for the full tag table.
+
+All state candidates, legal transitions, illegal transitions, and related invariants belong in `term-registry.md` Notes, not only in spec comments or inline tables. Use Notes labels (see **`library/term-capture`** for the full label list).
+
+Common Notes labels added at this phase:
+
+- `State Candidate - states: {{list}} illegal transitions: {{list}}` — the full state set and which transitions must be rejected
+- `Invariant - {{rule_that_must_always_hold}}` — each guard that enforces a valid transition (e.g., "SETTLED cannot return to AUTHORIZED")
+- `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}` — ambiguous or spec-conflicting transitions (e.g., TTL 24h vs 72h)
+- `Follow-up - {{question_or_action}}` — transitions deferred to product or architecture
+
+**Capture the full lifecycle on the term row for the stateful entity — not only in code comments.**
+
+---
+
 ## Payment — states (from spec + consolidation)
 
 `INITIATED` → `METHOD_SELECTED` → `PENDING_REDIRECT` (optional) → `AUTHORIZED` → `CAPTURED` / `PARTIALLY_CAPTURED` → `SETTLED`  
 Branches: `FAILED` (terminal), `CANCELLED` (if allowed).
 
 **Refund** (separate aggregate or child): `REQUESTED` → `COMPLETED` / `FAILED`.
-
----
-
-## Illegal (reject in operation)
-
-| From | To | Why illegal |
-|------|-----|-------------|
-| `SETTLED` | `AUTHORIZED` | Time doesn’t run backward. |
-| `FAILED` | anything except new attempt | New attempt = **new** Payment or new **idempotency** scope. |
-| `INITIATED` | `SETTLED` | Skip rails. |
 
 ---
 
@@ -51,6 +58,7 @@ Branches: `FAILED` (terminal), `CANCELLED` (if allowed).
 - [ ] Have you defined all valid lifecycle states for every stateful entity?
 - [ ] Have you documented every allowed transition and every illegal transition?
 - [ ] Is each transition guarded by an `Invariant:` line attached to the relevant operation?
+- [ ] Have you added `State Candidate` and `Invariant` notes to `term-registry.md` for each stateful term?
 - [ ] Have you verified that domain events are emitted on all significant state transitions?
 - [ ] Have you updated the class diagram to reflect state and guard information?
 
