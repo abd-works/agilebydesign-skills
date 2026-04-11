@@ -1,6 +1,6 @@
 {
   "name": "abd-ooad",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "workspace": {
     "active_skill_workspace": "c:/dev/agile_bots_demo/mm3e/ooad",
     "known_skill_workspaces": [
@@ -14,51 +14,45 @@
   },
   "process_stages": {
     "A": ["workspace-and-config", "domain-scan"],
-    "B": ["nouns-verbs-rules-and-states", "raw-candidates", "thing-vs-data-about-a-thing"],
+    "B": ["nouns-verbs-rules-and-states", "candidate-classes", "thing-vs-data-about-a-thing"],
     "C": [
       "responsibilities-and-collaborators",
-      "properties-and-operations",
-      "relationships-and-cardinality",
-      "invariants-in-the-model"
+      "properties-methods-and-relationships",
+      "inherit-interface-or-compose"
     ],
+    "E": ["classify-stereotypes", "design-bounded-contexts"],
     "D": [
-      "watch-for-bloated-classes",
-      "smashed-abstractions-and-hidden-roles",
-      "inheritance-when-behavior-generalizes",
-      "abstract-classes-and-interfaces",
-      "prefer-composition"
+      "invariants",
+      "state-and-lifecycle",
+      "scenario-validation"
     ],
-    "E": [
-      "model-state-transitions",
-      "iterative-refinement",
-      "tension-as-a-signal",
-      "what-changes-together",
-      "validate-with-scenarios"
-    ],
-    "F": ["refine-names"]
+    "validators": [
+      "check-single-responsibility",
+      "check-hidden-roles"
+    ]
   },
   "phase_files": [
     "workspace-and-config",
     "domain-scan",
     "nouns-verbs-rules-and-states",
-    "raw-candidates",
+    "candidate-classes",
     "thing-vs-data-about-a-thing",
     "responsibilities-and-collaborators",
-    "properties-and-operations",
-    "relationships-and-cardinality",
-    "invariants-in-the-model",
-    "watch-for-bloated-classes",
-    "smashed-abstractions-and-hidden-roles",
-    "inheritance-when-behavior-generalizes",
-    "abstract-classes-and-interfaces",
-    "prefer-composition",
-    "model-state-transitions",
+    "properties-methods-and-relationships",
+    "inherit-interface-or-compose",
+    "classify-stereotypes",
+    "design-bounded-contexts",
+    "invariants",
+    "state-and-lifecycle",
+    "scenario-validation",
+    "check-single-responsibility",
+    "check-hidden-roles",
+    "model-in-layers"
+  ],
+  "practice_files": [
     "iterative-refinement",
     "tension-as-a-signal",
-    "what-changes-together",
-    "validate-with-scenarios",
-    "refine-names",
-    "model-in-layers"
+    "refine-names"
   ],
   "library_files": [
     "domain-model.md",
@@ -98,27 +92,22 @@
     "default_phase": "domain-scan"
   },
   "phase_section_headings": {
-    "workspace-and-config": "Workspace and Config",
-    "domain-scan": "Domain Scan (Step 0 — Scan, Anchor, Sketch)",
-    "nouns-verbs-rules-and-states": "Step 1 — Nouns, Verbs, Rules and States",
-    "raw-candidates": "Step 2 — Raw Candidate List",
-    "thing-vs-data-about-a-thing": "Step 3 — Thing vs Data About a Thing",
-    "responsibilities-and-collaborators": "Step 5 — Responsibilities and Collaborators",
-    "properties-and-operations": "Step 6 — Properties and Operations",
-    "relationships-and-cardinality": "Step 7 — Relationships and Cardinality",
-    "invariants-in-the-model": "Step 8 — Invariants in the Model",
-    "watch-for-bloated-classes": "Step 9 — Watch for Bloated Classes",
-    "smashed-abstractions-and-hidden-roles": "Step 10 — Smashed Abstractions and Hidden Roles",
-    "inheritance-when-behavior-generalizes": "Step 11 — Inheritance When Behavior Generalizes",
-    "abstract-classes-and-interfaces": "Step 12 — Abstract Classes and Interfaces",
-    "prefer-composition": "Step 13 — Prefer Composition",
-    "model-state-transitions": "Step 14 — Model State Transitions",
-    "iterative-refinement": "Step 15 — Iterative Refinement",
-    "tension-as-a-signal": "Step 16 — Tension as a Signal",
-    "what-changes-together": "Step 17 — What Changes Together",
-    "validate-with-scenarios": "Step 18 — Validate with Scenarios",
-    "refine-names": "Step 19 — Refine Names",
-    "model-in-layers": "Step 20 — Model in Layers"
+    "workspace-and-config": "Stage 0a — Workspace and Config",
+    "domain-scan": "Stage 0b — Domain Scan",
+    "nouns-verbs-rules-and-states": "Stage 1 — p1: Nouns, Verbs, Rules and States",
+    "candidate-classes": "Stage 1 — p2: Candidate Classes",
+    "thing-vs-data-about-a-thing": "Stage 1 — p3: Thing vs Data About a Thing",
+    "responsibilities-and-collaborators": "Stage 2 — p4: Responsibilities and Collaborators",
+    "properties-methods-and-relationships": "Stage 2 — p5: Properties, Methods and Relationships",
+    "inherit-interface-or-compose": "Stage 2 — p6: Inherit, Interface or Compose",
+    "classify-stereotypes": "Stage 3 — p7: Classify Stereotypes",
+    "design-bounded-contexts": "Stage 3 — p8: Design Bounded Contexts",
+    "invariants": "Stage 4 — p9: Invariants",
+    "state-and-lifecycle": "Stage 4 — p10: State and Lifecycle",
+    "scenario-validation": "Stage 4 — p11: Scenario Validation",
+    "check-single-responsibility": "Validator — Check Single Responsibility",
+    "check-hidden-roles": "Validator — Check Hidden Roles",
+    "model-in-layers": "Optional — Model in Layers"
   },
   "build": {
     "agents_output": "AGENTS.md",

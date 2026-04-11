@@ -120,12 +120,13 @@ At scan fidelity, each **class line** is either:
 
 Do **not** label every class with the same stereotype. Later phases may promote or refactor them; the scan only needs to distinguish **module cores** (`<<Anchor>>`) from **scoped types** (plain class names under the section).
 
-**Live workflow checklists** (see **`library/strategy-execution-and-checklists.md`**), under `<workspace>/abd-ooad/progress/` when `active_skill_workspace` is set. Created on first `python scripts/base/generate.py --phase domain-scan` if missing:
+**Live workflow checklists** (see **`library/strategy-execution-and-checklists.md`**), under `<workspace>/abd-ooad/progress/` when `active_skill_workspace` is set. Created on first **`python scripts/base/generate.py --phase domain-scan --slice <slice-id>`** (default **`main`**) if missing:
 
 | File | Role |
 |------|------|
-| `progress/process-checklist.md` | Pipeline position — one checkbox per phase in `skill-config` |
-| `progress/domain-scan-checklist.md` | Steps copied from **## Action Checklist** above — **tick completion here** |
+| `progress/slices/<slice-id>/domain-scan-checklist.md` | Steps copied from **## Action Checklist** above — **tick completion here** |
+
+**Strategy (which phases next):** `strategy.md` + `progress/strategy-run-checklist.md` — see **`library/strategy-execution-and-checklists.md`**.
 
 > Walkthrough diagrams are not produced at scan fidelity. The scan does not yet have the resolution needed for a meaningful sequence scenario. Walkthroughs begin at the nouns-verbs phase.
 

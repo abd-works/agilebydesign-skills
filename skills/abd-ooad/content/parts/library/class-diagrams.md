@@ -9,25 +9,21 @@ All class-structure work should **start from** or **stay aligned with** the chec
 | **Draw.io** | `templates/domain model template.drawio` | **New diagram:** duplicate this file into the workspace, rename, then edit. **Existing diagram:** when adding classes or relationships, keep the same swimlane style, member layout, and collaborator-line conventions as the template. |
 | **Markdown** | `templates/domain model template.md` | **New companion doc:** copy structure and headings from this file. **Updates:** when you change the `.drawio` or the `.md`, update the **other** artifact in the same pass and preserve the template’s patterns (classes, `opt` collaborators, `Invariant:` lines). |
 
-Do **not** invent a one-off Markdown shape or Draw.io layout for class models unless the user explicitly opts out — the templates encode Jeff’s notation (collaborators on the second line in Draw.io, matching `opt` / invariants in Markdown).
+Do **not** invent a one-off Markdown shape or Draw.io layout for class models unless the user explicitly opts out — follow the template notation (collaborators on the second line in Draw.io, matching `opt` / invariants in Markdown).
 
 **CLI:** New diagrams can be created with `scripts/drawio_cli.py`; even then, prefer matching the **visual and structural** conventions of `domain model template.drawio` (or duplicate the template and extend it) so `verify` / layout rules apply cleanly.
 
 ## What to keep in sync
 
-When the user asks to **create or update** modeling diagrams:
-
-| Artifact | Draw.io | Markdown companion |
-|----------|---------|-------------------|
-| **Class structure** | `*.drawio` (see template above; CLI: `drawio_cli.py`) | Same structure and semantics as `templates/domain model template.md` |
+When the user asks to **create or update** modeling diagrams, treat **class structure** as a pair: a **`*.drawio`** file (see templates above; CLI: `scripts/drawio_cli.py`) and a Markdown companion with the **same structure and semantics** as `templates/domain model template.md`.
 
 **Rule:** If both files exist for a topic, **update both** in the same pass so comments and collaborator lists do not drift. If only one exists, create the missing companion **from the templates** unless the user opts out.
 
-**Speech-to-text note:** “Vast diagram” or “Lost diagram” in informal notes usually means **class diagram**.
+
 
 ## Class diagram — parallel “comments”
 
-Jeff’s style embeds **collaborators** (and optionally **invariants**) next to fields and methods:
+Embeds **collaborators** (and optionally **invariants**) next to fields and methods:
 
 - In **Draw.io**, that is the second line in the member cell (indented), as in **`templates/domain model template.drawio`**.
 - In **Markdown**, use **`templates/domain model template.md`**: optional collaborators after `opt`, and `Invariant:` lines.
@@ -62,7 +58,7 @@ Use this decision tree to pick the correct relationship. When in doubt, choose t
 | Dependency | `add-dependency` | --> | Weakest | A uses B only inside a method — no stored reference |
 | Inheritance | `add-inheritance` | --▷ | n/a | IS-A — subclass extends superclass |
 
-**Scan-phase defaults:** At domain-scan fidelity, prefer conservative choices:
+**At domain-scan fidelity** (first pass on the **same** diagram you will extend later), prefer conservative choices:
 - Use `add-dependency` for any relationship that is clearly transient (produced by, resolved via, creates)
 - Use `add-composition` only when the source material explicitly states ownership or lifecycle coupling
 - Use `add-association` for all other confirmed structural relationships
@@ -146,12 +142,14 @@ The CLI does not yet support notes — add them manually in draw.io after CLI bu
 
 ### When to add invariants
 
-| Phase | Add invariants? |
-|-------|----------------|
-| domain-scan | Yes — add the invariants you found during the scan (inline preferred at this fidelity) |
-| domain-noun-verb (Phase 2) | No — extraction only; invariants captured in registry notes |
-| raw-candidates through responsibilities | Yes — as invariants become confirmed, add to diagram |
-| Full model phases | Yes — invariants are a required part of the final model |
+Same **`domain*.md` / `.drawio`** pair throughout — the question is when to **reflect** invariants in the diagram:
+
+| Pipeline moment | Add invariants? |
+|----------------|-----------------|
+| **`domain-scan`** | Yes — add invariants you found during the scan (inline preferred at this fidelity) |
+| **`nouns-verbs-rules-and-states` → `candidate-classes`** | Prefer registry / notes first; diagram stays structural |
+| **`responsibilities-and-collaborators` onward** | Yes — as invariants are confirmed, add to diagram |
+| **Behaviour** (`invariants`, `state-and-lifecycle`) | Yes — invariants are part of the validated model |
 
 ### Markdown companion notation
 

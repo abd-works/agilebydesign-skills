@@ -56,7 +56,6 @@ Examples for mm3e-experiment:
 /sessions/kind-inspiring-cori/mnt/mm3e-experiment/abd-ooad/
 ├── progress/
 │   ├── strategy-run-checklist.md   ← planned phases + scope (vs strategy.md); seeded from template on first generate
-│   ├── process-checklist.md       ← full pipeline (all phase_files)
 │   ├── domain-scan-checklist.md
 │   └── … (<phase>-checklist.md per phase run)
 ├── domain-scan-model.md

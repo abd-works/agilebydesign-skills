@@ -1,15 +1,23 @@
-# Progress checklists (abd-ooad)
+# Progress checklists (live ticks)
 
-Copy to **`abd-ooad/progress/README.md`** when you want documented guidance in the workspace (optional).
+This folder holds **session** `- [ ]` progress only. Normative methodology stays in the skill repository.
 
-## `strategy-run-checklist.md` (default)
+## Layout
 
-Single file: ordered **global** execution steps aligned with **`strategy.md` → Execution plan**. Use when one pipeline runs through all slices in sequence.
+| Path | Role |
+|------|------|
+| **`strategy-run-checklist.md`** | Which **phase-ids** you completed, in order, with **scope** (mirror **strategy.md** execution plan). |
+| **`slices/<slice-id>/`** | One **folder per slice** from **strategy.md** §1. Each slice has **`<phase-id>-checklist.md`** files — action steps from that phase’s **## Action Checklist** in the skill. |
+| **`process-checklist.md`** | Legacy: one row per phase in **phase_files**. Prefer **strategy-run-checklist** + **slices/** for OOAD work. |
 
-## One file per slice (`progress/slices/`)
+## Commands
 
-Optional **`slices/<slice-id>-checklist.md`** when: parallel owners, very large slices, multi-repo “mastermind” sources, or slice-local sub-task tracking.
+Create missing files when you run **`generate.py`** (unless **`--no-ensure-checklists`**):
 
-Keep **`strategy-run-checklist.md`** as the **normative** global ladder unless the engagement is fully partitioned by slice. Reconcile slice files back to global steps when work completes.
+```text
+python scripts/base/generate.py --phase <phase-id> --slice <slice-id>
+```
 
-See **`library/strategy-execution-and-checklists.md`**.
+Default **`--slice`** is **`main`** (single-slice engagements). Multi-slice work: use the **same slice ID** as in **strategy.md** §1 for each pass.
+
+**`--stage`** uses the same **`--slice`** for every phase in that stage.

@@ -1,6 +1,6 @@
 ﻿# Thing vs data about a thing
 
-**Skill:** abd-ooad — **Phase-id:** `thing-vs-data-about-a-thing` (Stage 1 — Vocabulary, final pass).
+**Skill:** abd-ooad — **Phase-id:** `thing-vs-data-about-a-thing` (Stage 1 — Scaffold, p3).
 
 **Upstream:** `raw-candidates` (p3) — every noun has a `<< kind? >>` provisional stub and a `Provisionally Classified` note in `term-registry.md`.
 

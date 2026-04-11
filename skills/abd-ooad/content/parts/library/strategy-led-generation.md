@@ -6,7 +6,7 @@ Domain scan (phase-id **`domain-scan`**) does not only produce a single “resul
 
 For the scan procedure itself, see the **Domain scan** phase. This page explains **what each artifact is for** and how **`strategy.md`** relates to **`domain-scan-results.md`**.
 
-**Checkbox discipline:** Live ticks for pipeline position and phase steps belong only under **`<workspace>/abd-ooad/progress/`** — see **`library/strategy-execution-and-checklists.md`**. Do not put tick tables in `strategy.md`.
+**Checkbox discipline:** Live ticks for **strategy** (which phases, in order) and **phase** (action steps) belong only under **`<workspace>/abd-ooad/progress/`** — see **`library/strategy-execution-and-checklists.md`**. Do not put tick tables in `strategy.md`.
 
 ---
 
@@ -23,7 +23,7 @@ Created during domain scan under `<workspace>/abd-ooad/`:
 | `term-registry.md` | Terms, **Targets** (bulleted typed pointers), **Notes** — seeded at scan. | **Yes** — every later phase-id updates **Targets** and **Notes** as the model evolves. See **`library/term-registry.md`**. |
 | `terms.md` (per slice) | Evidence ledger by **`## [Anchor module]`** — quotes, promotion log. | **Yes** — from **`nouns-verbs-rules-and-states`** onward for that slice. Template: **`templates/terms-template.md`**. |
 
-**Plus** (when workspace is configured): **`progress/`** checklists — see **`library/strategy-execution-and-checklists.md`**. **`generate.py`** creates **`process-checklist.md`**, **`<phase>-checklist.md`**, and (abd-ooad) **`strategy-run-checklist.md`** when templates exist and files are missing. Normative phase steps stay in **`content/parts/phases/<phase>.md`**. These are the **only** place for session tick marks.
+**Plus** (when workspace is configured): **`progress/`** checklists — see **`library/strategy-execution-and-checklists.md`**. **`generate.py`** creates **`progress/slices/<slice-id>/<phase>-checklist.md`** (default **`--slice main`**), **`progress/README.md`** from **`templates/progress-README.md`**, and **`strategy-run-checklist.md`** from **`templates/strategy-run-checklist.md`**, when those templates exist and files are missing. Normative phase steps stay in **`content/parts/phases/<phase>.md`**. These are the **only** place for session tick marks.
 
 Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; they start when the skill’s later phases call for them.
 
@@ -45,9 +45,8 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 | Where is the source map and anchor list? | `domain-scan-results.md` |
 | Where do I define **which slices** exist (chapters, files, modules, …), **depth**, **subdomains per anchor**, and **which phases** hit which? | `strategy.md` → **§1 Source slices**, **§2 Slice plan**, **Coverage across steps**, **Cross-slice integration**, **Anchor and subdomain elaboration**, **Execution plan (normative)** |
 | Where do I tick **which phases** we ran, **in order**, with **scope**? | **`abd-ooad/progress/strategy-run-checklist.md`** (keep in sync with `strategy.md`) |
-| Where do I tick **full** pipeline position (all phases)? | **`abd-ooad/progress/process-checklist.md`** (optional reference) |
-| Where do I tick **steps inside** the current phase? | **`abd-ooad/progress/<phase>-checklist.md`** |
-| Where do I tick domain-scan action steps? | **`abd-ooad/progress/domain-scan-checklist.md`** |
+| Where do I tick **steps inside** the current phase **for a slice**? | **`abd-ooad/progress/slices/<slice-id>/<phase>-checklist.md`** (same **slice ID** as **strategy.md** §1; use **`--slice`** on **`generate.py`**) |
+| Where do I tick domain-scan action steps? | **`abd-ooad/progress/slices/<slice-id>/domain-scan-checklist.md`** |
 | Can I merge checklist into strategy? | **No** — strategy holds the plan; ticks only under **`progress/`** |
 
 ---
@@ -56,7 +55,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 
 1. **Strategy** — Keep **`strategy.md`** aligned with reality; append *Ongoing strategic decisions* when you pivot.
 2. **Strategy execution** — Tick **`progress/strategy-run-checklist.md`** as you **complete** each phase for its declared scope.
-3. **Phase work** — For the active phase-id, run **`generate.py --phase <phase-id>`** (or **`generate.py --stage <A|B|…|F>`** for a stage) and tick **`progress/<phase-id>-checklist.md`** for action steps.
+3. **Phase work** — For the active phase-id, run **`generate.py --phase <phase-id> --slice <slice-id>`** (or **`generate.py --stage <A|B|…|F> --slice <slice-id>`** for a stage) and tick **`progress/slices/<slice-id>/<phase-id>-checklist.md`** for action steps.
 4. **Registry** — Keep `term-registry.md` aligned with the current phase-id (**Targets** + **Notes**); keep slice **`terms.md`** in sync for verbatim evidence.
 5. **Results** — Touch `domain-scan-results.md` only for corrections to the original scan snapshot.
 
@@ -64,7 +63,7 @@ Walkthrough diagrams (`.md` / `.drawio`) are **not** required at scan fidelity; 
 
 ## References
 
-- Templates: `templates/domain-scan-results.md`, `templates/strategy.md`, `templates/strategy-run-checklist.md`
+- Templates: `templates/domain-scan-results.md`, `templates/strategy.md`, `templates/progress-README.md`, `templates/strategy-run-checklist.md`
 - Strategy vs checklists: **`library/strategy-execution-and-checklists.md`**
 - Anchors: `anchors` in this library
 - Term registry: `term-registry` in this library

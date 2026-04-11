@@ -34,150 +34,85 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 ## Phase
 
-# Phase: Workspace and Config
+# State and lifecycle
 
-**Before beginning any OOAD work, establish the project workspace and configure routing.**
+**Skill:** abd-ooad — **Phase-id:** `state-and-lifecycle` (Stage 4 — Behaviour, p10).
 
----
+**Upstream:** `invariants` (p9) — invariants are attached; guards are defined on operations.
 
-## Purpose
-
-Make **`skill_workspace`** (your project root) unambiguous to abd-ooad so all generated domain models go to the right place.
+**What this phase does:** For every stateful entity and aggregate, define the complete lifecycle: all valid states, all allowed transitions, all illegal transitions, and the guard on each transition (which should already be an invariant from p9). The lifecycle makes the invariants structural — illegal transitions become unreachable or explicitly rejected.
 
 ---
 
-## Quick Start
+## How to define a lifecycle
 
-```bash
-cd /sessions/kind-inspiring-cori/mnt/abd-ooad
-python scripts/base/set_workspace.py /path/to/your/project
-```
+For each stateful entity:
 
-This sets **`active_skill_workspace`** in **`skill-config.json`** so abd-ooad knows where to create:
-- `domain-scan-model.md` and `.drawio`
-- `step-1-extraction.md` and `.drawio`
-- All subsequent OOAD artifacts
+1. **List all states** — every named state the entity can be in; use SCREAMING_SNAKE_CASE
+2. **List allowed transitions** — for each state, which transitions are valid? → draw the forward edges
+3. **List illegal transitions** — which transitions must be explicitly rejected? → these have guard clauses from p9
+4. **Map domain events to transitions** — which state changes emit a domain event?
+5. **Mark terminal states** — states with no outgoing transitions; the lifecycle ends here
 
 ---
 
-## Key Concepts
+## Notation
 
-### Skill Path vs Skill Workspace
+Write the state transition summary in `domain-model.md` as a `State:` block under the entity:
 
-| Term | Meaning | Example |
-|------|---------|---------|
-| **`skill_path`** | Where abd-ooad is installed (SKILL.md, scripts/, phases/) | `/sessions/kind-inspiring-cori/mnt/abd-ooad/` |
-| **`skill_workspace`** | Your project root (where domain models go) | `/sessions/kind-inspiring-cori/mnt/mm3e-experiment/` |
-
-### Configuration File
-
-**Location:** `<skill_path>/skill-config.json`
-
-**Key fields:**
-- **`active_skill_workspace`** — Path to your project root (absolute preferred)
-- **`known_skill_workspaces`** — List of projects you've worked on (for quick switching)
+```
+State: INITIATED → METHOD_SELECTED → AUTHORIZED → CAPTURED → SETTLED
+Branches: FAILED (terminal), CANCELLED (if policy allows)
+Illegal: SETTLED → AUTHORIZED (rejected; no reverse)
+Events: PaymentSettled on SETTLED
+```
 
 ---
 
-## Output Convention
+## Domain events
 
-All OOAD artifacts go under:
+Domain events are emitted when a state transition represents a fact that other BCs care about. Every domain event:
 
-```
-<skill_workspace>/abd-ooad/
-```
-
-Examples for mm3e-experiment:
-```
-/sessions/kind-inspiring-cori/mnt/mm3e-experiment/abd-ooad/
-├── progress/
-│   ├── strategy-run-checklist.md   ← planned phases + scope (vs strategy.md); seeded from template on first generate
-│   ├── domain-scan-checklist.md
-│   └── … (<phase>-checklist.md per phase run)
-├── domain-scan-model.md
-├── domain-scan-model.drawio
-├── step-1-extraction.md
-├── step-1-extraction.drawio
-├── ... (steps 2–20 outputs)
-```
-
-Live **checkboxes** belong only under **`progress/`** (see **`library/strategy-execution-and-checklists.md`**). Do not duplicate tick tables in `strategy.md` or other normative docs under `abd-ooad/`.
+- Is named in the past tense: `PaymentSettled`, `RefundRequested`
+- Is immutable
+- Carries the minimum data needed by subscribers
+- Is emitted by the aggregate operation that causes the transition
 
 ---
 
-## Setting Your Workspace
+## Cross-BC lifecycle dependencies
 
-### Check Current Workspace
-
-```bash
-cd /sessions/kind-inspiring-cori/mnt/abd-ooad
-python scripts/base/set_workspace.py
-```
-
-Shows current **`active_skill_workspace`** and its resolved absolute path.
-
-### Set New Workspace
-
-```bash
-python scripts/base/set_workspace.py /sessions/kind-inspiring-cori/mnt/mm3e-experiment
-```
-
-The script:
-1. Validates the directory exists
-2. Resolves the path intelligently (relative if portable, absolute otherwise)
-3. Updates **`skill-config.json`**
-4. Adds it to **`known_skill_workspaces`** if not already there
+If BC-B must not act until BC-A reaches a state (e.g., "warehouse must not pick before payment is settled"), this is a cross-BC ordering constraint. Record it as a `Follow-up` for integration test scope — it is not enforced in the domain model, it is enforced at the boundary via events and subscriptions.
 
 ---
 
-## Diagrams and Workspace
+## term-registry.md
 
-All diagram files (`.drawio`) are generated by `scripts/drawio_cli.py` and written alongside their Markdown companions under `<workspace>/abd-ooad/`. Set the workspace once and all outputs — Markdown and diagrams — go to the same place.
+Tag all model notes with `[p10]` — see `templates/domain model template.md` for the full tag table.
 
----
+Common Notes labels added at this phase:
 
-## Troubleshooting
-
-**Q: "Path does not exist or is not a directory"**
-- Ensure the workspace directory exists before setting it
-- Use absolute paths if relative paths cause issues
-
-**Q: "active_skill_workspace not in skill-config.json"**
-- The file might be missing; create it with default content:
-  ```json
-  {
-    "active_skill_workspace": ".",
-    "known_skill_workspaces": []
-  }
-  ```
-
-**Q: Multiple projects?**
-- Use `known_skill_workspaces` to list them
-- Switch by running `set_workspace.py` with the path you want
-- Or edit **`skill-config.json`** directly
+- `State Candidate - states: {{list}} illegal transitions: {{list}}` — full state set and which transitions are rejected
+- `Invariant - {{rule_that_must_always_hold}}` — transition guard confirmed (cross-reference to p9 if already recorded)
+- `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}` — ambiguous states, conflicting spec transitions, configurable TTLs
+- `Follow-up - {{question_or_action}}` — cross-BC ordering constraints; deferred lifecycle decisions
 
 ---
 
 ## Action Checklist
 
-- [ ] Have you run `python scripts/base/set_workspace.py <path>` to set `active_skill_workspace`?
-- [ ] Does `skill-config.json` now show the correct workspace path?
-- [ ] Is the workspace directory accessible and writable?
-- [ ] Have you confirmed where OOAD artifacts will be written (`<workspace>/abd-ooad/`)?
-- [ ] Are you ready to run `python scripts/base/generate.py --phase domain-scan` to start?
+- [ ] Every stateful entity has a complete state list in `domain-model.md`.
+- [ ] Every allowed and illegal transition is documented.
+- [ ] Every transition guard maps to an invariant from p9.
+- [ ] Domain events identified and named for all significant state transitions.
+- [ ] Cross-BC lifecycle dependencies recorded as `Follow-up` notes.
+- [ ] `term-registry.md` updated with `State Candidate`, `Invariant` (cross-reference), and `Tension` notes.
 
 ---
 
-## Next Step
+## Prompt
 
-Once workspace is set, proceed to **Phase 0a: Domain Scan** to begin OOAD.
-
-Run:
-```bash
-python scripts/base/generate.py --phase domain-scan
-```
-
-See **`content/parts/phases/domain-scan.md`** for details.
+> For each stateful entity: list every state, every allowed transition, every illegal one. Map each guard to an invariant. Name the events that fire on significant transitions. If a transition requires a cross-BC ordering constraint, record it as a follow-up — it belongs in integration tests, not in the domain model.
 
 
 ---

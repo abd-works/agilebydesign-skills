@@ -7,7 +7,7 @@
 
 #### Walk 1 — Covers: {walk_scope}
 
-Indented pseudo-code (aligns with lifelines and activations in the paired `.drawio` domain realization diagram):
+Indented walkthrough (aligns with lifelines and activations in the paired `.drawio` domain realization diagram):
 
 ```
 {{object}}: {{ReturnType}} = new {{Class}}({{param}}: {{Type}}, {{param}}: {{Type}})

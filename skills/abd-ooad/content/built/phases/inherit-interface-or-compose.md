@@ -34,150 +34,82 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 ## Phase
 
-# Phase: Workspace and Config
+# Inherit, interface or compose
 
-**Before beginning any OOAD work, establish the project workspace and configure routing.**
+**Skill:** abd-ooad — **Phase-id:** `inherit-interface-or-compose` (Stage 2 — Model, p6).
 
----
+**Upstream:** `properties-methods-and-relationships` (p5) — every class has typed properties, operations, and explicit relationships.
 
-## Purpose
+**What this phase does:** For every relationship defined in p5, decide the structural mechanism. Three lenses — evaluated simultaneously for each relationship, not sequentially:
 
-Make **`skill_workspace`** (your project root) unambiguous to abd-ooad so all generated domain models go to the right place.
+| Question | Answer → | Mechanism |
+|----------|----------|-----------|
+| Is A substitutable for B? Callers use them interchangeably? | yes | **Inherit** (is-a) |
+| Do A and B share a contract (same interface) but are not substitutable? | yes | **Interface** |
+| Does A hold or use B but is not B? | yes | **Compose** (has-a / uses-a) |
 
----
-
-## Quick Start
-
-```bash
-cd /sessions/kind-inspiring-cori/mnt/abd-ooad
-python scripts/base/set_workspace.py /path/to/your/project
-```
-
-This sets **`active_skill_workspace`** in **`skill-config.json`** so abd-ooad knows where to create:
-- `domain-scan-model.md` and `.drawio`
-- `step-1-extraction.md` and `.drawio`
-- All subsequent OOAD artifacts
+All three questions apply to every relationship at once. A composition can also satisfy an interface. Inheritance without substitutability is wrong — change it to composition or interface.
 
 ---
 
-## Key Concepts
+## Rules
 
-### Skill Path vs Skill Workspace
+**Inherit only when:**
+- The subtype is substitutable for the parent in every caller context (Liskov)
+- Callers actually use the parent type — otherwise the hierarchy is notional, not structural
+- The behavioral difference is domain-driven, not infrastructure-driven (PSP brand differences belong in adapters, not domain subtypes)
 
-| Term | Meaning | Example |
-|------|---------|---------|
-| **`skill_path`** | Where abd-ooad is installed (SKILL.md, scripts/, phases/) | `/sessions/kind-inspiring-cori/mnt/abd-ooad/` |
-| **`skill_workspace`** | Your project root (where domain models go) | `/sessions/kind-inspiring-cori/mnt/mm3e-experiment/` |
+**Interface when:**
+- Two classes share a contract (method names and semantics) but are not subtypes of each other
+- A port to an external system should be defined as a domain interface with infrastructure implementations
+- Callers depend on the abstraction, not the concrete class
 
-### Configuration File
-
-**Location:** `<skill_path>/skill-config.json`
-
-**Key fields:**
-- **`active_skill_workspace`** — Path to your project root (absolute preferred)
-- **`known_skill_workspaces`** — List of projects you've worked on (for quick switching)
-
----
-
-## Output Convention
-
-All OOAD artifacts go under:
-
-```
-<skill_workspace>/abd-ooad/
-```
-
-Examples for mm3e-experiment:
-```
-/sessions/kind-inspiring-cori/mnt/mm3e-experiment/abd-ooad/
-├── progress/
-│   ├── strategy-run-checklist.md   ← planned phases + scope (vs strategy.md); seeded from template on first generate
-│   ├── domain-scan-checklist.md
-│   └── … (<phase>-checklist.md per phase run)
-├── domain-scan-model.md
-├── domain-scan-model.drawio
-├── step-1-extraction.md
-├── step-1-extraction.drawio
-├── ... (steps 2–20 outputs)
-```
-
-Live **checkboxes** belong only under **`progress/`** (see **`library/strategy-execution-and-checklists.md`**). Do not duplicate tick tables in `strategy.md` or other normative docs under `abd-ooad/`.
+**Compose when:**
+- A has B as a part — B has its own identity or lifecycle that is just used by A
+- Behavior varies by swapping the composed part (strategy pattern)
+- The relationship would require inheritance just to share one method — that is composition
 
 ---
 
-## Setting Your Workspace
+## Decisions to record in the model
 
-### Check Current Workspace
+For each relationship from p5:
 
-```bash
-cd /sessions/kind-inspiring-cori/mnt/abd-ooad
-python scripts/base/set_workspace.py
-```
-
-Shows current **`active_skill_workspace`** and its resolved absolute path.
-
-### Set New Workspace
-
-```bash
-python scripts/base/set_workspace.py /sessions/kind-inspiring-cori/mnt/mm3e-experiment
-```
-
-The script:
-1. Validates the directory exists
-2. Resolves the path intelligently (relative if portable, absolute otherwise)
-3. Updates **`skill-config.json`**
-4. Adds it to **`known_skill_workspaces`** if not already there
+1. Write the mechanism next to the relationship in `domain-model.md`: `inherits`, `implements`, or `composes`
+2. If inherit: add the subtype hierarchy to the model (`### Subtype : ParentClass`)
+3. If interface: define the interface (`### InterfaceName : << Interface >>`) with the contracted methods
+4. If compose: confirm the composition/association type already recorded in p5; no further model change needed unless the composition is a strategy (then make the type explicit)
 
 ---
 
-## Diagrams and Workspace
+## term-registry.md
 
-All diagram files (`.drawio`) are generated by `scripts/drawio_cli.py` and written alongside their Markdown companions under `<workspace>/abd-ooad/`. Set the workspace once and all outputs — Markdown and diagrams — go to the same place.
+Tag all model notes with `[p6]` — see `templates/domain model template.md` for the full tag table.
 
----
+Common Notes labels added at this phase:
 
-## Troubleshooting
-
-**Q: "Path does not exist or is not a directory"**
-- Ensure the workspace directory exists before setting it
-- Use absolute paths if relative paths cause issues
-
-**Q: "active_skill_workspace not in skill-config.json"**
-- The file might be missing; create it with default content:
-  ```json
-  {
-    "active_skill_workspace": ".",
-    "known_skill_workspaces": []
-  }
-  ```
-
-**Q: Multiple projects?**
-- Use `known_skill_workspaces` to list them
-- Switch by running `set_workspace.py` with the path you want
-- Or edit **`skill-config.json`** directly
+- `Classified - Inherit {{reason}}` — subtype confirmed; callers use polymorphism
+- `Classified - Interface {{reason}}` — shared contract defined; implementations injected
+- `Classified - Compose {{reason}}` — confirmed has-a; composition or strategy
+- `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}` — unclear whether relationship warrants inheritance vs composition
+- `Follow-up - {{question_or_action}}` — deferred hierarchy decisions
 
 ---
 
 ## Action Checklist
 
-- [ ] Have you run `python scripts/base/set_workspace.py <path>` to set `active_skill_workspace`?
-- [ ] Does `skill-config.json` now show the correct workspace path?
-- [ ] Is the workspace directory accessible and writable?
-- [ ] Have you confirmed where OOAD artifacts will be written (`<workspace>/abd-ooad/`)?
-- [ ] Are you ready to run `python scripts/base/generate.py --phase domain-scan` to start?
+- [ ] Every relationship from p5 has an explicit mechanism: inherit, interface, or compose.
+- [ ] Every inheritance decision passes the substitutability test — callers actually use the parent type.
+- [ ] No inheritance for infrastructure variation (adapters, PSP brands) — these are compose.
+- [ ] Every interface is defined with its contracted methods in `domain-model.md`.
+- [ ] `term-registry.md` updated with `Classified` (Inherit / Interface / Compose) notes.
+- [ ] Tensions recorded where mechanism is contested or unclear.
 
 ---
 
-## Next Step
+## Prompt
 
-Once workspace is set, proceed to **Phase 0a: Domain Scan** to begin OOAD.
-
-Run:
-```bash
-python scripts/base/generate.py --phase domain-scan
-```
-
-See **`content/parts/phases/domain-scan.md`** for details.
+> For each relationship: ask all three questions simultaneously — is-a? shared contract? has-a? Pick the mechanism the model actually needs, not the one that feels familiar. If inheritance requires callers to use a type that no caller actually uses, it is wrong. Record the decision and the reason.
 
 
 ---

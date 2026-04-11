@@ -34,150 +34,88 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 ## Phase
 
-# Phase: Workspace and Config
+# Candidate classes
 
-**Before beginning any OOAD work, establish the project workspace and configure routing.**
+**Skill:** abd-ooad — **Phase-id:** `candidate-classes` (Stage 1 — Scaffold, p2).
 
----
+**Upstream:** `nouns-verbs-rules-and-states` (p1) — nouns, verbs, rules, and states have been extracted per module into `domain-noun-verb.md` and `term-registry.md`.
 
-## Purpose
+**What this phase does:** Group the extracted nouns and verbs into class-like clusters. Each cluster becomes a named stub. No DDD stereotypes yet — no Entity, ValueObject, Policy, Event. Just: what naturally travels together? What talks to what? English only, no types, no syntax.
 
-Make **`skill_workspace`** (your project root) unambiguous to abd-ooad so all generated domain models go to the right place.
-
----
-
-## Quick Start
-
-```bash
-cd /sessions/kind-inspiring-cori/mnt/abd-ooad
-python scripts/base/set_workspace.py /path/to/your/project
-```
-
-This sets **`active_skill_workspace`** in **`skill-config.json`** so abd-ooad knows where to create:
-- `domain-scan-model.md` and `.drawio`
-- `step-1-extraction.md` and `.drawio`
-- All subsequent OOAD artifacts
+The goal is a set of named candidates that the CRC pass (p4) can reason about. Clustering too fine is better than clustering too coarse — you can merge later; missing a cluster means missing a class.
 
 ---
 
-## Key Concepts
+## What you produce
 
-### Skill Path vs Skill Workspace
+For each cluster:
 
-| Term | Meaning | Example |
-|------|---------|---------|
-| **`skill_path`** | Where abd-ooad is installed (SKILL.md, scripts/, phases/) | `/sessions/kind-inspiring-cori/mnt/abd-ooad/` |
-| **`skill_workspace`** | Your project root (where domain models go) | `/sessions/kind-inspiring-cori/mnt/mm3e-experiment/` |
+- A named stub in `domain-model.md` under the correct anchor module — plain name, no stereotype yet: `ClassName`
+- A row in `term-registry.md` with Target set to the stub name and a `Sibling Candidate` or `High Confidence Anchor` note explaining why these terms travel together
+- A `Tension` note for any cluster whose boundary is unclear
 
-### Configuration File
+No separate list file. The model and registry are the single source of truth.
 
-**Location:** `<skill_path>/skill-config.json`
-
-**Key fields:**
-- **`active_skill_workspace`** — Path to your project root (absolute preferred)
-- **`known_skill_workspaces`** — List of projects you've worked on (for quick switching)
+When the project keeps a class diagram for the slice, update it after the markdown matches (**visual twin**).
 
 ---
 
-## Output Convention
+## How to cluster
 
-All OOAD artifacts go under:
+Work module by module (as identified in the domain scan). For each module:
 
-```
-<skill_workspace>/abd-ooad/
-```
-
-Examples for mm3e-experiment:
-```
-/sessions/kind-inspiring-cori/mnt/mm3e-experiment/abd-ooad/
-├── progress/
-│   ├── strategy-run-checklist.md   ← planned phases + scope (vs strategy.md); seeded from template on first generate
-│   ├── domain-scan-checklist.md
-│   └── … (<phase>-checklist.md per phase run)
-├── domain-scan-model.md
-├── domain-scan-model.drawio
-├── step-1-extraction.md
-├── step-1-extraction.drawio
-├── ... (steps 2–20 outputs)
-```
-
-Live **checkboxes** belong only under **`progress/`** (see **`library/strategy-execution-and-checklists.md`**). Do not duplicate tick tables in `strategy.md` or other normative docs under `abd-ooad/`.
+1. Lay out the nouns from `term-registry.md` for that module
+2. Ask: which of these always appear together in the source? Which share the same verbs? Which are meaningless without each other?
+3. Group them — one name per group, chosen from the strongest noun in the cluster
+4. Verbs that belong exclusively to one cluster become a note on that stub: "owns: authorize, capture, settle"
+5. Verbs that cross clusters are cross-cutting — note them in `term-registry.md` as `Tension`
 
 ---
 
-## Setting Your Workspace
+## Illustrative shape
 
-### Check Current Workspace
+Source nouns: Character, HP, AC, bonus, roll, DC, modifier, advantage, disadvantage, player, GM
 
-```bash
-cd /sessions/kind-inspiring-cori/mnt/abd-ooad
-python scripts/base/set_workspace.py
-```
+Clusters:
 
-Shows current **`active_skill_workspace`** and its resolved absolute path.
+| Stub name | Terms grouped | Verbs owned |
+|-----------|--------------|-------------|
+| `Character` | Character, HP, AC | takes damage, heals, levels up |
+| `Check` | roll, DC, bonus, modifier, advantage, disadvantage | resolves, succeeds, fails |
+| `Actor` | player, GM | controls, narrates |
 
-### Set New Workspace
-
-```bash
-python scripts/base/set_workspace.py /sessions/kind-inspiring-cori/mnt/mm3e-experiment
-```
-
-The script:
-1. Validates the directory exists
-2. Resolves the path intelligently (relative if portable, absolute otherwise)
-3. Updates **`skill-config.json`**
-4. Adds it to **`known_skill_workspaces`** if not already there
+Each stub → row in `term-registry.md` with grouped terms listed in Notes. Each stub → `ClassName` stub in `domain-model.md`.
 
 ---
 
-## Diagrams and Workspace
+## term-registry.md
 
-All diagram files (`.drawio`) are generated by `scripts/drawio_cli.py` and written alongside their Markdown companions under `<workspace>/abd-ooad/`. Set the workspace once and all outputs — Markdown and diagrams — go to the same place.
+Tag model notes with `[p2]` — see `templates/domain model template.md` for the full tag table.
 
----
+Common Notes labels added at this phase:
 
-## Troubleshooting
-
-**Q: "Path does not exist or is not a directory"**
-- Ensure the workspace directory exists before setting it
-- Use absolute paths if relative paths cause issues
-
-**Q: "active_skill_workspace not in skill-config.json"**
-- The file might be missing; create it with default content:
-  ```json
-  {
-    "active_skill_workspace": ".",
-    "known_skill_workspaces": []
-  }
-  ```
-
-**Q: Multiple projects?**
-- Use `known_skill_workspaces` to list them
-- Switch by running `set_workspace.py` with the path you want
-- Or edit **`skill-config.json`** directly
+- `Sibling Candidate - {{anchor_term}} {{why_related}}` — terms grouped into this cluster
+- `High Confidence Anchor - {{why_this_class_is_central}}` — cluster that is clearly a core module class
+- `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}` — cluster boundary unclear; overlapping terms; competing groupings
+- `Follow-up - {{question_or_action}}` — deferred to `thing-vs-data-about-a-thing` (p3)
 
 ---
 
 ## Action Checklist
 
-- [ ] Have you run `python scripts/base/set_workspace.py <path>` to set `active_skill_workspace`?
-- [ ] Does `skill-config.json` now show the correct workspace path?
-- [ ] Is the workspace directory accessible and writable?
-- [ ] Have you confirmed where OOAD artifacts will be written (`<workspace>/abd-ooad/`)?
-- [ ] Are you ready to run `python scripts/base/generate.py --phase domain-scan` to start?
+- [ ] Every noun from `term-registry.md` for this module appears in exactly one cluster stub.
+- [ ] Every cluster has a name and a row in `term-registry.md`.
+- [ ] Verbs exclusively owned by one cluster are noted on that stub.
+- [ ] Cross-cutting verbs are recorded as `Tension` notes.
+- [ ] No stereotypes applied — no Entity, ValueObject, Policy, Event, Process, Role.
+- [ ] No typed properties or operations — English descriptions only.
+- [ ] `domain-model.md` has a plain `ClassName` stub for each cluster under the correct module.
 
 ---
 
-## Next Step
+## Prompt
 
-Once workspace is set, proceed to **Phase 0a: Domain Scan** to begin OOAD.
-
-Run:
-```bash
-python scripts/base/generate.py --phase domain-scan
-```
-
-See **`content/parts/phases/domain-scan.md`** for details.
+> Work module by module. For each module: lay out the nouns, group what travels together, name each group, note the verbs it owns. No stereotypes, no types — just clusters and names. When a boundary is unclear, name the tension; don't leave terms unplaced.
 
 
 ---

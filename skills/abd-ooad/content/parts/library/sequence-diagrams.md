@@ -4,14 +4,12 @@
 
 All walkthrough / sequence work should **start from** or **stay aligned with** the checked-in templates under the skill **`templates/`** folder (paths relative to the skill root):
 
-| Role | Template file | When to use it |
-|------|----------------|----------------|
-| **Draw.io** | `templates/domain realization template.drawio` | **New diagram:** duplicate this file into the workspace, rename, replace `{{placeholders}}`, then edit lifelines and messages. **Existing diagram:** when adding lifelines or messages, keep lifeline alignment, execution bars, and arrow-to-activation conventions as in the template. |
-| **Markdown** | `templates/domain walkthrough template.md` | **New companion doc:** copy its scenario / walk / pseudo-code structure. **Updates:** when you change the `.drawio` or the `.md`, update the **other** artifact in the same pass so steps and activations stay aligned. |
 
-Optional: add a **Mermaid** `sequenceDiagram` block in the Markdown file for quick preview (GitHub / readers), using **participant names that match** the lifeline headers in the `.drawio` file.
+| Role         | Template file                                  | When to use it                                                                                                                                                                                                                                                                           |
+| ------------ | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Draw.io**  | `templates/domain realization template.drawio` | **New diagram:** duplicate this file into the workspace, rename, replace `{{placeholders}}`, then edit lifelines and messages. **Existing diagram:** when adding lifelines or messages, keep lifeline alignment, execution bars, and arrow-to-activation conventions as in the template. |
+| **Markdown** | `templates/domain walkthrough template.md`     | **New companion doc:** copy its scenario, walks, and walkthrough structure. **Updates:** when you change the `.drawio` or the `.md`, update the **other** artifact in the same pass so steps and activations stay aligned.                                                                  |
 
-There is **no** `drawio_cli.py` automation for sequence lifelines yet — **always** ground new Draw.io work in `domain realization template.drawio`.
 
 ## Terminology (same concept)
 
@@ -26,11 +24,7 @@ Use whichever label the user prefers. In deliverables, pick one label per docume
 
 ## What to keep in sync
 
-When the user asks to **create or update** modeling diagrams:
-
-| Artifact | Draw.io | Markdown companion |
-|----------|---------|-------------------|
-| **Sequence / walkthrough** | `*.drawio` (start from `templates/domain realization template.drawio`) | Same structure as `templates/domain walkthrough template.md` |
+When the user asks to **create or update** modeling diagrams, treat **sequence / walkthrough** as a pair: a **`*.drawio`** grounded in **`templates/domain realization template.drawio`** and a Markdown companion with the **same structure** as **`templates/domain walkthrough template.md`**.
 
 **Rule:** If both files exist for a topic, **update both** in the same pass so walk steps do not drift. If only one exists, create the missing companion **from those templates** unless the user opts out.
 
@@ -50,20 +44,23 @@ When the user asks to **create or update** modeling diagrams:
   - **Time Flow:** Vertical space strictly represents time. Elements must flow downwards cleanly without any vertical overlap of independent, sequential operations.
 - Small **edge labels** for `new`, parameters, and call text
 
-There is **no** `drawio_cli.py` automation for lifelines yet. **New diagrams:** duplicate the template into the workspace (see **Templates** above), replace placeholders, then adjust lifeline heights and messages as needed.
+**CLI (`scripts/drawio_cli.py`):** Sequence commands use the same entry point as class diagrams. `sequence-init` copies **`templates/domain realization template.drawio`** to your file; `sequence-add-lifeline`, `sequence-add-sync`, and `sequence-add-return` add lifelines and messages (styles match the template); `sequence-list` lists lifeline labels. Activation bars, strict horizontal alignment of message rows, and nested activations are still usually finished in Draw.io — see **using-diagram-cli**.
+
+**Template-only workflow:** duplicate **`domain realization template.drawio`** (see **Templates** above), replace placeholders, then adjust lifeline heights and messages as needed.
 
 ## Sequence / walkthrough — Markdown
 
-**Narrative + pseudo-code** — Follow `templates/domain walkthrough template.md` (required structure; see **Templates** above):
+**Narrative walkthrough** — Follow `templates/domain walkthrough template.md` (required structure; see **Templates** above):
+
 - One **Scenario** block per flow.
 - **Walk N: Covers** — scope (what responsibilities this walk exercises).
-- Indented pseudo-code showing object creation, calls, returns, and nesting (same story as the Draw.io diagram).
+- Indented walkthrough lines showing object creation, calls, returns, and nesting (same story as the Draw.io diagram).
 
 ## Creating Sequence Diagrams from Walkthroughs (Step-by-step)
 
-### Step 1: Extract Lifelines from Pseudo-code
+### Step 1: Extract lifelines from the walkthrough
 
-Read the walkthrough pseudo-code and identify all **distinct objects/participants**:
+Read the walkthrough and identify all **distinct objects/participants**:
 
 ```
 {object}: {Type} = new {Class}()
@@ -73,20 +70,23 @@ Read the walkthrough pseudo-code and identify all **distinct objects/participant
 ```
 
 **Participants:**
+
 - `{object}:{Class}` ← lifeline 1
 - `{collaborator}:{CollaboratingClass}` ← lifeline 2
 - Any other objects mentioned ← additional lifelines
 
-### Step 2: Translate Pseudo-code to Messages
+### Step 2: Translate the walkthrough to messages
 
-For each call in the pseudo-code, create a **message arrow** in Draw.io:
+For each call in the walkthrough, create a **message arrow** in Draw.io:
 
-| Pseudo-code | Draw.io Message |
-|-------------|-----------------|
-| `{object}.{method}()` | Synchronous message arrow (filled) from **{object}** to **{collaborator}** labeled `method()` with params |
-| `return {value}` | Return arrow (dashed, open) from callee back to caller labeled with `{value}` (if non-void) |
-| `{var} = new {Class}()` | Create message (labeled `«new»`) from initiator to the new object's lifeline |
-| Nested calls | Stack activation bars (execution rectangles) vertically; nested calls go to the right edge of parent activation |
+
+| Walkthrough line        | Draw.io Message                                                                                                 |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `{object}.{method}()`   | Synchronous message arrow (filled) from **{object}** to **{collaborator}** labeled `method()` with params       |
+| `return {value}`        | Return arrow (dashed, open) from callee back to caller labeled with `{value}` (if non-void)                     |
+| `{var} = new {Class}()` | Create message (labeled `«new»`) from initiator to the new object's lifeline                                    |
+| Nested calls            | Stack activation bars (execution rectangles) vertically; nested calls go to the right edge of parent activation |
+
 
 ### Step 3: Align with Template
 
@@ -94,22 +94,23 @@ When creating the `.drawio` file:
 
 1. **Duplicate** `templates/domain realization template.drawio`
 2. **Replace placeholder lifelines** with actual participant names from Step 1
-3. **Add messages** following the order in the pseudo-code (top to bottom = time flow)
+3. **Add messages** following the order in the walkthrough (top to bottom = time flow)
 4. **Verify alignment:**
-   - All lifelines top-aligned (horizontal line at y=0)
-   - All message arrows **horizontal** (0° angle)
-   - Message arrows snap to **outer edge of execution bars**, not center lifeline
-   - Execution bars centered on lifeline, nested bars stacked right
+  - All lifelines top-aligned (horizontal line at y=0)
+  - All message arrows **horizontal** (0° angle)
+  - Message arrows snap to **outer edge of execution bars**, not center lifeline
+  - Execution bars centered on lifeline, nested bars stacked right
 
 ### Step 4: Keep Markdown ↔ Draw.io in Sync
 
-- **If updating the `.drawio`:** Update the `.md` pseudo-code to match new messages/lifelines
-- **If updating the `.md`:** Update the `.drawio` diagram to match new pseudo-code steps
-- **Test alignment:** Trace each line of pseudo-code to a message in the diagram; each message should appear in the `.md`
+- **If updating the `.drawio`:** Update the `.md` walkthrough to match new messages/lifelines
+- **If updating the `.md`:** Update the `.drawio` diagram to match new walkthrough steps
+- **Test alignment:** Trace each line of the walkthrough to a message in the diagram; each message should appear in the `.md`
 
 ### Example: Character Creation Scenario
 
-**Markdown pseudo-code (Walk 1: Create ability):**
+**Walkthrough excerpt (Walk 1: Create ability):**
+
 ```
 player: Player = initiator
 character: Character = new Character(power_level: 5)
@@ -121,11 +122,13 @@ return character with Strength:3
 ```
 
 **Lifelines in `.drawio`:**
+
 1. `player:Player`
 2. `character:Character`
 3. `strength_ability:Ability`
 
 **Messages in `.drawio`:**
+
 1. `player` → `character` : `create(power_level: 5)`
 2. `character` → `abilities` : `add(strength_ability)`
 3. `character` → `character` : `spend_power_points(3)` (self-call)
@@ -133,12 +136,17 @@ return character with Strength:3
 
 ## File naming (suggested)
 
-| Pair | Example |
-|------|---------|
-| Model + Walkthrough | `step-1-model.md` (domain model) + `step-1-walkthrough.md` (scenarios & walks) + `step-1-walkthrough.drawio` (sequence diagram) |
-| Pattern | `{step-name}-model.md`, `{step-name}-walkthrough.md`, `{step-name}-walkthrough.drawio` |
+The **domain class model** stays **`*-domain-model.md`** (+ class **`*-domain-model.drawio`**) — **one** evolving pair, not a new domain-model file per pipeline phase. **Walkthrough** files are separate: scenario narrative + sequence diagram.
 
-Use `{step-name}` consistently across all three artifacts so their relationship is obvious.
+
+| Artifact                   | Example                                                                                              |
+| -------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Domain (class) model       | `domain.md`, `domain.drawio` — same pair through the whole pipeline                                  |
+| Walkthrough (one scenario) | `walkthrough-<scenario>.md` + `walkthrough-<scenario>.drawio`                                        |
+| Optional tutorial layout   | `{lesson}-walkthrough.md` + `{lesson}-walkthrough.drawio` (still **one** `domain.md` for the domain) |
+
+
+Use a **shared stem** per walkthrough so Markdown and Draw.io stay obviously paired.
 
 ---
 

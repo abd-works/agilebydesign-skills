@@ -34,150 +34,68 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 ## Phase
 
-# Phase: Workspace and Config
+# Check — hidden roles
 
-**Before beginning any OOAD work, establish the project workspace and configure routing.**
+**Skill:** abd-ooad — **Validator-id:** `check-hidden-roles`.
 
----
+**When to run:** After `classify-stereotypes` (p7). Can also be applied when a generic noun (User, Actor, Person, Account) appears in the model.
 
-## Purpose
-
-Make **`skill_workspace`** (your project root) unambiguous to abd-ooad so all generated domain models go to the right place.
+**What this validator does:** Ask whether a single noun is covering multiple distinct roles in different contexts. A smashed abstraction is one class carrying two distinct identities — the check surfaces it so the roles can be separated.
 
 ---
 
-## Quick Start
+## The test
 
-```bash
-cd /sessions/kind-inspiring-cori/mnt/abd-ooad
-python scripts/base/set_workspace.py /path/to/your/project
-```
+For each generic or high-traffic class:
 
-This sets **`active_skill_workspace`** in **`skill-config.json`** so abd-ooad knows where to create:
-- `domain-scan-model.md` and `.drawio`
-- `step-1-extraction.md` and `.drawio`
-- All subsequent OOAD artifacts
+> *In context A, what does this class do and what does it know?*
+> *In context B, what does this class do and what does it know?*
+
+If contexts A and B have different properties, different operations, and different collaborators — the noun covers two roles and needs to be split.
 
 ---
 
-## Key Concepts
+## Common smash signals
 
-### Skill Path vs Skill Workspace
-
-| Term | Meaning | Example |
-|------|---------|---------|
-| **`skill_path`** | Where abd-ooad is installed (SKILL.md, scripts/, phases/) | `/sessions/kind-inspiring-cori/mnt/abd-ooad/` |
-| **`skill_workspace`** | Your project root (where domain models go) | `/sessions/kind-inspiring-cori/mnt/mm3e-experiment/` |
-
-### Configuration File
-
-**Location:** `<skill_path>/skill-config.json`
-
-**Key fields:**
-- **`active_skill_workspace`** — Path to your project root (absolute preferred)
-- **`known_skill_workspaces`** — List of projects you've worked on (for quick switching)
+- A single `User` class used for: payer identity, merchant config, admin action, and audit actor — these are four distinct roles
+- A class that has `isAdmin`, `isMerchant`, `isCustomer` flags — each flag is a hidden role
+- Operations that check `if type == X / else type == Y` on the same object — the branches are roles
+- A class that collaborates with completely different BCs depending on context
+- Generic names: `Account`, `Party`, `Actor`, `Person` — always check these
 
 ---
 
-## Output Convention
+## Outcome
 
-All OOAD artifacts go under:
+For each hidden role found:
 
-```
-<skill_workspace>/abd-ooad/
-```
+- Name the distinct roles explicitly
+- Decide: is the original class still needed as a base, or does it become an `Entity` holding references?
+- Add the new role class(es) to `domain-model.md`
+- Record `Role Separation` note in `term-registry.md`
+- Update collaborator lists for affected classes
 
-Examples for mm3e-experiment:
-```
-/sessions/kind-inspiring-cori/mnt/mm3e-experiment/abd-ooad/
-├── progress/
-│   ├── strategy-run-checklist.md   ← planned phases + scope (vs strategy.md); seeded from template on first generate
-│   ├── domain-scan-checklist.md
-│   └── … (<phase>-checklist.md per phase run)
-├── domain-scan-model.md
-├── domain-scan-model.drawio
-├── step-1-extraction.md
-├── step-1-extraction.drawio
-├── ... (steps 2–20 outputs)
-```
-
-Live **checkboxes** belong only under **`progress/`** (see **`library/strategy-execution-and-checklists.md`**). Do not duplicate tick tables in `strategy.md` or other normative docs under `abd-ooad/`.
+References to external BCs (e.g., `payerRef`, `merchantRef`) are **references**, not modeled roles inside this BC — record them as `Follow-up` if the referenced entity belongs elsewhere.
 
 ---
 
-## Setting Your Workspace
+## term-registry.md notes at this validator
 
-### Check Current Workspace
-
-```bash
-cd /sessions/kind-inspiring-cori/mnt/abd-ooad
-python scripts/base/set_workspace.py
-```
-
-Shows current **`active_skill_workspace`** and its resolved absolute path.
-
-### Set New Workspace
-
-```bash
-python scripts/base/set_workspace.py /sessions/kind-inspiring-cori/mnt/mm3e-experiment
-```
-
-The script:
-1. Validates the directory exists
-2. Resolves the path intelligently (relative if portable, absolute otherwise)
-3. Updates **`skill-config.json`**
-4. Adds it to **`known_skill_workspaces`** if not already there
+- `Role Separation - {{merged_role}} splits into: {{role_a}}, {{role_b}}` — hidden role extracted from a smashed abstraction
+- `Classified - Role {{reason}}` — role confirmed and added to the model
+- `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}` — role ownership is contested between BCs or organisational boundaries
+- `Follow-up - {{question_or_action}}` — deferred role boundary; cross-BC identity question
 
 ---
 
-## Diagrams and Workspace
+## Checklist
 
-All diagram files (`.drawio`) are generated by `scripts/drawio_cli.py` and written alongside their Markdown companions under `<workspace>/abd-ooad/`. Set the workspace once and all outputs — Markdown and diagrams — go to the same place.
-
----
-
-## Troubleshooting
-
-**Q: "Path does not exist or is not a directory"**
-- Ensure the workspace directory exists before setting it
-- Use absolute paths if relative paths cause issues
-
-**Q: "active_skill_workspace not in skill-config.json"**
-- The file might be missing; create it with default content:
-  ```json
-  {
-    "active_skill_workspace": ".",
-    "known_skill_workspaces": []
-  }
-  ```
-
-**Q: Multiple projects?**
-- Use `known_skill_workspaces` to list them
-- Switch by running `set_workspace.py` with the path you want
-- Or edit **`skill-config.json`** directly
-
----
-
-## Action Checklist
-
-- [ ] Have you run `python scripts/base/set_workspace.py <path>` to set `active_skill_workspace`?
-- [ ] Does `skill-config.json` now show the correct workspace path?
-- [ ] Is the workspace directory accessible and writable?
-- [ ] Have you confirmed where OOAD artifacts will be written (`<workspace>/abd-ooad/`)?
-- [ ] Are you ready to run `python scripts/base/generate.py --phase domain-scan` to start?
-
----
-
-## Next Step
-
-Once workspace is set, proceed to **Phase 0a: Domain Scan** to begin OOAD.
-
-Run:
-```bash
-python scripts/base/generate.py --phase domain-scan
-```
-
-See **`content/parts/phases/domain-scan.md`** for details.
+- [ ] All generic nouns checked for hidden roles.
+- [ ] Role smashes named and `Role Separation` notes recorded in `term-registry.md`.
+- [ ] New role classes added to `domain-model.md`.
+- [ ] Collaborator lists updated for affected classes.
+- [ ] Cross-BC references confirmed as references (not rich classes inside this BC).
+- [ ] Deferred role boundaries recorded as `Follow-up` with reason.
 
 
 ---

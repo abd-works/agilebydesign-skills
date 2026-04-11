@@ -1,12 +1,21 @@
 """
 Ensure live workflow checklists under active_skill_workspace/<skill_name>/progress/.
 
-- process-checklist.md — one checkbox per phase (from skill-config.json → phase_files).
-- <phase-slug>-checklist.md — steps copied from ## Action Checklist in phases/<slug>.md.
-- strategy-run-checklist.md — optional; if templates/strategy-run-checklist.md exists in the skill,
-  copy to progress/ when missing (abd-ooad: execution order + scope vs strategy.md).
+**Normative rules** (strategy vs ticks, layers, revisits, flags) live only in the skill repo:
+``content/parts/library/strategy-execution-and-checklists.md``. That file is authored; this module
+never writes it and ``generate.py`` does not create it.
 
-Created on first run of ``python scripts/base/generate.py --phase <slug>`` when missing.
+**Workspace routing** (``skill_name``, ``active_skill_workspace``, path resolution):
+``content/parts/library/base/workspace-and-config.md``.
+
+**This module creates** (when missing, on ``generate.py --phase <slug> [--slice <id>]``):
+
+- ``README.md`` — from ``templates/progress-README.md`` when present (explains the tree).
+- ``strategy-run-checklist.md`` — from ``templates/strategy-run-checklist.md`` when present (vs ``strategy.md``).
+- ``slices/<slice-id>/<phase-slug>-checklist.md`` — steps from ``## Action Checklist`` in ``phases/<slug>.md``.
+  **Slice IDs** match **strategy.md** §1; default CLI slice is ``main`` for single-slice engagements.
+- ``process-checklist.md`` — legacy: one box per ``phase_files`` slug.
+
 Does not overwrite existing files.
 """
 from __future__ import annotations
@@ -29,6 +38,23 @@ def _parts_dir(skill_path: Path) -> Path:
 def progress_dir(workspace: Path, skill_name: str) -> Path:
     """Live checklists root: ``<active_skill_workspace>/<skill_name>/progress``."""
     return workspace / skill_name / "progress"
+
+
+def sanitize_slice_id(raw: str) -> str:
+    """Safe folder name under progress/slices/. Defaults to main if empty or invalid."""
+    s = (raw or "").strip()
+    if not s:
+        return "main"
+    parts: list[str] = []
+    for c in s:
+        if c.isalnum() or c in "-_":
+            parts.append(c)
+        elif c in " /":
+            parts.append("-")
+    slug = "".join(parts).strip("-")
+    if not slug:
+        return "main"
+    return slug[:120]
 
 
 def extract_action_checklist_lines(phase_body: str) -> list[str]:
@@ -75,11 +101,13 @@ def render_process_checklist(
     return "\n".join(lines)
 
 
-def render_phase_checklist(skill_name: str, slug: str, task_lines: list[str]) -> str:
-    """Markdown body for ``<slug>-checklist.md``."""
+def render_phase_checklist(
+    skill_name: str, slug: str, task_lines: list[str], slice_id: str
+) -> str:
+    """Markdown body for ``slices/<slice-id>/<slug>-checklist.md``."""
     src = f"`content/parts/phases/{slug}.md`"
     lines = [
-        f"# Live checklist — {slug}",
+        f"# Live checklist — {slug} — slice `{slice_id}`",
         "",
         f"**Normative steps** live under **## Action Checklist** in {src}. "
         "Track progress **here**; do not tick boxes in the repo copy.",
@@ -95,7 +123,7 @@ def render_phase_checklist(skill_name: str, slug: str, task_lines: list[str]) ->
                 "*No `- [ ]` lines were found under ## Action Checklist in the phase file.*",
                 "*Add steps to the phase doc, then delete this file and re-run "
                 "`python scripts/base/generate.py --phase "
-                f"{slug}` to regenerate.*",
+                f"{slug} --slice {slice_id}` to regenerate.*",
                 "",
             ]
         )
@@ -106,6 +134,20 @@ def render_phase_checklist(skill_name: str, slug: str, task_lines: list[str]) ->
             lines.append(t2)
         lines.append("")
     return "\n".join(lines)
+
+
+def ensure_progress_readme(skill_path: Path, workspace: Path, skill_name: str) -> Path | None:
+    """Copy templates/progress-README.md to progress/README.md when missing."""
+    tpl = skill_path / "templates" / "progress-README.md"
+    if not tpl.is_file():
+        return None
+    prog = progress_dir(workspace, skill_name)
+    prog.mkdir(parents=True, exist_ok=True)
+    out = prog / "README.md"
+    if out.is_file():
+        return None
+    out.write_text(tpl.read_text(encoding="utf-8"), encoding="utf-8")
+    return out
 
 
 def ensure_strategy_run_checklist(skill_path: Path, workspace: Path, skill_name: str) -> Path | None:
@@ -125,11 +167,14 @@ def ensure_strategy_run_checklist(skill_path: Path, workspace: Path, skill_name:
     return out
 
 
-def ensure_workspace_checklists(skill: "Skill", phase_slug: str) -> tuple[Path | None, Path | None]:
+def ensure_workspace_checklists(
+    skill: "Skill", phase_slug: str, slice_id: str = "main"
+) -> tuple[Path | None, Path | None]:
     """
-    If ``active_skill_workspace`` is set, ensure ``process-checklist.md`` and
-    ``<phase_slug>-checklist.md`` exist under ``<workspace>/<name>/progress/``.
-    Optionally seeds ``strategy-run-checklist.md`` from the skill template when present.
+    If ``active_skill_workspace`` is set, create missing files under ``progress/`` (see module docstring).
+    Normative documentation is not emitted here — only workspace checklist markdown.
+
+    Phase action checklists are written to ``progress/slices/<slice-id>/<phase>-checklist.md``.
 
     Returns ``(process_path_or_none, phase_path_or_none)`` for paths written this call.
     """
@@ -141,6 +186,8 @@ def ensure_workspace_checklists(skill: "Skill", phase_slug: str) -> tuple[Path |
     skill_name = str(cfg.get("name") or skill.path.name).strip() or "skill"
     phase_files: tuple[str, ...] = tuple(cfg.get("phase_files") or ())
     headings: dict[str, str] = dict(cfg.get("phase_section_headings") or {})
+
+    sid = sanitize_slice_id(slice_id)
 
     prog = progress_dir(workspace, skill_name)
     prog.mkdir(parents=True, exist_ok=True)
@@ -160,14 +207,17 @@ def ensure_workspace_checklists(skill: "Skill", phase_slug: str) -> tuple[Path |
     body = phase_path.read_text(encoding="utf-8") if phase_path.is_file() else ""
     tasks = extract_action_checklist_lines(body)
 
-    p_phase = prog / f"{phase_slug}-checklist.md"
+    slice_dir = prog / "slices" / sid
+    slice_dir.mkdir(parents=True, exist_ok=True)
+    p_phase = slice_dir / f"{phase_slug}-checklist.md"
     if not p_phase.is_file():
         p_phase.write_text(
-            render_phase_checklist(skill_name, phase_slug, tasks),
+            render_phase_checklist(skill_name, phase_slug, tasks, sid),
             encoding="utf-8",
         )
         written_phase = p_phase
 
+    ensure_progress_readme(skill.path, workspace, skill_name)
     ensure_strategy_run_checklist(skill.path, workspace, skill_name)
 
     return written_process, written_phase

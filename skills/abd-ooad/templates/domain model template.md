@@ -40,7 +40,7 @@ note: * -- see Note labels table and Example below
 | `[p14]` | model-state-transitions | `State Candidate`, `Invariant`, `Tension`, `Follow-up` |
 | `[p15]` | iterative-refinement | `Renamed`, `Classified`, `Tension`, `Follow-up` |
 | `[p16]` | tension-as-a-signal | `Tension`, `Renamed`, `Follow-up` |
-| `[p17]` | what-changes-together | `Cohesion Group`, `Tension`, `Follow-up` |
+| `[p17]` | design-bounded-contexts | `Cohesion Group`, `Bounded Context`, `Tension`, `Follow-up` |
 | `[p18]` | validate-with-scenarios | `Scenario Gap`, `Invariant`, `Follow-up` |
 | `[p19]` | refine-names | `Renamed`, `Promoted`, `Follow-up` |
 
@@ -80,3 +80,31 @@ note: [p5] Promoted -- was a loose property on Payment; recurred across three op
 + region:RegionCode                                        (p5)
      opt  RegionCode [1..1]                                (p7)
 -----
+
+---
+
+## Patterns — subtype heading & invariant lines
+
+Use this skill’s **Markdown companion** for structure the diagram must mirror.
+
+### Subtype heading (inheritance visible in the doc)
+
+When a specialization has a real superclass, make it explicit:
+
+```markdown
+### **WireTransfer** : **Payment**
+
+note: WireTransfer -- country-specific wire settlement; extends Payment lifecycle
+```
+
+(For a root type with no parent, use a single class name and no `: Base` part — see **Payment** in **Example** above.)
+
+### Invariant lines
+
+Attach constraints **under** the property or operation they apply to — use the `Invariant:` line style already shown on **`authorize`** under **Payment** in **Example** above. Do **not** gather invariants in a separate section at module level.
+
+```markdown
++ submit():Result
+     Invariant: state must be READY before submit
+```
+

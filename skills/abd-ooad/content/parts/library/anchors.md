@@ -48,7 +48,7 @@ An anchor is a concept you expect to be present in the model from scan through f
 
 | Output                     | What anchor produces                                                                                                            |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `domain-scan-results.md`   | Row in the anchors table: Module name, core class name, scan-visible supporting classes, basis                                  |
+| `domain-scan-results.md`   | **Source map** for the corpus: how major sections/topics relate (scan Step 2 in **`phases/domain-scan`**). It is **not** the anchor roster — that lives in **`term-registry.md`** (Notes: `High Confidence Anchor`, `Sibling Candidate`, `Tension`, …) and in **`domain-scan-model.md`** (module sections and `<<Anchor>>` on the core class). |
 | `domain-scan-model.md`     | Module section header (`## [… module]`) + **core class** with `<<Anchor>>` + other classes in that section with **no** stereotype (grouping by section is enough; no per-line `[supporting class — …]` tags). See **`phases/domain-scan` → Notation in domain-scan-model.md**.    |
 | `domain-scan-model.drawio` | One dashed frame per anchor; core class inside; supporting classes inside; cross-module relationships between core classes only |
 | `term-registry.md`         | Core class of a module → Classification **`anchor (class + module)`**; supporting classes → **`class`** with owning module in **Notes** (e.g. `Supporting class — Character module`). Use **Status** for lifecycle (e.g. **Tension**, **Candidate**) — not a duplicate of Classification.   |
@@ -74,7 +74,7 @@ The absence of a matching core class is the clearest signal that you have not ye
 1. Do not force a name — generic names produce models that are hard to reason about
 2. Read the relevant chapter(s) more carefully — the anchor often has its own defined term or dedicated section
 3. Ask: if another module needed to reference this cluster, what single class would it name?
-4. If no single class emerges after exploration, record the cluster as a **tension** in domain-scan-results.md and defer
+4. If no single class emerges after exploration, record the cluster as a **tension** in **`term-registry.md`** (and reference it from the scan map in **`domain-scan-results.md`** if useful) and defer
 
 <!-- abd:begin domain-scan -->
 

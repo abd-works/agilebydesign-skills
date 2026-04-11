@@ -21,16 +21,140 @@ a ``markdown`` path segment (e.g. ``markdown/notes/foo.md`` -> ``memory/notes/fo
 **Folder named ``context``:** Pass ``--path`` as the **project root** (parent of ``context``) and
 ``--output`` to ``<project>/memory/context`` so converted markdown under ``<project>/markdown/`` is
 found. (``index_memory`` does this automatically.)
+
+**Chunking spec:** If ``context_chunking_spec.yaml`` exists beside ``--path``, its ``section_boundaries``,
+``splitting``, ``defaults``, and ``taxonomy`` override built-in heuristics. Chunks written when the spec
+is active include YAML front matter with ``evidence_type`` and ``modeling_kind`` labels.
+Run ``draft_chunking_spec.py --path <folder>`` to generate the spec before chunking.
 """
 
 import re
 import sys
 from pathlib import Path
+from typing import Any
 
 from _config import ROOT, MEMORY, ASSETS, ensure_root
 
 ensure_root()
 MIN_CHUNK_LINES = 5
+SPEC_FILENAME = "context_chunking_spec.yaml"
+
+
+# ---------------------------------------------------------------------------
+# Chunking spec loading
+# ---------------------------------------------------------------------------
+
+def _load_spec(src_root: Path) -> dict[str, Any] | None:
+    """Load context_chunking_spec.yaml from src_root if present. Returns parsed dict or None."""
+    spec_path = src_root / SPEC_FILENAME
+    if not spec_path.exists():
+        return None
+    try:
+        return _parse_yaml(spec_path.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"  Warning: could not parse {SPEC_FILENAME}: {e}")
+        return None
+
+
+def _parse_yaml(text: str) -> dict[str, Any]:
+    """Minimal YAML parser for the spec structure (avoids PyYAML dependency)."""
+    result: dict[str, Any] = {}
+    current_section: str | None = None
+    current_dict: dict[str, Any] = {}
+
+    for raw_line in text.splitlines():
+        line = raw_line.rstrip()
+        if not line or line.lstrip().startswith("#"):
+            continue
+
+        # Top-level key (no leading space)
+        if not raw_line.startswith(" ") and ":" in line:
+            key, _, val = line.partition(":")
+            key = key.strip()
+            val = val.strip()
+            if val == "" or val.startswith("#"):
+                if current_section:
+                    result[current_section] = current_dict
+                current_section = key
+                current_dict = {}
+            else:
+                if current_section:
+                    result[current_section] = current_dict
+                    current_section = None
+                    current_dict = {}
+                result[key] = _parse_scalar(val)
+            continue
+
+        # Indented key under current section
+        if current_section and line.lstrip():
+            stripped = line.lstrip()
+            if ":" in stripped:
+                k, _, v = stripped.partition(":")
+                k = k.strip()
+                v = v.strip()
+                if v == "" or v.startswith("#"):
+                    continue
+                current_dict[k] = _parse_scalar(v)
+
+    if current_section:
+        result[current_section] = current_dict
+
+    return result
+
+
+def _parse_scalar(val: str) -> Any:
+    """Parse a YAML scalar: bool, int, list, or string."""
+    val = val.split("#")[0].strip()  # strip inline comments
+    if val.lower() == "true":
+        return True
+    if val.lower() == "false":
+        return False
+    try:
+        return int(val)
+    except ValueError:
+        pass
+    if val.startswith("[") and val.endswith("]"):
+        inner = val[1:-1]
+        return [item.strip().strip('"').strip("'") for item in inner.split(",") if item.strip()]
+    # Strip surrounding quotes
+    if (val.startswith('"') and val.endswith('"')) or (val.startswith("'") and val.endswith("'")):
+        return val[1:-1]
+    return val
+
+
+def _spec_section_break_regex(spec: dict) -> re.Pattern | None:
+    sb = spec.get("section_boundaries", {})
+    chapter = sb.get("chapter_break_regex", "")
+    section = sb.get("section_break_regex", "")
+    patterns = [p for p in [chapter, section] if p]
+    if not patterns:
+        return None
+    combined = "|".join(f"(?:{p})" for p in patterns)
+    try:
+        return re.compile(combined, re.IGNORECASE)
+    except re.error:
+        return None
+
+
+def _spec_min_lines(spec: dict) -> int:
+    splitting = spec.get("splitting", {})
+    min_chars = splitting.get("min_chunk_chars", 150)
+    return max(3, min_chars // 80)  # rough chars-to-lines conversion
+
+
+def _spec_max_lines(spec: dict) -> int:
+    splitting = spec.get("splitting", {})
+    max_chars = splitting.get("max_chunk_chars", 4000)
+    return max_chars // 60
+
+
+def _spec_split_heading_level(spec: dict) -> int:
+    return spec.get("splitting", {}).get("split_on_heading_level", 2)
+
+
+def _spec_defaults(spec: dict) -> tuple[str, str]:
+    d = spec.get("defaults", {})
+    return d.get("evidence_type", "rule"), d.get("modeling_kind", "rule")
 
 
 def _find_image_refs(text: str) -> list[str]:
@@ -68,12 +192,13 @@ def _chunk_by_slides(text: str) -> list[tuple[str, str]]:
     return chunks
 
 
-def _chunk_by_headings(text: str) -> list[tuple[str, str]]:
+def _chunk_by_headings(text: str, heading_level: int = 2) -> list[tuple[str, str]]:
+    pat = re.compile(r"^#{1," + str(heading_level) + r"}\s", re.MULTILINE)
     lines = text.split("\n")
     chunks, current_lines, chunk_idx = [], [], 0
 
     for line in lines:
-        if re.match(r"^#{1,2}\s", line) and len(current_lines) >= MIN_CHUNK_LINES:
+        if pat.match(line) and len(current_lines) >= MIN_CHUNK_LINES:
             chunks.append((f"section_{chunk_idx:02d}", "\n".join(current_lines)))
             current_lines, chunk_idx = [], chunk_idx + 1
         current_lines.append(line)
@@ -83,12 +208,12 @@ def _chunk_by_headings(text: str) -> list[tuple[str, str]]:
     return chunks
 
 
-def _chunk_by_section_markers(text: str) -> list[tuple[str, str]]:
+def _chunk_by_section_markers(text: str, section_pat: re.Pattern | None = None) -> list[tuple[str, str]]:
     """Split on CHAPTER, INTRODUCTION, or similar section markers (for PDFs without # headers)."""
     lines = text.split("\n")
     chunks, current_lines, chunk_idx = [], [], 0
-    # Match lines starting with CHAPTER N (PDF/rpg book structure). Use CHAPTER only to avoid over-splitting on repeated INTRODUCTION headers.
-    section_pat = re.compile(r"^CHAPTER\s+\d+\b", re.IGNORECASE)
+    if section_pat is None:
+        section_pat = re.compile(r"^CHAPTER\s+\d+\b", re.IGNORECASE)
 
     for line in lines:
         if section_pat.search(line) and len(current_lines) >= MIN_CHUNK_LINES:
@@ -207,17 +332,62 @@ def _add_chunk_source_ref(content: str, source_path: str | None, source_url: str
     return f"<!-- Source: {source_path}{loc}{url} -->\n\n" + content
 
 
-def chunk_file(md_path: Path, conv_root: Path, chunk_root: Path) -> int:
+def _build_front_matter(
+    chunk_id: str,
+    source_path: str | None,
+    evidence_type: str,
+    modeling_kind: str,
+    section_path: list[str],
+) -> str:
+    """Produce YAML front matter block for a chunk when a spec is active."""
+    lines = ["---"]
+    lines.append(f"chunk_id: {chunk_id}")
+    if source_path:
+        lines.append("source:")
+        lines.append(f"  canonical_path: {source_path}")
+    lines.append(f"evidence_type: {evidence_type}")
+    lines.append(f"modeling_kind: {modeling_kind}")
+    if section_path:
+        sections_yaml = ", ".join(f'"{s}"' for s in section_path)
+        lines.append(f"section_path: [{sections_yaml}]")
+    lines.append("---")
+    return "\n".join(lines) + "\n\n"
+
+
+def _extract_section_path(content: str) -> list[str]:
+    """Extract heading breadcrumb from chunk content (first few headings)."""
+    headings = re.findall(r"^#{1,6}\s+(.+)$", content, re.MULTILINE)
+    return [h.strip() for h in headings[:3]]
+
+
+def chunk_file(
+    md_path: Path,
+    conv_root: Path,
+    chunk_root: Path,
+    spec: dict | None = None,
+) -> int:
     text = md_path.read_text(encoding="utf-8")
     stem, source_path, source_url = md_path.stem, *_extract_source_ref(text)
     out_dir = chunk_root
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    use_spec = spec is not None
+    if use_spec:
+        section_pat = _spec_section_break_regex(spec)
+        heading_level = _spec_split_heading_level(spec)
+        default_et, default_mk = _spec_defaults(spec)
+    else:
+        section_pat = None
+        heading_level = 2
+        default_et = default_mk = ""
+
     if _is_slide_deck(text):
         chunks = _chunk_by_slides(text)
     elif text.count("\n") > 200:
         if _has_markdown_headings(text):
-            chunks = _chunk_by_headings(text)
+            chunks = _chunk_by_headings(text, heading_level=heading_level)
+        elif section_pat:
+            chunks = _chunk_by_section_markers(text, section_pat=section_pat)
         else:
             chunks = _chunk_by_section_markers(text)
     else:
@@ -234,10 +404,21 @@ def chunk_file(md_path: Path, conv_root: Path, chunk_root: Path) -> int:
     for label, content in chunks:
         if not content.strip():
             continue
-        content = _add_chunk_source_ref(content, source_path, source_url, _loc(label))
-        out = out_dir / (f"{stem}__{label}.md" if len(chunks) > 1 else f"{stem}.md")
-        out.write_text(content, encoding="utf-8")
-        for ref in _find_image_refs(content):
+        out_name = f"{stem}__{label}.md" if len(chunks) > 1 else f"{stem}.md"
+        chunk_id = Path(out_name).stem  # filename stem without .md
+
+        if use_spec:
+            section_path = _extract_section_path(content)
+            front = _build_front_matter(chunk_id, source_path, default_et, default_mk, section_path)
+            # Strip any existing source comment to avoid duplication
+            content_body = re.sub(r"<!--\s*Source:[^>]*-->\s*\n*", "", content).lstrip()
+            final_content = front + content_body
+        else:
+            final_content = _add_chunk_source_ref(content, source_path, source_url, _loc(label))
+
+        out = out_dir / out_name
+        out.write_text(final_content, encoding="utf-8")
+        for ref in _find_image_refs(final_content):
             _copy_images([ref], conv_root, chunk_root)
         written += 1
     return written
@@ -271,6 +452,13 @@ def _run_path_mode(source_path: str, memory_name_override: str | None = None, ou
         chunk_base = MEMORY / memory_name
         dest = f"memory/{memory_name}/"
 
+    # Load chunking spec if present
+    spec = _load_spec(src_root)
+    if spec:
+        print(f"  Using chunking spec: {src_root / SPEC_FILENAME}")
+        default_et, default_mk = _spec_defaults(spec)
+        print(f"  Defaults: evidence_type={default_et}  modeling_kind={default_mk}")
+
     md_files = _select_chunk_sources(scan_root)
     if not md_files:
         print(f"No markdown in {scan_root}")
@@ -287,7 +475,7 @@ def _run_path_mode(source_path: str, memory_name_override: str | None = None, ou
         label = str(rel) if rel != Path(".") else f.name
         print(f"  [{i}/{len(md_files)}] {label} ... ", end="", flush=True)
         try:
-            n = chunk_file(f, conv_root, chunk_root)
+            n = chunk_file(f, conv_root, chunk_root, spec=spec)
             total += n
             print(f"OK  ({n} chunks)")
         except Exception as e:

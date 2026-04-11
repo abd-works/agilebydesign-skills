@@ -1,10 +1,11 @@
 ---
 name: abd-context-to-memory
 description: >-
-  Converts documents (PDF, PPTX, DOCX, XLSX, etc.) to markdown, chunks them,
-  and embeds into a local FAISS vector store for semantic search. Use when the
-  user wants to "add to memory", "convert and chunk", "ingest content for agent",
-  "refresh memory", "use memory", or process a folder of documents for AI agent context.
+  Converts documents (PDF, PPTX, DOCX, XLSX, etc.) to markdown, drafts a
+  structure-based chunking spec, chunks with evidence labels, and embeds into a
+  local FAISS vector store for semantic search. Use when the user wants to "add
+  to memory", "convert and chunk", "ingest content for agent", "refresh memory",
+  "use memory", or process a folder of documents for AI agent context.
 license: MIT
 metadata:
   author: agilebydesign
@@ -13,7 +14,7 @@ metadata:
 
 # abd-context-to-memory
 
-Converts source documents to markdown, chunks them, and embeds into a local FAISS vector store. Three steps: **convert** → **chunk** → **embed**.
+**convert → draft spec → chunk → embed.** Turns source documents into a semantically searchable FAISS vector store, using a structure-derived chunking spec so splits and evidence labels reflect the actual shape of the content.
 
 ## When to Activate
 
@@ -25,12 +26,65 @@ Converts source documents to markdown, chunks them, and embeds into a local FAIS
 
 ## Pipeline
 
+### Standard (recommended)
+
 ```
-python scripts/index_memory.py --path <source_folder>          # convert + chunk + embed
-python scripts/index_memory.py --path <source_folder> --skip-convert  # chunk + embed only
+python scripts/index_memory.py --path <source_folder>
 ```
 
-That's it. Chunks land in `<source>/memory/`, the FAISS index in `<source>/memory/rag/`.
+This runs all four steps:
+1. **Convert** — source docs → `markdown/`
+2. **Draft spec** — structural scan of markdown → `context_chunking_spec.yaml` (AI-assisted, human review)
+3. **Chunk** — apply spec → `memory/`
+4. **Embed** — chunks → `memory/rag/` (FAISS)
+
+### Skip convert (markdown already present)
+
+```
+python scripts/index_memory.py --path <source_folder> --skip-convert
+```
+
+### Skip spec draft (spec already reviewed and present)
+
+```
+python scripts/index_memory.py --path <source_folder> --skip-spec
+```
+
+### Skip both convert and spec draft
+
+```
+python scripts/index_memory.py --path <source_folder> --skip-convert --skip-spec
+```
+
+### Draft spec only (no chunking or embedding)
+
+```
+python scripts/draft_chunking_spec.py --path <source_folder>
+```
+
+## Chunking Spec (`context_chunking_spec.yaml`)
+
+Before chunking, the pipeline drafts a **`context_chunking_spec.yaml`** in the source folder. This spec is derived by scanning the actual structure of the markdown sources and captures:
+
+- `section_boundaries` — regexes that start new major units (chapters, sections)
+- `splitting` — min/max chunk sizes, table handling, heading split level
+- `defaults` — default `evidence_type` / `modeling_kind` labels for new chunks
+- `taxonomy` — closed-world allowed values for `evidence_type` and `modeling_kind`
+
+**Human review recommended:** After drafting, review `context_chunking_spec.yaml` in the source folder before running the full pipeline. Fix any misidentified boundaries, tighten taxonomy, and confirm noise exclusions. Re-run with `--skip-spec` once the spec is accepted.
+
+If `context_chunking_spec.yaml` **already exists** in the source folder, the chunk step uses it directly — the draft step is skipped automatically.
+
+### `evidence_type` vs `modeling_kind`
+
+Two independent labels applied per chunk:
+
+| Axis | Question | Examples |
+|------|----------|---------|
+| `evidence_type` | What does this chunk look like in the source? (form) | `definition`, `rule`, `example`, `table`, `metadata_noise`, `mixed` |
+| `modeling_kind` | How should agent work treat this chunk? (stance) | `definition`, `rule`, `example`, `noise`, `structural_only` |
+
+They often match but diverge when form and purpose differ (e.g. a table that is normative → `evidence_type: table`, `modeling_kind: rule`).
 
 ## Semantic Search
 
@@ -51,10 +105,13 @@ Run from workspace root. Scripts in `skills/abd-context-to-memory/scripts/`.
 
 | Script | Purpose |
 |--------|---------|
-| `index_memory.py --path <folder>` | Full pipeline: convert → chunk → embed |
+| `index_memory.py --path <folder>` | Full pipeline: convert → draft spec → chunk → embed |
+| `index_memory.py --path <folder> --skip-convert` | Skip convert, run draft spec → chunk → embed |
+| `index_memory.py --path <folder> --skip-spec` | Skip spec draft, run convert → chunk → embed |
+| `draft_chunking_spec.py --path <folder>` | Structural scan + draft `context_chunking_spec.yaml` only |
 | `convert_to_markdown.py --memory <folder>` | Convert all supported files to markdown |
 | `convert_to_markdown.py --file <file>` | Convert a single file |
-| `chunk_markdown.py --path <folder>` | Chunk markdown into memory/ |
+| `chunk_markdown.py --path <folder>` | Chunk markdown into memory/ (uses spec if present) |
 | `embed_and_index.py --path <folder>` | Embed chunks into local FAISS index |
 | `search_memory.py "<query>"` | Semantic search over embedded chunks |
 
@@ -62,9 +119,10 @@ Run from workspace root. Scripts in `skills/abd-context-to-memory/scripts/`.
 
 ```
 <source_folder>/
-  markdown/          # converted markdown + images
-  memory/            # chunks
-    rag/             # FAISS vector index
+  context_chunking_spec.yaml   # chunking rules + taxonomy (draft → review → accepted)
+  markdown/                    # converted markdown + images
+  memory/                      # chunks (with evidence_type / modeling_kind front matter when spec present)
+    rag/                       # FAISS vector index
 ```
 
 ## Dependencies

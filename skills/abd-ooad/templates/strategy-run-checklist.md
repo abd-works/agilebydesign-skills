@@ -9,8 +9,7 @@
 **Purpose:** Tick **which phase-ids** (or **stages**) you will run, in **what order**, and with **what scope** — aligned with **`strategy.md` → Execution plan (normative)**. Resume at the **first unchecked** row.
 
 **Normative plan (no ticks):** `strategy.md`  
-**Full pipeline reference (all phase-ids):** `process-checklist.md`  
-**Current phase steps:** `<phase-id>-checklist.md` (e.g. `nouns-verbs-rules-and-states-checklist.md`)
+**Phase action steps:** `<phase-id>-checklist.md` (e.g. `nouns-verbs-rules-and-states-checklist.md`) under `progress/`
 
 **Revisits:** Add **new rows** here when you must go **backward** (same file — not a separate rerun workflow). Example rows below.
 

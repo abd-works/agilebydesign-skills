@@ -1,6 +1,6 @@
 # Responsibilities and collaborators
 
-**Skill:** abd-ooad — **Phase-id:** `responsibilities-and-collaborators` (Stage 2 — Structure, p5).
+**Skill:** abd-ooad — **Phase-id:** `responsibilities-and-collaborators` (Stage 2 — Model, p4).
 
 **Upstream:** `thing-vs-data-about-a-thing` (p4) — every class has a confirmed stereotype; no `?` carries into this phase.
 

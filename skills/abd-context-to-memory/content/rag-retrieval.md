@@ -19,7 +19,7 @@ Run `search_memory "<query>"` when the user says:
    python skills/abd-context-to-memory/scripts/search_memory.py "<query>" --rag <source>/memory/rag --k 5
    ```
 3. **Inject results** — Use the returned chunks in your response.
-4. **Cite sources** — Include path and slide/section when using retrieved content.
+4. **Cite sources** — Include path and slide/section when using retrieved content. If chunks have front matter, also note `evidence_type` / `modeling_kind` to signal how much weight to give the result.
 
 ## Requirements
 
@@ -34,3 +34,13 @@ Run `search_memory "<query>"` when the user says:
   index.faiss
   metadata.json
 ```
+
+## Chunk front matter (when spec was active during chunking)
+
+Results may include chunks with YAML front matter. Use the labels to calibrate your response:
+
+| `modeling_kind` | How to use |
+|----------------|-----------|
+| `rule` / `definition` | Cite as authoritative — normative content |
+| `example` | Use as illustration only, not as ground truth |
+| `noise` / `structural_only` | Low weight — boilerplate or navigation chrome |

@@ -2,18 +2,23 @@
 """Emit instruction text for a phase or operation slug, or a full stage.
 
 Usage:
-    python scripts/base/generate.py --phase <phase-id> [--mode static|dynamic] [--no-ensure-checklists]
-    python scripts/base/generate.py --stage <A|B|C|D|E|F> [--mode static|dynamic] [--no-ensure-checklists]
+    python scripts/base/generate.py --phase <phase-id> [--slice <id>] [--mode static|dynamic] [--no-ensure-checklists]
+    python scripts/base/generate.py --stage <A|B|C|D|E|F> [--slice <id>] [--mode static|dynamic] [--no-ensure-checklists]
     python scripts/base/generate.py --list-phases
     python scripts/base/generate.py --list-stages
+
+--slice <id>    slice folder under ``progress/slices/<id>/`` for phase action checklists (default: ``main``).
+                Use the same **slice ID** as **strategy.md** §1. Passed to every phase in ``--stage`` runs.
 
 --mode static   reads content/built/phases/<slug>.md when present; else assembles from sources.
 --mode dynamic  always assembles from sources (default).
 
-Unless ``--no-ensure-checklists`` is passed, creates missing live checklists under
-``active_skill_workspace/<skill_name>/progress/`` (see workspace_checklists.py):
-``process-checklist.md``, ``<phase>-checklist.md``, and optionally ``strategy-run-checklist.md``
-(from ``templates/strategy-run-checklist.md`` when the skill provides it).
+Unless ``--no-ensure-checklists`` is passed, ensures missing markdown files exist under
+``active_skill_workspace/<skill_name>/progress/`` (implementation: ``workspace_checklists.py``):
+``README.md`` (from ``templates/progress-README.md`` when present), ``process-checklist.md`` (legacy),
+``slices/<slice-id>/<phase>-checklist.md``, and ``strategy-run-checklist.md`` (from
+``templates/strategy-run-checklist.md`` when the skill provides it). Strategy vs ticks are documented in
+``content/parts/library/strategy-execution-and-checklists.md``; ``--no-ensure-checklists`` skips that step.
 
 ``--stage`` runs each phase-id in that stage in **process_stages** order (see ``skill-config.json``),
 concatenating prompts with clear separators.
@@ -103,7 +108,13 @@ def main() -> int:
     p.add_argument(
         "--no-ensure-checklists",
         action="store_true",
-        help="Do not create missing progress checklists under active_skill_workspace (see workspace_checklists.py).",
+        help="Do not create missing files under …/progress/ before emitting the phase prompt (emit instructions only).",
+    )
+    p.add_argument(
+        "--slice",
+        metavar="ID",
+        default="main",
+        help="Slice id for progress/slices/<id>/ phase checklists (match strategy.md §1). Default: main.",
     )
     ns = p.parse_args()
     try:
@@ -119,7 +130,7 @@ def main() -> int:
 
         if ns.slug:
             if not ns.no_ensure_checklists:
-                ensure_workspace_checklists(skill, ns.slug)
+                ensure_workspace_checklists(skill, ns.slug, ns.slice)
             text = skill.prompt(ns.slug, form=form)
             sys.stdout.write(text)
             if not text.endswith("\n"):
@@ -147,7 +158,7 @@ def main() -> int:
                 )
                 return 1
             if not ns.no_ensure_checklists:
-                ensure_workspace_checklists(skill, slug)
+                ensure_workspace_checklists(skill, slug, ns.slice)
             body = skill.prompt(slug, form=form)
             header = (
                 f"\n\n---\n\n## Stage {letter} — `{slug}`\n\n"

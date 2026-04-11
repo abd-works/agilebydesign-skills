@@ -34,150 +34,94 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 ## Phase
 
-# Phase: Workspace and Config
+# Classify stereotypes
 
-**Before beginning any OOAD work, establish the project workspace and configure routing.**
+**Skill:** abd-ooad — **Phase-id:** `classify-stereotypes` (Stage 3 — DDD patterns, p7).
 
----
+**Upstream:** `inherit-interface-or-compose` (p6) — every class has typed properties, operations, relationships, and a structural mechanism (inherit / interface / compose).
 
-## Purpose
-
-Make **`skill_workspace`** (your project root) unambiguous to abd-ooad so all generated domain models go to the right place.
+**What this phase does:** Assign a single DDD stereotype to each class. Stereotypes are classification labels — they describe *what role the class plays in the domain*, not how it is implemented. They feed **`design-bounded-contexts`** (p8) and invariant scope in **Behaviour** (p9 onward).
 
 ---
 
-## Quick Start
+## Stereotype reference
 
-```bash
-cd /sessions/kind-inspiring-cori/mnt/abd-ooad
-python scripts/base/set_workspace.py /path/to/your/project
-```
-
-This sets **`active_skill_workspace`** in **`skill-config.json`** so abd-ooad knows where to create:
-- `domain-scan-model.md` and `.drawio`
-- `step-1-extraction.md` and `.drawio`
-- All subsequent OOAD artifacts
-
----
-
-## Key Concepts
-
-### Skill Path vs Skill Workspace
-
-| Term | Meaning | Example |
-|------|---------|---------|
-| **`skill_path`** | Where abd-ooad is installed (SKILL.md, scripts/, phases/) | `/sessions/kind-inspiring-cori/mnt/abd-ooad/` |
-| **`skill_workspace`** | Your project root (where domain models go) | `/sessions/kind-inspiring-cori/mnt/mm3e-experiment/` |
-
-### Configuration File
-
-**Location:** `<skill_path>/skill-config.json`
-
-**Key fields:**
-- **`active_skill_workspace`** — Path to your project root (absolute preferred)
-- **`known_skill_workspaces`** — List of projects you've worked on (for quick switching)
+| Stereotype | What it means |
+|-----------|--------------|
+| `Entity` | Has identity (an ID); changes over time; tracked across operations |
+| `ValueObject` | Defined by its value; immutable; no identity beyond its content |
+| `Aggregate` | Root Entity that owns a consistency boundary; external access only via root |
+| `DomainService` | Stateless operation that coordinates multiple entities; belongs in domain, not application |
+| `Policy` | Captures a rule or decision criterion; often a predicate or strategy |
+| `DomainEvent` | Something that happened in the domain; immutable record of a fact |
+| `Role` | A contextual identity an Entity plays; extracted when one class is doing two jobs |
+| `Process` | Orchestrates a multi-step workflow; may be stateful (saga) or stateless |
+| `Factory` | Creates complex aggregates or entities; separates construction from use |
 
 ---
 
-## Output Convention
+## How to classify
 
-All OOAD artifacts go under:
+Work class by class. For each class:
 
-```
-<skill_workspace>/abd-ooad/
-```
+1. Ask: does it have identity that persists across operations? → Entity or Aggregate candidate
+2. Ask: is it defined entirely by its value, no lifecycle, no ID needed? → ValueObject
+3. Ask: does it represent something that *happened*, immutable, timestamped? → DomainEvent
+4. Ask: is it a stateless operation that does not naturally belong on any entity? → DomainService
+5. Ask: does it capture a rule, decision, or policy that changes independently? → Policy
+6. Ask: is it orchestrating a process across multiple steps/entities? → Process or Saga
+7. Ask: is this class doing two jobs — one entity playing a role in a context? → split into Entity + Role
 
-Examples for mm3e-experiment:
-```
-/sessions/kind-inspiring-cori/mnt/mm3e-experiment/abd-ooad/
-├── progress/
-│   ├── strategy-run-checklist.md   ← planned phases + scope (vs strategy.md); seeded from template on first generate
-│   ├── domain-scan-checklist.md
-│   └── … (<phase>-checklist.md per phase run)
-├── domain-scan-model.md
-├── domain-scan-model.drawio
-├── step-1-extraction.md
-├── step-1-extraction.drawio
-├── ... (steps 2–20 outputs)
-```
-
-Live **checkboxes** belong only under **`progress/`** (see **`library/strategy-execution-and-checklists.md`**). Do not duplicate tick tables in `strategy.md` or other normative docs under `abd-ooad/`.
+Apply one stereotype per class. If more than one fits, the class probably has hidden responsibilities — record a `Tension` note and consider splitting.
 
 ---
 
-## Setting Your Workspace
+## Aggregate boundaries
 
-### Check Current Workspace
+If you classify a class as Aggregate, immediately mark:
+- Which classes are inside the aggregate boundary (child entities and VOs)
+- Which classes reference the aggregate root by ID only (external associations)
 
-```bash
-cd /sessions/kind-inspiring-cori/mnt/abd-ooad
-python scripts/base/set_workspace.py
-```
-
-Shows current **`active_skill_workspace`** and its resolved absolute path.
-
-### Set New Workspace
-
-```bash
-python scripts/base/set_workspace.py /sessions/kind-inspiring-cori/mnt/mm3e-experiment
-```
-
-The script:
-1. Validates the directory exists
-2. Resolves the path intelligently (relative if portable, absolute otherwise)
-3. Updates **`skill-config.json`**
-4. Adds it to **`known_skill_workspaces`** if not already there
+Aggregate boundaries are confirmed in `design-bounded-contexts` (p8). Do not finalise them here — but do flag aggregate candidates.
 
 ---
 
-## Diagrams and Workspace
+## Updates to the model
 
-All diagram files (`.drawio`) are generated by `scripts/drawio_cli.py` and written alongside their Markdown companions under `<workspace>/abd-ooad/`. Set the workspace once and all outputs — Markdown and diagrams — go to the same place.
+- Add the stereotype to each class in `domain-model.md`: `ClassName : << Entity >>`, `ClassName : << ValueObject >>`, etc.
+- Replace any remaining `<< Kind? >>` provisional stubs with the confirmed stereotype
+- If a `Role` is extracted from an Entity, add the new Role class and update its collaborators
 
 ---
 
-## Troubleshooting
+## term-registry.md
 
-**Q: "Path does not exist or is not a directory"**
-- Ensure the workspace directory exists before setting it
-- Use absolute paths if relative paths cause issues
+Tag all model notes with `[p7]` — see `templates/domain model template.md` for the full tag table.
 
-**Q: "active_skill_workspace not in skill-config.json"**
-- The file might be missing; create it with default content:
-  ```json
-  {
-    "active_skill_workspace": ".",
-    "known_skill_workspaces": []
-  }
-  ```
+Common Notes labels added at this phase:
 
-**Q: Multiple projects?**
-- Use `known_skill_workspaces` to list them
-- Switch by running `set_workspace.py` with the path you want
-- Or edit **`skill-config.json`** directly
+- `Classified - {{Stereotype}} {{reason}}` — final stereotype assigned; replaces any `Provisionally Classified` note from earlier phases
+- `Promoted - {{from_target}} → Role {{reason}}` — hidden role extracted as its own class
+- `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}` — class resists a single stereotype; may need to be split
+- `Follow-up - {{question_or_action}}` — deferred; to be resolved at p8 aggregate boundaries
 
 ---
 
 ## Action Checklist
 
-- [ ] Have you run `python scripts/base/set_workspace.py <path>` to set `active_skill_workspace`?
-- [ ] Does `skill-config.json` now show the correct workspace path?
-- [ ] Is the workspace directory accessible and writable?
-- [ ] Have you confirmed where OOAD artifacts will be written (`<workspace>/abd-ooad/`)?
-- [ ] Are you ready to run `python scripts/base/generate.py --phase domain-scan` to start?
+- [ ] Every class has exactly one stereotype in `domain-model.md`.
+- [ ] No remaining `<< Kind? >>` provisional stubs.
+- [ ] Aggregate candidates are flagged with an initial boundary sketch.
+- [ ] Hidden roles extracted as separate classes where found.
+- [ ] ValueObjects confirmed as immutable with no ID.
+- [ ] `term-registry.md` updated — `Provisionally Classified` notes promoted to `Classified - {{Stereotype}}`.
+- [ ] Tensions recorded for any class that resisted classification.
 
 ---
 
-## Next Step
+## Prompt
 
-Once workspace is set, proceed to **Phase 0a: Domain Scan** to begin OOAD.
-
-Run:
-```bash
-python scripts/base/generate.py --phase domain-scan
-```
-
-See **`content/parts/phases/domain-scan.md`** for details.
+> Work class by class. Assign one stereotype — the one that best describes what role this class plays in the domain. If a class resists classification, that is a signal: it has two responsibilities. Name the tension, consider splitting, and move on. Do not invent roles; stereotypes come from domain behaviour already captured in the model.
 
 
 ---

@@ -4,7 +4,19 @@
 
 **All class diagrams must be created and maintained using `scripts/drawio_cli.py`.**
 
-Do not hand-write `.drawio` XML. Do not create ad-hoc rectangle layouts. The CLI produces proper UML swimlane class components with separate sections for name, fields, and methods — matching the `templates/domain model template.drawio` visual standard.
+**Sequence / walkthrough diagrams:** use the same CLI. Initialize from the template, then add lifelines and messages:
+
+```bash
+python scripts/drawio_cli.py sequence-init --file <output>.drawio
+python scripts/drawio_cli.py sequence-add-lifeline "obj:Class" --file <output>.drawio
+python scripts/drawio_cli.py sequence-add-sync <FROM> <TO> "message()" --file <output>.drawio
+python scripts/drawio_cli.py sequence-add-return <FROM> <TO> "optionalLabel" --file <output>.drawio
+python scripts/drawio_cli.py sequence-list --file <output>.drawio
+```
+
+Lifeline labels are matched by exact text or a unique partial match (after stripping HTML). Finer layout (activation bars, nested calls, strict horizontal message rows) may still be adjusted in Draw.io; see **sequence-diagrams** and **sequence-diagram-layout-rules**.
+
+Do not hand-write `.drawio` XML for **class** diagrams. Do not create ad-hoc rectangle layouts. The CLI produces proper UML swimlane class components with separate sections for name, fields, and methods — matching the `templates/domain model template.drawio` visual standard.
 
 ---
 
@@ -245,17 +257,18 @@ Keep both files in sync — when you add a class to the `.drawio`, add the same 
 
 ---
 
-## Per-Phase Diagram Rules
+## Diagram fidelity as the model evolves
 
-| Phase | What to Show | Properties | Methods | Relationships |
-|-------|-------------|------------|---------|---------------|
-| domain-scan | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
-| nouns-verbs → raw-candidates | Candidates added | None | None | Structural only |
-| responsibilities → turn-verbs-into-operations | All confirmed classes | Semantic properties | Confirmed methods | All known |
-| relationships → model-state-transitions | Refined model | Full | Full | Full with cardinality |
-| iterative-refinement → model-in-layers | Final layered model | Full | Full | Full |
+You maintain **one** class diagram (and its Markdown companion) for the domain — not a separate `.drawio` per pipeline phase. The table below is **how complete that single diagram should be** when you finish a **stage** (or when you sync after a phase pass), not a license to duplicate the model per step.
 
-**Domain-scan constraint:** The diagram fidelity must match the sketch exactly. One frame per anchor module. Core class inside each frame has the same name as the frame. If you cannot find a core class for a frame, the anchor is incomplete — explore further before drawing.
+| Stage / exit | What to show | Properties | Methods | Relationships |
+|----------------|-------------|------------|---------|---------------|
+| After **`domain-scan`** | Anchor modules: one dashed frame per anchor, core class inside frame + confirmed supporting classes | Scan-identified fields on core class only | None | High-confidence only, between core classes |
+| After **Scaffold** (`nouns-verbs-rules-and-states` → `thing-vs-data-about-a-thing`) | Named class stubs / candidates in structure | As discovered | None or stubs | Structural only |
+| After **Model** (`responsibilities-and-collaborators` → `inherit-interface-or-compose`) | All confirmed classes | Semantic properties | Confirmed methods | All known, cardinality as decided |
+| After **Behaviour** (`invariants` → `scenario-validation`) | Full model for validation | Full | Full | Full with cardinality; invariants as agreed |
+
+**Domain-scan constraint:** The first diagram pass should match the scan sketch: one frame per anchor module; core class inside each frame matches the frame name. If you cannot find a core class for a frame, the anchor is incomplete — explore further before drawing.
 
 ---
 

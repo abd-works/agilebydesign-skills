@@ -12,13 +12,13 @@
 | 5 | responsibilities-and-collaborators | → | **p4** | responsibilities-and-collaborators *(CRC pass — English only)* | Stage 2 — Model |
 | 6 + 7 | properties-and-operations + relationships-and-cardinality | → | **p5** | properties-methods-and-relationships *(properties → operations → relationships + cardinality; one pass)* | Stage 2 — Model |
 | 12 + 13 + 14 | inheritance-when-behavior-generalizes + abstract-classes-and-interfaces + prefer-composition | → | **p6** | inherit-interface-or-compose *(one phase, three lenses: is-a → inherit; shared contract → interface; has-a → compose; evaluated simultaneously)* | Stage 2 — Model |
-| — | *(no equivalent — was premature in raw-candidates)* | → | **p7** | classify-stereotypes *(Entity, ValueObject, Policy, Role, Event, Process — confirmed after model shape is known)* | Stage 2 — Model |
-| 18 | what-changes-together | → | **p8** | what-changes-together *(aggregate boundaries, transaction scope, BC seams)* | Stage 2 — Model |
-| 8 | invariants-in-the-model | → | **p9** | invariants | Stage 3 — Behaviour |
-| 15 | model-state-transitions | → | **p10** | state-and-lifecycle *(states, transitions, guards, birth → retirement arc)* | Stage 3 — Behaviour |
-| 19 | validate-with-scenarios | → | **p11** | scenario-validation | Stage 3 — Behaviour |
-| 10 | watch-for-bloated-classes | → | **check-single-responsibility** | validator — does this class have more than one reason to change? | Stage 2 + 3 gate |
-| 11 | smashed-abstractions-and-hidden-roles | → | **check-hidden-roles** | validator — is this name doing double duty? | Stage 2 + 3 gate |
+| — | *(no equivalent — was premature in raw-candidates)* | → | **p7** | classify-stereotypes *(Entity, ValueObject, Policy, Role, Event, Process — confirmed after model shape is known)* | Stage 3 — DDD patterns |
+| 18 | what-changes-together | → | **p8** | design-bounded-contexts *(bounded contexts, seams, aggregates — what changes atomically)* | Stage 3 — DDD patterns |
+| 8 | invariants-in-the-model | → | **p9** | invariants | Stage 4 — Behaviour |
+| 15 | model-state-transitions | → | **p10** | state-and-lifecycle *(states, transitions, guards, birth → retirement arc)* | Stage 4 — Behaviour |
+| 19 | validate-with-scenarios | → | **p11** | scenario-validation | Stage 4 — Behaviour |
+| 10 | watch-for-bloated-classes | → | **check-single-responsibility** | validator — does this class have more than one reason to change? | Gate after p5 / p8 |
+| 11 | smashed-abstractions-and-hidden-roles | → | **check-hidden-roles** | validator — is this name doing double duty? | After p7 |
 
 | 16 | iterative-refinement | → | dropped | practice within every phase | — |
 | 17 | tension-as-a-signal | → | dropped | term-registry at point of discovery | — |
@@ -41,10 +41,12 @@
 - p4 `responsibilities-and-collaborators` — CRC pass; one responsibility sentence, exclusions, collaborator names; English only
 - p5 `properties-methods-and-relationships` — properties → operations → relationships + cardinality; one pass in that order
 - p6 `inherit-interface-or-compose` — for each relationship: is-a → inherit; shared contract → interface; has-a/uses-a → compose; evaluated simultaneously
-- p7 `classify-stereotypes` — Entity, ValueObject, Policy, Role, Event, Process; confirmed after model shape and relationships are known; no `?` carries past this phase
-- p8 `what-changes-together` — aggregate boundaries, transaction scope, BC seams
 
-### Stage 3 — Behaviour
+### Stage 3 — DDD patterns
+- p7 `classify-stereotypes` — Entity, ValueObject, Policy, Role, Event, Process; confirmed after model shape and relationships are known; no `?` carries past this phase
+- p8 `design-bounded-contexts` — name bounded contexts and seams; confirm aggregates (what changes atomically per operation)
+
+### Stage 4 — Behaviour
 - p9 `invariants` — rules that must always hold; guard clauses attached to operations
 - p10 `state-and-lifecycle` — states, transitions, guards, birth → retirement arc
 - p11 `scenario-validation` — walk real scenarios through the model; find gaps, wrong owners, missing operations

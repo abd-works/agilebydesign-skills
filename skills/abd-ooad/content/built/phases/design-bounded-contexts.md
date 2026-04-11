@@ -34,150 +34,86 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 ## Phase
 
-# Phase: Workspace and Config
+# Design bounded contexts
 
-**Before beginning any OOAD work, establish the project workspace and configure routing.**
+**Skill:** abd-ooad — **Phase-id:** `design-bounded-contexts` (Stage 3 — DDD patterns, p8).
 
----
+**Upstream:** `classify-stereotypes` (p7) — every class has a stereotype and aggregate candidates are flagged.
 
-## Purpose
-
-Make **`skill_workspace`** (your project root) unambiguous to abd-ooad so all generated domain models go to the right place.
+**What this phase does:** Name and align **bounded contexts** (DDD strategic design): linguistic boundaries where a single ubiquitous language holds, and where models may diverge legitimately across seams. Within each context, confirm **aggregate** boundaries by asking what must change **atomically** under one business operation. This is the final structural decision before behaviour rules (`invariants` onward). The answer determines which classes sit inside an aggregate, which reference a root by ID only, and where context boundaries (and integration seams) sit.
 
 ---
 
-## Quick Start
+## Bounded context first
 
-```bash
-cd /sessions/kind-inspiring-cori/mnt/abd-ooad
-python scripts/base/set_workspace.py /path/to/your/project
-```
+For each major area of the domain:
 
-This sets **`active_skill_workspace`** in **`skill-config.json`** so abd-ooad knows where to create:
-- `domain-scan-model.md` and `.drawio`
-- `step-1-extraction.md` and `.drawio`
-- All subsequent OOAD artifacts
+1. **Name the context** — one short phrase (e.g. *Billing*, *Inventory*, *Campaign authoring*).
+2. **List what must stay linguistically consistent** inside it — shared terms that must not mean different things.
+3. **Mark seams** — where another context consumes this model (events, queries, anti-corruption layer). Do not merge distinct contexts for implementation convenience.
 
 ---
 
-## Key Concepts
+## Aggregates inside a context
 
-### Skill Path vs Skill Workspace
+For each aggregate candidate from p7:
 
-| Term | Meaning | Example |
-|------|---------|---------|
-| **`skill_path`** | Where abd-ooad is installed (SKILL.md, scripts/, phases/) | `/sessions/kind-inspiring-cori/mnt/abd-ooad/` |
-| **`skill_workspace`** | Your project root (where domain models go) | `/sessions/kind-inspiring-cori/mnt/mm3e-experiment/` |
+1. **Name a realistic operation** on the aggregate root (e.g. `Payment.capture`, `Order.submit`).
+2. **Walk the object graph** — which child entities and VOs must be updated in the **same** transaction?
+3. **Confirm the boundary** — everything inside belongs to one aggregate; everything outside references the root by ID.
+4. **Check for bloat signals**: if more than 5–7 objects change together routinely, the boundary is probably too wide.
 
-### Configuration File
-
-**Location:** `<skill_path>/skill-config.json`
-
-**Key fields:**
-- **`active_skill_workspace`** — Path to your project root (absolute preferred)
-- **`known_skill_workspaces`** — List of projects you've worked on (for quick switching)
+Objects that must stay consistent together belong in the same aggregate. Objects whose consistency is eventual (cross-context, separate transactions) belong outside.
 
 ---
 
-## Output Convention
+## Bloat signal
 
-All OOAD artifacts go under:
+If an aggregate boundary spans objects that change in different business contexts, it is too wide. Signs:
 
-```
-<skill_workspace>/abd-ooad/
-```
+- Many classes change together but for *different reasons*
+- Two distinct domain concepts share a root for convenience
+- The aggregate grows with every new feature
 
-Examples for mm3e-experiment:
-```
-/sessions/kind-inspiring-cori/mnt/mm3e-experiment/abd-ooad/
-├── progress/
-│   ├── strategy-run-checklist.md   ← planned phases + scope (vs strategy.md); seeded from template on first generate
-│   ├── domain-scan-checklist.md
-│   └── … (<phase>-checklist.md per phase run)
-├── domain-scan-model.md
-├── domain-scan-model.drawio
-├── step-1-extraction.md
-├── step-1-extraction.drawio
-├── ... (steps 2–20 outputs)
-```
-
-Live **checkboxes** belong only under **`progress/`** (see **`library/strategy-execution-and-checklists.md`**). Do not duplicate tick tables in `strategy.md` or other normative docs under `abd-ooad/`.
+When you see this, name the `Tension` and split the boundary — do not merge for transaction convenience.
 
 ---
 
-## Setting Your Workspace
+## Cohesion and module boundaries
 
-### Check Current Workspace
-
-```bash
-cd /sessions/kind-inspiring-cori/mnt/abd-ooad
-python scripts/base/set_workspace.py
-```
-
-Shows current **`active_skill_workspace`** and its resolved absolute path.
-
-### Set New Workspace
-
-```bash
-python scripts/base/set_workspace.py /sessions/kind-inspiring-cori/mnt/mm3e-experiment
-```
-
-The script:
-1. Validates the directory exists
-2. Resolves the path intelligently (relative if portable, absolute otherwise)
-3. Updates **`skill-config.json`**
-4. Adds it to **`known_skill_workspaces`** if not already there
+Classes that always change together belong in the same module **within** a bounded context. Classes that change for different reasons may belong in separate contexts or separate aggregates. Update `domain-model.md` module groupings if this analysis reveals a better boundary.
 
 ---
 
-## Diagrams and Workspace
+## term-registry.md
 
-All diagram files (`.drawio`) are generated by `scripts/drawio_cli.py` and written alongside their Markdown companions under `<workspace>/abd-ooad/`. Set the workspace once and all outputs — Markdown and diagrams — go to the same place.
+Tag all model notes with `[p8]` — see `templates/domain model template.md` for the full tag table.
 
----
+Common Notes labels added at this phase:
 
-## Troubleshooting
-
-**Q: "Path does not exist or is not a directory"**
-- Ensure the workspace directory exists before setting it
-- Use absolute paths if relative paths cause issues
-
-**Q: "active_skill_workspace not in skill-config.json"**
-- The file might be missing; create it with default content:
-  ```json
-  {
-    "active_skill_workspace": ".",
-    "known_skill_workspaces": []
-  }
-  ```
-
-**Q: Multiple projects?**
-- Use `known_skill_workspaces` to list them
-- Switch by running `set_workspace.py` with the path you want
-- Or edit **`skill-config.json`** directly
+- `Cohesion Group - {{group_name}} changes with: {{related_classes}}` — confirmed aggregate or co-change cluster
+- `Bounded Context - {{context_name}}` — named context; lists core terms and seams
+- `Classified - Aggregate Root {{reason}}` — root confirmed; boundary defined
+- `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}` — boundary too wide; competing groupings; bloat signal
+- `Follow-up - {{question_or_action}}` — deferred to architecture (e.g. cross-context contract testing)
 
 ---
 
 ## Action Checklist
 
-- [ ] Have you run `python scripts/base/set_workspace.py <path>` to set `active_skill_workspace`?
-- [ ] Does `skill-config.json` now show the correct workspace path?
-- [ ] Is the workspace directory accessible and writable?
-- [ ] Have you confirmed where OOAD artifacts will be written (`<workspace>/abd-ooad/`)?
-- [ ] Are you ready to run `python scripts/base/generate.py --phase domain-scan` to start?
+- [ ] Every major area has a **bounded context** name and a clear seam where another context integrates.
+- [ ] Every Aggregate candidate has a confirmed boundary with named members.
+- [ ] Every class inside an aggregate boundary is there for the same business operation.
+- [ ] Every cross-aggregate reference is by root ID only — no embedded child from another aggregate.
+- [ ] Module groupings in `domain-model.md` updated if cohesion analysis revealed better boundaries.
+- [ ] Bloat signals named as `Tension` notes with a split recommendation.
+- [ ] `term-registry.md` updated with `Cohesion Group`, `Bounded Context`, and `Classified - Aggregate Root` notes as applicable.
 
 ---
 
-## Next Step
+## Prompt
 
-Once workspace is set, proceed to **Phase 0a: Domain Scan** to begin OOAD.
-
-Run:
-```bash
-python scripts/base/generate.py --phase domain-scan
-```
-
-See **`content/parts/phases/domain-scan.md`** for details.
+> For each bounded context, walk aggregate candidates through a real operation. List what changes atomically. If everything on the list belongs to one business reason, the aggregate holds. If not, split it. Name context seams explicitly — ambiguity there becomes integration debt later.
 
 
 ---

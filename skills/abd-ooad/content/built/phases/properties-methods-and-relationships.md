@@ -34,150 +34,93 @@ You are the **domain modeler and OOAD practitioner** using this skill: you provi
 
 ## Phase
 
-# Phase: Workspace and Config
+# Properties, methods and relationships
 
-**Before beginning any OOAD work, establish the project workspace and configure routing.**
+**Skill:** abd-ooad — **Phase-id:** `properties-methods-and-relationships` (Stage 2 — Model, p5).
 
----
+**Upstream:** `responsibilities-and-collaborators` (p4) — each class has a responsibility sentence, exclusions, and named collaborators; English only.
 
-## Purpose
-
-Make **`skill_workspace`** (your project root) unambiguous to abd-ooad so all generated domain models go to the right place.
+**What this phase does:** Convert responsibility statements into first-class model members in one ordered pass: **properties first, then operations that exercise them, then relationships and cardinality between classes.** These three sub-steps happen in sequence within the same phase — they inform each other and must not be done in isolation.
 
 ---
 
-## Quick Start
+## Pass 1 — Properties
 
-```bash
-cd /sessions/kind-inspiring-cori/mnt/abd-ooad
-python scripts/base/set_workspace.py /path/to/your/project
-```
+Every property answers: *What must this object know to fulfil its responsibility?*
 
-This sets **`active_skill_workspace`** in **`skill-config.json`** so abd-ooad knows where to create:
-- `domain-scan-model.md` and `.drawio`
-- `step-1-extraction.md` and `.drawio`
-- All subsequent OOAD artifacts
+Rules:
+- Name properties contextually (`authorizedMoney` not `amount` when partial capture matters)
+- If a property recurs across many operations, it is likely a value object — extract it
+- Remove anything that is UI, infrastructure, or application-layer concern
+- No types yet if the domain type is still uncertain — write the English description, type comes when clear
 
----
-
-## Key Concepts
-
-### Skill Path vs Skill Workspace
-
-| Term | Meaning | Example |
-|------|---------|---------|
-| **`skill_path`** | Where abd-ooad is installed (SKILL.md, scripts/, phases/) | `/sessions/kind-inspiring-cori/mnt/abd-ooad/` |
-| **`skill_workspace`** | Your project root (where domain models go) | `/sessions/kind-inspiring-cori/mnt/mm3e-experiment/` |
-
-### Configuration File
-
-**Location:** `<skill_path>/skill-config.json`
-
-**Key fields:**
-- **`active_skill_workspace`** — Path to your project root (absolute preferred)
-- **`known_skill_workspaces`** — List of projects you've worked on (for quick switching)
+For each class: update `domain-model.md` with properties. Add a `Classified - Property` note to `term-registry.md` for each property introduced. Tag notes `[p5]`.
 
 ---
 
-## Output Convention
+## Pass 2 — Operations
 
-All OOAD artifacts go under:
+Every operation answers: *What must this object do, and who calls it?*
 
-```
-<skill_workspace>/abd-ooad/
-```
+Rules:
+- Map verbs from `nouns-verbs-rules-and-states` (p1) and `responsibilities-and-collaborators` (p4) to owning classes
+- Challenge each verb: does it belong on a domain object or an application service?
+- Application-layer verbs (orchestrate, call HTTP, render) must be moved out now
+- Each surviving operation appears as a method signature on the class: `methodName(param: Type): ReturnType`
 
-Examples for mm3e-experiment:
-```
-/sessions/kind-inspiring-cori/mnt/mm3e-experiment/abd-ooad/
-├── progress/
-│   ├── strategy-run-checklist.md   ← planned phases + scope (vs strategy.md); seeded from template on first generate
-│   ├── domain-scan-checklist.md
-│   └── … (<phase>-checklist.md per phase run)
-├── domain-scan-model.md
-├── domain-scan-model.drawio
-├── step-1-extraction.md
-├── step-1-extraction.drawio
-├── ... (steps 2–20 outputs)
-```
-
-Live **checkboxes** belong only under **`progress/`** (see **`library/strategy-execution-and-checklists.md`**). Do not duplicate tick tables in `strategy.md` or other normative docs under `abd-ooad/`.
+For each operation: update `domain-model.md`. Add a `Classified - Operation` note to `term-registry.md`. Tag notes `[p5]`.
 
 ---
 
-## Setting Your Workspace
+## Pass 3 — Relationships and cardinality
 
-### Check Current Workspace
+Every relationship answers: *How do these objects refer to each other, and who owns whom?*
 
-```bash
-cd /sessions/kind-inspiring-cori/mnt/abd-ooad
-python scripts/base/set_workspace.py
-```
+Rules:
+- Decide composition vs association: if the child only exists inside the parent, it is composition; if it has independent identity, it is association
+- Cardinality: record `1..1`, `1..*`, `0..*` for each end
+- Cross-BC references (e.g. `OrderId`, `PayerId`) are references, not embedded aggregates — confirm this explicitly
+- Use ASCII notation from `class-diagrams` in the library: `----|>`, `..|>`, `*---`, `o---`, `- - ->`
 
-Shows current **`active_skill_workspace`** and its resolved absolute path.
-
-### Set New Workspace
-
-```bash
-python scripts/base/set_workspace.py /sessions/kind-inspiring-cori/mnt/mm3e-experiment
-```
-
-The script:
-1. Validates the directory exists
-2. Resolves the path intelligently (relative if portable, absolute otherwise)
-3. Updates **`skill-config.json`**
-4. Adds it to **`known_skill_workspaces`** if not already there
+For each relationship: update `domain-model.md`. Add a `Classified` note to `term-registry.md` confirming relationship type. Tag notes `[p5]`.
 
 ---
 
-## Diagrams and Workspace
+## term-registry.md
 
-All diagram files (`.drawio`) are generated by `scripts/drawio_cli.py` and written alongside their Markdown companions under `<workspace>/abd-ooad/`. Set the workspace once and all outputs — Markdown and diagrams — go to the same place.
+Tag all model notes with `[p5]` — see `templates/domain model template.md` for the full tag table.
 
----
+Common Notes labels added at this phase:
 
-## Troubleshooting
+- `Classified - Property {{reason}}` — noun resolves to a property on a class
+- `Classified - Operation {{reason}}` — verb confirmed as a domain operation
+- `Classified - Composition {{reason}}` — child lives inside parent; lifecycle bound
+- `Classified - Association {{reason}}` — independent identity; cross-reference
+- `Promoted - Property → Class {{reason}}` — property promoted to its own class (e.g. `Money` extracted from raw `amount`)
+- `Tension - **{{TensionName}}** {{what_is_ambiguous_or_conflicting}}` — ownership unclear; competing boundaries
+- `Follow-up - {{question_or_action}}` — deferred to `inherit-interface-or-compose` (p6)
 
-**Q: "Path does not exist or is not a directory"**
-- Ensure the workspace directory exists before setting it
-- Use absolute paths if relative paths cause issues
-
-**Q: "active_skill_workspace not in skill-config.json"**
-- The file might be missing; create it with default content:
-  ```json
-  {
-    "active_skill_workspace": ".",
-    "known_skill_workspaces": []
-  }
-  ```
-
-**Q: Multiple projects?**
-- Use `known_skill_workspaces` to list them
-- Switch by running `set_workspace.py` with the path you want
-- Or edit **`skill-config.json`** directly
+**Any new VO, aggregate, or operation introduced in this phase gets a term row or row update.**
 
 ---
 
 ## Action Checklist
 
-- [ ] Have you run `python scripts/base/set_workspace.py <path>` to set `active_skill_workspace`?
-- [ ] Does `skill-config.json` now show the correct workspace path?
-- [ ] Is the workspace directory accessible and writable?
-- [ ] Have you confirmed where OOAD artifacts will be written (`<workspace>/abd-ooad/`)?
-- [ ] Are you ready to run `python scripts/base/generate.py --phase domain-scan` to start?
+- [ ] Every class has typed properties derived from its p4 responsibility statement.
+- [ ] Every property is semantically tight — the object needs it to fulfil its responsibility.
+- [ ] UI, infrastructure, and application-layer properties removed.
+- [ ] Every domain verb from p1 and p4 is mapped to an owning class or application service.
+- [ ] Application-layer verbs moved out — not on domain objects.
+- [ ] Every surviving operation is a formal method signature on the class.
+- [ ] Every class pair that interacts has an explicit relationship type and cardinality.
+- [ ] Cross-BC references confirmed as references, not embedded aggregates.
+- [ ] `term-registry.md` updated with `Classified`, `Promoted`, and `Tension` notes.
 
 ---
 
-## Next Step
+## Prompt
 
-Once workspace is set, proceed to **Phase 0a: Domain Scan** to begin OOAD.
-
-Run:
-```bash
-python scripts/base/generate.py --phase domain-scan
-```
-
-See **`content/parts/phases/domain-scan.md`** for details.
+> Work in order: properties, then operations, then relationships. Do not skip to operations before properties are solid — operations depend on knowing what the object holds. When ownership of an operation or relationship is unclear, name the tension and resolve it before moving on.
 
 
 ---

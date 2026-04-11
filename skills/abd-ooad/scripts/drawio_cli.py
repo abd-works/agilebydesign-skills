@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """
-drawio_cli.py — CLI for creating and editing Draw.io UML class diagrams.
+drawio_cli.py — CLI for creating and editing Draw.io UML class and sequence diagrams.
+
+Class diagram: swimlanes, fields, methods, relationships, verify/fixups.
+
+Sequence diagram: ``sequence-init`` (copy domain-realization template), ``sequence-add-lifeline``,
+``sequence-add-sync`` / ``sequence-add-return`` (messages between lifelines), ``sequence-list``.
+See ``content/parts/library/sequence-diagrams.md``.
 
 Follows Jeff's OOAD notation style as documented in the class-diagrams video:
   - swimlane classes with bold name header
@@ -13,6 +19,10 @@ Follows Jeff's OOAD notation style as documented in the class-diagrams video:
 Usage:
   python drawio_cli.py COMMAND [OPTIONS] --file DIAGRAM.drawio
 
+AI-assisted review: ``diagnose --format json`` prints overlap geometry, verify
+codes (V1–V6), and ``suggested_cli`` — paste into a chat so the model can pick
+fixes (``relayout``, ``routing-optimize``, or individual ``fix-*`` commands).
+
 Run `python drawio_cli.py --help` or `python drawio_cli.py COMMAND --help`
 for details.
 """
@@ -20,6 +30,8 @@ for details.
 import argparse
 import json
 import os
+import re
+import shutil
 import sys
 import uuid
 import xml.etree.ElementTree as ET
@@ -76,6 +88,21 @@ OBJECT_STYLE = (
     "verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;"
 )
 
+# Sequence diagram (matches templates/domain realization template.drawio)
+SEQ_LIFELINE_STYLE = (
+    "shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;"
+    "container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;"
+    'portConstraint=eastwest;newEdgeStyle={"curved":0,"rounded":0};'
+)
+SEQ_SYNC_MSG_STYLE = (
+    "html=1;verticalAlign=bottom;startArrow=oval;startFill=1;endArrow=block;"
+    "startSize=8;curved=0;rounded=0;fontSize=11;"
+)
+SEQ_RETURN_MSG_STYLE = (
+    "html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;curved=0;rounded=0;"
+)
+SEQ_EDGE_LABEL_STYLE = EDGE_LABEL_STYLE
+
 # ─── Layout constants ─────────────────────────────────────────────────────────
 
 DEFAULT_WIDTH      = 200
@@ -87,6 +114,13 @@ GRID_COL_SPACING   = 80   # horizontal gap between columns
 GRID_ROW_SPACING   = 60   # vertical gap between rows
 START_X            = 100
 START_Y            = 100
+
+# Sequence layout (lifeline boxes)
+SEQ_START_X        = 80
+SEQ_START_Y        = 100
+SEQ_LIFELINE_W     = 100
+SEQ_LIFELINE_H     = 450
+SEQ_LIFELINE_GAP_X = 120
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -111,6 +145,72 @@ def load_diagram(path):
 def save_diagram(tree, path):
     ET.indent(tree.getroot(), space="  ")
     tree.write(path, encoding="utf-8", xml_declaration=True)
+
+
+def segment_intersects_rect(x1, y1, x2, y2, rx, ry, rw, rh):
+    """True if segment (x1,y1)→(x2,y2) intersects axis-aligned rectangle [rx,rx+rw]×[ry,ry+rh]."""
+    rx2, ry2 = rx + rw, ry + rh
+
+    def _in(px, py):
+        return rx < px < rx2 and ry < py < ry2
+
+    if _in(x1, y1) or _in(x2, y2):
+        return True
+    dx, dy = x2 - x1, y2 - y1
+    for sx1, sy1, sx2, sy2 in [
+        (rx, ry, rx2, ry),
+        (rx, ry2, rx2, ry2),
+        (rx, ry, rx, ry2),
+        (rx2, ry, rx2, ry2),
+    ]:
+        dxs, dys = sx2 - sx1, sy2 - sy1
+        cross = dx * dys - dy * dxs
+        if abs(cross) < 1e-10:
+            continue
+        t = ((sx1 - x1) * dys - (sy1 - y1) * dxs) / cross
+        u = ((sx1 - x1) * dy - (sy1 - y1) * dx) / cross
+        if 0.0 <= t <= 1.0 and 0.0 <= u <= 1.0:
+            return True
+    return False
+
+
+def find_class_bbox_overlaps(classes):
+    """
+    Return overlapping class pairs (for AI / diagnose).
+
+    Each item: a, b, overlap_w, overlap_h, box_a, box_b (dicts with x,y,w,h).
+    """
+    boxes = []
+    for name, cls in classes.items():
+        g = cls.find("mxGeometry")
+        if g is None:
+            continue
+        boxes.append(
+            (
+                name,
+                float(g.get("x", 0)),
+                float(g.get("y", 0)),
+                float(g.get("width", DEFAULT_WIDTH)),
+                float(g.get("height", 100)),
+            )
+        )
+    out = []
+    for i, (n1, x1, y1, w1, h1) in enumerate(boxes):
+        for n2, x2, y2, w2, h2 in boxes[i + 1 :]:
+            if x1 < x2 + w2 and x1 + w1 > x2 and y1 < y2 + h2 and y1 + h1 > y2:
+                overlap_w = min(x1 + w1, x2 + w2) - max(x1, x2)
+                overlap_h = min(y1 + h1, y2 + h2) - max(y1, y2)
+                out.append(
+                    {
+                        "a": n1,
+                        "b": n2,
+                        "overlap_w": int(overlap_w),
+                        "overlap_h": int(overlap_h),
+                        "box_a": {"x": x1, "y": y1, "w": w1, "h": h1},
+                        "box_b": {"x": x2, "y": y2, "w": w2, "h": h2},
+                    }
+                )
+    return out
 
 
 def create_new_diagram(path):
@@ -181,6 +281,111 @@ def find_class(root, class_name):
         available = ", ".join(sorted(classes.keys())) or "(none)"
         raise KeyError(f"Class '{class_name}' not found. Available: {available}")
     return classes[class_name]
+
+
+def _lifeline_label_plain(value):
+    """Strip HTML from lifeline cell value for matching (e.g. obj:Class)."""
+    if not value:
+        return ""
+    v = unescape(value)
+    v = re.sub(r"<[^>]+>", " ", v)
+    return " ".join(v.split()).strip()
+
+
+def _iter_lifeline_cells(root):
+    """Yield mxCell elements that are UML lifeline shapes."""
+    for cell in root.findall("mxCell"):
+        if cell.get("vertex") != "1":
+            continue
+        st = cell.get("style", "")
+        if "umlLifeline" in st:
+            yield cell
+
+
+def _lifeline_entries(root):
+    """List of (plain_label, cell) for all lifelines with non-empty labels."""
+    out = []
+    for cell in _iter_lifeline_cells(root):
+        plain = _lifeline_label_plain(cell.get("value", ""))
+        if plain:
+            out.append((plain, cell))
+    return out
+
+
+def find_lifeline(root, spec):
+    """Find a lifeline by exact label or unique partial match. Raises KeyError."""
+    spec = (spec or "").strip()
+    entries = _lifeline_entries(root)
+    if not entries:
+        raise KeyError("No lifelines found in diagram. Use sequence-add-lifeline or sequence-init.")
+
+    for plain, cell in entries:
+        if plain == spec:
+            return cell
+
+    matches = []
+    for plain, cell in entries:
+        if spec in plain or plain in spec:
+            matches.append((plain, cell))
+    if len(matches) == 1:
+        return matches[0][1]
+    if not matches:
+        avail = ", ".join(p for p, _ in entries)
+        raise KeyError(f"Lifeline '{spec}' not found. Available: {avail}")
+    names = [m[0] for m in matches]
+    raise KeyError(f"Ambiguous lifeline '{spec}'. Matches: {names}")
+
+
+def _next_lifeline_xy(root):
+    """Return (x, y) for a new lifeline to the right of existing lifelines."""
+    max_right = 0.0
+    found = False
+    for cell in _iter_lifeline_cells(root):
+        g = cell.find("mxGeometry")
+        if g is None:
+            continue
+        found = True
+        x = float(g.get("x", 0))
+        w = float(g.get("width", SEQ_LIFELINE_W))
+        max_right = max(max_right, x + w)
+    if not found:
+        return SEQ_START_X, SEQ_START_Y
+    return int(max_right + SEQ_LIFELINE_GAP_X), SEQ_START_Y
+
+
+def _add_sequence_message_edge(root, source_cell, target_cell, style, label=None):
+    """Directed message edge between two lifeline cells (sync or return style)."""
+    edge_id = new_id()
+    edge = ET.SubElement(root, "mxCell")
+    edge.set("id", edge_id)
+    edge.set("value", "")
+    edge.set("style", style)
+    edge.set("edge", "1")
+    edge.set("parent", "1")
+    edge.set("source", source_cell.get("id"))
+    edge.set("target", target_cell.get("id"))
+    ET.SubElement(edge, "mxGeometry").set("as", "geometry")
+
+    if label:
+        lbl = ET.SubElement(root, "mxCell")
+        lbl.set("id", new_id())
+        lbl.set("value", label)
+        lbl.set("style", SEQ_EDGE_LABEL_STYLE)
+        lbl.set("vertex", "1")
+        lbl.set("connectable", "0")
+        lbl.set("parent", edge_id)
+        lg = ET.SubElement(lbl, "mxGeometry")
+        lg.set("x", "0")
+        lg.set("y", "0")
+        lg.set("relative", "1")
+        lg.set("as", "geometry")
+
+    return edge_id
+
+
+def _abd_ooad_template_path():
+    """Path to ``domain realization template.drawio`` next to this skill."""
+    return Path(__file__).resolve().parent.parent / "templates" / "domain realization template.drawio"
 
 
 def find_field_row(root, class_name, field_text):
@@ -466,67 +671,53 @@ def cmd_relayout(args):
     print(f"✓ Hierarchical relayout: {len(classes)} classes across {n_levels} depth levels.")
 
 
-# ─── Verify ───────────────────────────────────────────────────────────────────
+# ─── Verify / diagnose ───────────────────────────────────────────────────────
 
-def cmd_verify(args):
+
+def collect_diagram_issues(root, classes, id_to_name):
     """
-    Audit a diagram for layout and style problems.
+    Run all verify checks; return a list of issue dicts (code, severity, msg, detail).
 
-    Checks performed (with XML-level detail so issues are unambiguous):
-
-    V1  CLASS OVERLAP      — two class bounding boxes intersect
-    V2  PARENT ABOVE CHILD — a subclass has lower y than its superclass
-                             (child should be BELOW parent on the canvas)
-    V3  EDGE STYLE         — inheritance must NOT have edgeStyle= (straight
-                             diagonal lines); structural edges (association,
-                             composition, aggregation) MUST have
-                             edgeStyle=orthogonalEdgeStyle
-    V4  WAYPOINTS          — edges with explicit <Array as="points"> waypoints
-                             may produce unnecessary bends; flag them
-
-    Exit code 0 = clean, 1 = issues found (useful for scripting).
-    Pass --fix to automatically apply what can be fixed programmatically
-    (overlap → relayout, edge styles → rewrite style strings).
-    Waypoints and direction issues require relayout to fix.
+    Used by ``verify`` and ``diagnose`` (JSON for AI). See also
+    :func:`find_class_bbox_overlaps` for raw overlap geometry.
     """
-    tree, root = load_diagram(args.file)
-    classes = get_all_classes(root)
-    id_to_name = {v.get("id"): k for k, v in classes.items()}
-
     issues = []
 
     # ── V1: Class bounding-box overlaps ──────────────────────────────────────
-    # Two rects overlap iff:
-    #   A.x < B.x+B.w  AND  A.x+A.w > B.x
-    #   A.y < B.y+B.h  AND  A.y+A.h > B.y
-    boxes = []
-    for name, cls in classes.items():
-        g = cls.find("mxGeometry")
-        if g is None:
-            continue
-        boxes.append((name,
-                       float(g.get("x", 0)),  float(g.get("y", 0)),
-                       float(g.get("width", DEFAULT_WIDTH)),
-                       float(g.get("height", 100))))
-
-    for i, (n1, x1, y1, w1, h1) in enumerate(boxes):
-        for n2, x2, y2, w2, h2 in boxes[i+1:]:
-            if x1 < x2+w2 and x1+w1 > x2 and y1 < y2+h2 and y1+h1 > y2:
-                overlap_w = min(x1+w1, x2+w2) - max(x1, x2)
-                overlap_h = min(y1+h1, y2+h2) - max(y1, y2)
-                issues.append({
-                    "code": "V1",
-                    "severity": "ERROR",
-                    "msg": (f"CLASS OVERLAP: '{n1}' and '{n2}' overlap by "
-                            f"{int(overlap_w)}×{int(overlap_h)}px"),
-                    "detail": (f"  {n1}: x={int(x1)} y={int(y1)} "
-                               f"w={int(w1)} h={int(h1)} "
-                               f"→ right={int(x1+w1)} bottom={int(y1+h1)}\n"
-                               f"  {n2}: x={int(x2)} y={int(y2)} "
-                               f"w={int(w2)} h={int(h2)} "
-                               f"→ right={int(x2+w2)} bottom={int(y2+h2)}\n"
-                               f"  Fix: run `relayout`"),
-                })
+    for o in find_class_bbox_overlaps(classes):
+        n1, n2 = o["a"], o["b"]
+        x1, y1, w1, h1 = (
+            o["box_a"]["x"],
+            o["box_a"]["y"],
+            o["box_a"]["w"],
+            o["box_a"]["h"],
+        )
+        x2, y2, w2, h2 = (
+            o["box_b"]["x"],
+            o["box_b"]["y"],
+            o["box_b"]["w"],
+            o["box_b"]["h"],
+        )
+        overlap_w, overlap_h = o["overlap_w"], o["overlap_h"]
+        issues.append(
+            {
+                "code": "V1",
+                "severity": "ERROR",
+                "msg": (
+                    f"CLASS OVERLAP: '{n1}' and '{n2}' overlap by "
+                    f"{int(overlap_w)}×{int(overlap_h)}px"
+                ),
+                "detail": (
+                    f"  {n1}: x={int(x1)} y={int(y1)} "
+                    f"w={int(w1)} h={int(h1)} "
+                    f"→ right={int(x1+w1)} bottom={int(y1+h1)}\n"
+                    f"  {n2}: x={int(x2)} y={int(y2)} "
+                    f"w={int(w2)} h={int(h2)} "
+                    f"→ right={int(x2+w2)} bottom={int(y2+h2)}\n"
+                    f"  Fix: run `relayout`"
+                ),
+            }
+        )
 
     # ── V2: Parent should be above (lower y) than child ───────────────────────
     parent_of, _ = _build_inheritance_graph(root, classes)
@@ -683,28 +874,6 @@ def cmd_verify(args):
     # For edges without orthogonal routing (straight dependencies), the path is
     # approximated as a line segment from source center to target center.
     # Flag any third class whose bounding box that segment crosses.
-    def _seg_rect_intersects(x1, y1, x2, y2, rx, ry, rw, rh):
-        """True if segment P1–P2 crosses the axis-aligned rectangle."""
-        rx2, ry2 = rx + rw, ry + rh
-        def _in(px, py):
-            return rx < px < rx2 and ry < py < ry2
-        if _in(x1, y1) or _in(x2, y2):
-            return True
-        dx, dy = x2 - x1, y2 - y1
-        for sx1, sy1, sx2, sy2 in [
-            (rx, ry, rx2, ry), (rx, ry2, rx2, ry2),
-            (rx, ry, rx, ry2), (rx2, ry, rx2, ry2),
-        ]:
-            dxs, dys = sx2 - sx1, sy2 - sy1
-            cross = dx * dys - dy * dxs
-            if abs(cross) < 1e-10:
-                continue
-            t = ((sx1 - x1) * dys - (sy1 - y1) * dxs) / cross
-            u = ((sx1 - x1) * dy  - (sy1 - y1) * dx)  / cross
-            if 0.0 <= t <= 1.0 and 0.0 <= u <= 1.0:
-                return True
-        return False
-
     _box_map = {}
     for name, cls in classes.items():
         g = cls.find("mxGeometry")
@@ -761,7 +930,7 @@ def cmd_verify(args):
             for other, (ox, oy, ow, oh) in _box_map.items():
                 if other in (src_name, tgt_name):
                     continue
-                if _seg_rect_intersects(p1x, p1y, p2x, p2y,
+                if segment_intersects_rect(p1x, p1y, p2x, p2y,
                                         ox + MARGIN, oy + MARGIN,
                                         ow - 2 * MARGIN, oh - 2 * MARGIN):
                     blockers.add(other)
@@ -778,33 +947,148 @@ def cmd_verify(args):
                            f"shortest bypass waypoint around the blocking class."),
             })
 
-    # ── Report ────────────────────────────────────────────────────────────────
-    errors   = [i for i in issues if i["severity"] == "ERROR"]
+    return issues
+
+
+def cmd_verify(args):
+    """
+    Audit a diagram for layout and style problems.
+
+    Checks performed (with XML-level detail so issues are unambiguous):
+
+    V1  CLASS OVERLAP      — two class bounding boxes intersect
+    V2  PARENT ABOVE CHILD — a subclass has lower y than its superclass
+    V3  EDGE STYLE         — inheritance vs orthogonal structural edges
+    V4  WAYPOINTS          — explicit waypoints may add bends
+    V5  SHARED ENDPOINT    — multiple edges without port constraints
+    V6  ARROW OVERLAP      — straight edges through unrelated classes
+
+    Exit code 0 = clean, 1 = ERROR-level issues found.
+    """
+    tree, root = load_diagram(args.file)
+    classes = get_all_classes(root)
+    id_to_name = {v.get("id"): k for k, v in classes.items()}
+    issues = collect_diagram_issues(root, classes, id_to_name)
+
+    errors = [i for i in issues if i["severity"] == "ERROR"]
     warnings = [i for i in issues if i["severity"] == "WARN"]
-    infos    = [i for i in issues if i["severity"] == "INFO"]
+    infos = [i for i in issues if i["severity"] == "INFO"]
 
     if not issues:
-        print(f"✓ Diagram looks clean — no overlaps, correct edge styles, "
-              f"parents above children.")
+        print(
+            f"✓ Diagram looks clean — no overlaps, correct edge styles, "
+            f"parents above children."
+        )
         return
 
     print(f"\n{'='*64}")
     print(f"Verify: {args.file}")
     print(f"{'='*64}")
-    print(f"  {len(errors)} error(s)   {len(warnings)} warning(s)   {len(infos)} info(s)\n")
+    print(
+        f"  {len(errors)} error(s)   {len(warnings)} warning(s)   "
+        f"{len(infos)} info(s)\n"
+    )
 
+    verbose = getattr(args, "verbose", False)
     for issue in issues:
         icon = {"ERROR": "✗", "WARN": "⚠", "INFO": "ℹ"}[issue["severity"]]
         print(f"{icon} [{issue['code']}] {issue['msg']}")
-        if args.verbose if hasattr(args, "verbose") else False:
+        if verbose:
             print(issue["detail"])
             print()
 
-    if not (args.verbose if hasattr(args, "verbose") else False):
+    if not verbose:
         print("\n(run with --verbose for XML-level detail and fix suggestions)")
 
     if errors:
         sys.exit(1)
+
+
+def cmd_diagnose(args):
+    """
+    Emit structured diagram analysis for humans and AI assistants.
+
+    Includes :func:`find_class_bbox_overlaps` geometry, verify issue codes,
+    suggested ``drawio_cli`` commands, and a short ``ai_brief`` you can paste
+    into a chat so the model can reason about fixes (layout vs routing).
+    """
+    tree, root = load_diagram(args.file)
+    classes = get_all_classes(root)
+    id_to_name = {v.get("id"): k for k, v in classes.items()}
+    issues = collect_diagram_issues(root, classes, id_to_name)
+    overlaps = find_class_bbox_overlaps(classes)
+
+    class_boxes = {}
+    if getattr(args, "include_bboxes", False):
+        for name, cls in classes.items():
+            g = cls.find("mxGeometry")
+            if g is None:
+                continue
+            class_boxes[name] = {
+                "x": float(g.get("x", 0)),
+                "y": float(g.get("y", 0)),
+                "w": float(g.get("width", DEFAULT_WIDTH)),
+                "h": float(g.get("height", 100)),
+            }
+
+    codes = {i["code"] for i in issues}
+    suggested = []
+    if "V1" in codes or "V2" in codes:
+        suggested.append(
+            "python drawio_cli.py --file FILE relayout --hgap 120 --vgap 100"
+        )
+    if codes & {"V3", "V4", "V5", "V6"}:
+        suggested.append(
+            "python drawio_cli.py --file FILE routing-optimize --passes 3"
+        )
+        suggested.append(
+            "(alternatives: fix-edge-styles, fix-shared-endpoints, "
+            "fix-duplicate-ports, fix-orthogonal-obstacles, fix-arrow-overlaps)"
+        )
+
+    summary = {
+        "errors": sum(1 for i in issues if i["severity"] == "ERROR"),
+        "warnings": sum(1 for i in issues if i["severity"] == "WARN"),
+        "infos": sum(1 for i in issues if i["severity"] == "INFO"),
+        "codes_present": sorted(codes),
+    }
+
+    ai_brief = (
+        "Draw.io class diagram diagnosis. "
+        "V1/V2 are layout (class boxes): prefer relayout or manual nudge using "
+        "class_boxes / find_class_bbox_overlaps. "
+        "V3–V6 are edges: run routing-optimize or individual fix-* commands. "
+        "AI should read `issues` and `overlap_pairs`, choose automated CLI fixes "
+        "first, then suggest manual class moves in Draw.io if errors remain."
+    )
+
+    payload = {
+        "file": os.path.abspath(args.file),
+        "summary": summary,
+        "overlap_pairs": overlaps,
+        "issues": issues,
+        "suggested_cli": suggested,
+        "ai_brief": ai_brief,
+    }
+    if class_boxes:
+        payload["class_boxes"] = class_boxes
+
+    fmt = getattr(args, "format", "json") or "json"
+    if fmt == "json":
+        print(json.dumps(payload, indent=2))
+    else:
+        print(f"File: {payload['file']}")
+        print(f"Summary: {summary}")
+        print(f"Overlaps: {len(overlaps)} pair(s)")
+        for o in overlaps:
+            print(f"  {o['a']} / {o['b']}  ({o['overlap_w']}×{o['overlap_h']} px)")
+        print(f"Issues: {len(issues)}")
+        for i in issues:
+            print(f"  [{i['code']}] {i['severity']}: {i['msg']}")
+        print("Suggested CLI:")
+        for s in suggested:
+            print(f"  {s}")
+        print(f"\n{ai_brief}")
 
 
 def cmd_fix_edge_styles(args):
@@ -1064,27 +1348,6 @@ def cmd_fix_arrow_overlaps(args):
                              float(g.get("width",  DEFAULT_WIDTH)),
                              float(g.get("height", 100)))
 
-    def _seg_rect_intersects(x1, y1, x2, y2, rx, ry, rw, rh):
-        rx2, ry2 = rx + rw, ry + rh
-        def _in(px, py):
-            return rx < px < rx2 and ry < py < ry2
-        if _in(x1, y1) or _in(x2, y2):
-            return True
-        dx, dy = x2 - x1, y2 - y1
-        for sx1, sy1, sx2, sy2 in [
-            (rx, ry, rx2, ry), (rx, ry2, rx2, ry2),
-            (rx, ry, rx, ry2), (rx2, ry, rx2, ry2),
-        ]:
-            dxs, dys = sx2 - sx1, sy2 - sy1
-            cross = dx * dys - dy * dxs
-            if abs(cross) < 1e-10:
-                continue
-            t = ((sx1 - x1) * dys - (sy1 - y1) * dxs) / cross
-            u = ((sx1 - x1) * dy  - (sy1 - y1) * dx)  / cross
-            if 0.0 <= t <= 1.0 and 0.0 <= u <= 1.0:
-                return True
-        return False
-
     fixed = 0
 
     for cell in root.findall("mxCell"):
@@ -1114,7 +1377,7 @@ def cmd_fix_arrow_overlaps(args):
             (bname, box_map[bname])
             for bname in box_map
             if bname not in (src_name, tgt_name)
-            and _seg_rect_intersects(
+            and segment_intersects_rect(
                 scx, scy, tcx, tcy,
                 box_map[bname][0] + DETECT_MARGIN,
                 box_map[bname][1] + DETECT_MARGIN,
@@ -1154,7 +1417,7 @@ def cmd_fix_arrow_overlaps(args):
                 oh2 = oh - 2 * shrink
                 if ow2 <= 0 or oh2 <= 0:
                     continue
-                if _seg_rect_intersects(ax, ay, bx, by,
+                if segment_intersects_rect(ax, ay, bx, by,
                                         ox + shrink, oy + shrink, ow2, oh2):
                     return False
             return True
@@ -1189,7 +1452,7 @@ def cmd_fix_arrow_overlaps(args):
                 oh2 = oh - 2 * shrink
                 if ow2 <= 0 or oh2 <= 0:
                     continue
-                if _seg_rect_intersects(ax, ay, bx, by,
+                if segment_intersects_rect(ax, ay, bx, by,
                                         ox + shrink, oy + shrink, ow2, oh2):
                     # project blocker centre onto segment to get t
                     bcx2 = ox + ow / 2
@@ -1271,7 +1534,424 @@ def cmd_fix_arrow_overlaps(args):
     print(f"✓ fix-arrow-overlaps: added {fixed} bypass waypoint(s).")
 
 
+def cmd_fix_duplicate_ports(args):
+    """
+    When two or more edges share the exact same (target, entryX, entryY) or
+    (source, exitX, exitY), spread ports along that side so arrows do not
+    attach at identical points.
+    """
+    from collections import defaultdict as _dd
+
+    tree, root = load_diagram(args.file)
+    classes = get_all_classes(root)
+    id_to_name = {v.get("id"): k for k, v in classes.items()}
+
+    def _bbox(cls_name):
+        cls = classes.get(cls_name)
+        if cls is None:
+            return None
+        g = cls.find("mxGeometry")
+        if g is None:
+            return None
+        return (float(g.get("x", 0)), float(g.get("y", 0)),
+                float(g.get("width", DEFAULT_WIDTH)),
+                float(g.get("height", 100)))
+
+    def _center(cls_name):
+        bb = _bbox(cls_name)
+        if bb is None:
+            return 0.0, 0.0
+        x, y, w, h = bb
+        return x + w / 2, y + h / 2
+
+    def _strip_port(style, prefix):
+        style = re.sub(rf"{prefix}[XY]=[^;]+;?", "", style)
+        style = re.sub(rf"{prefix}D[xy]=[^;]+;?", "", style)
+        return style.replace(";;", ";").strip(";")
+
+    def _entry_tokens(idx, n, side):
+        frac = round((idx + 1) / (n + 1), 3)
+        if side == "bottom":
+            return f"entryX={frac};entryY=1;entryDx=0;entryDy=0;"
+        if side == "top":
+            return f"entryX={frac};entryY=0;entryDx=0;entryDy=0;"
+        if side == "left":
+            return f"entryX=0;entryY={frac};entryDx=0;entryDy=0;"
+        return f"entryX=1;entryY={frac};entryDx=0;entryDy=0;"
+
+    def _exit_tokens(idx, n, side):
+        frac = round((idx + 1) / (n + 1), 3)
+        if side == "top":
+            return f"exitX={frac};exitY=0;exitDx=0;exitDy=0;"
+        if side == "bottom":
+            return f"exitX={frac};exitY=1;exitDx=0;exitDy=0;"
+        if side == "left":
+            return f"exitX=0;exitY={frac};exitDx=0;exitDy=0;"
+        return f"exitX=1;exitY={frac};exitDx=0;exitDy=0;"
+
+    def _parse_entry(style):
+        mx = re.search(r"entryX=([0-9.]+)", style)
+        my = re.search(r"entryY=([0-9.]+)", style)
+        if not mx or not my:
+            return None
+        return float(mx.group(1)), float(my.group(1))
+
+    def _parse_exit(style):
+        mx = re.search(r"exitX=([0-9.]+)", style)
+        my = re.search(r"exitY=([0-9.]+)", style)
+        if not mx or not my:
+            return None
+        return float(mx.group(1)), float(my.group(1))
+
+    def _side_from_entry(ex, ey):
+        if abs(ey - 1) < 0.01:
+            return "bottom", 0
+        if abs(ey) < 0.01:
+            return "top", 0
+        if abs(ex) < 0.01:
+            return "left", 1
+        if abs(ex - 1) < 0.01:
+            return "right", 1
+        return "bottom", 0
+
+    def _side_from_exit(ex, ey):
+        if abs(ey) < 0.01:
+            return "top", 0
+        if abs(ey - 1) < 0.01:
+            return "bottom", 0
+        if abs(ex) < 0.01:
+            return "left", 1
+        if abs(ex - 1) < 0.01:
+            return "right", 1
+        return "top", 0
+
+    fixed = 0
+
+    entry_groups = _dd(list)
+    for cell in root.findall("mxCell"):
+        if cell.get("edge") != "1":
+            continue
+        tgt = cell.get("target", "")
+        if not tgt or tgt not in id_to_name:
+            continue
+        pe = _parse_entry(cell.get("style", ""))
+        if pe is None:
+            continue
+        ex, ey = pe
+        entry_groups[(tgt, round(ex, 2), round(ey, 2))].append(cell)
+
+    for (tgt_id, rex, rey), cells in entry_groups.items():
+        if len(cells) < 2:
+            continue
+        side, axis = _side_from_entry(rex, rey)
+        tgt_name = id_to_name[tgt_id]
+        sorted_cells = sorted(
+            cells,
+            key=lambda c: _center(id_to_name.get(c.get("source", ""), ""))[axis],
+        )
+        n = len(sorted_cells)
+        for idx, cell in enumerate(sorted_cells):
+            base = _strip_port(cell.get("style", ""), "entry")
+            cell.set("style", base + ";" + _entry_tokens(idx, n, side))
+            fixed += 1
+        print(f"  ✓ de-duped {n} entry ports on '{tgt_name}' (was {rex},{rey})")
+
+    exit_groups = _dd(list)
+    for cell in root.findall("mxCell"):
+        if cell.get("edge") != "1":
+            continue
+        src = cell.get("source", "")
+        if not src or src not in id_to_name:
+            continue
+        pe = _parse_exit(cell.get("style", ""))
+        if pe is None:
+            continue
+        ex, ey = pe
+        exit_groups[(src, round(ex, 2), round(ey, 2))].append(cell)
+
+    for (src_id, rex, rey), cells in exit_groups.items():
+        if len(cells) < 2:
+            continue
+        side, axis = _side_from_exit(rex, rey)
+        src_name = id_to_name[src_id]
+        sorted_cells = sorted(
+            cells,
+            key=lambda c: _center(id_to_name.get(c.get("target", ""), ""))[axis],
+        )
+        n = len(sorted_cells)
+        for idx, cell in enumerate(sorted_cells):
+            base = _strip_port(cell.get("style", ""), "exit")
+            cell.set("style", base + ";" + _exit_tokens(idx, n, side))
+            fixed += 1
+        print(f"  ✓ de-duped {n} exit ports from '{src_name}' (was {rex},{rey})")
+
+    save_diagram(tree, args.file)
+    print(f"✓ fix-duplicate-ports: adjusted {fixed} edge(s).")
+
+
+def cmd_fix_orthogonal_obstacles(args):
+    """
+    For orthogonal edges, insert explicit waypoints so an axis-aligned
+    approximation of the route (L- or Z-shaped) minimizes crossings through
+    unrelated class boxes. Complements fix-arrow-overlaps (straight edges only).
+    """
+    import math as _math
+
+    DETECT_MARGIN = 5
+
+    tree, root = load_diagram(args.file)
+    classes = get_all_classes(root)
+    id_to_name = {v.get("id"): k for k, v in classes.items()}
+
+    box_map = {}
+    for name, cls in classes.items():
+        g = cls.find("mxGeometry")
+        if g is not None:
+            box_map[name] = (float(g.get("x", 0)), float(g.get("y", 0)),
+                             float(g.get("width", DEFAULT_WIDTH)),
+                             float(g.get("height", 100)))
+
+    def _fport(style, key, default=0.5):
+        m = re.search(rf"{key}=([0-9.]+)", style)
+        return float(m.group(1)) if m else default
+
+    def _infer_ports(style, sbb, tbb):
+        sx, sy, sw, sh = sbb
+        tx, ty, tw, th = tbb
+        scx, scy = sx + sw / 2, sy + sh / 2
+        tcx, tcy = tx + tw / 2, ty + th / 2
+        dx, dy = tcx - scx, tcy - scy
+        if abs(dx) >= abs(dy):
+            ex, ey = (1.0, 0.5) if dx > 0 else (0.0, 0.5)
+            ix, iy = (0.0, 0.5) if dx > 0 else (1.0, 0.5)
+        else:
+            ex, ey = (0.5, 1.0) if dy > 0 else (0.5, 0.0)
+            ix, iy = (0.5, 0.0) if dy > 0 else (0.5, 1.0)
+        if "exitX=" in style:
+            ex, ey = _fport(style, "exitX"), _fport(style, "exitY")
+        if "entryX=" in style:
+            ix, iy = _fport(style, "entryX"), _fport(style, "entryY")
+        return ex, ey, ix, iy
+
+    def _pt(bb, nx, ny):
+        x, y, w, h = bb
+        return x + nx * w, y + ny * h
+
+    def _count_hits(segments, excl):
+        n = 0
+        for x1, y1, x2, y2 in segments:
+            for oname, (ox, oy, ow, oh) in box_map.items():
+                if oname in excl:
+                    continue
+                ow2, oh2 = ow - 2 * DETECT_MARGIN, oh - 2 * DETECT_MARGIN
+                if ow2 <= 0 or oh2 <= 0:
+                    continue
+                if segment_intersects_rect(
+                    x1, y1, x2, y2,
+                    ox + DETECT_MARGIN, oy + DETECT_MARGIN, ow2, oh2,
+                ):
+                    n += 1
+        return n
+
+    def _path_len(segments):
+        return sum(
+            _math.hypot(x2 - x1, y2 - y1)
+            for x1, y1, x2, y2 in segments
+        )
+
+    def _segments_for_waypoints(p0, p3, wpts):
+        pts = [p0] + list(wpts) + [p3]
+        out = []
+        for i in range(len(pts) - 1):
+            a, b = pts[i], pts[i + 1]
+            out.append((a[0], a[1], b[0], b[1]))
+        return out
+
+    fixed = 0
+    for cell in root.findall("mxCell"):
+        if cell.get("edge") != "1":
+            continue
+        src_id = cell.get("source", "")
+        tgt_id = cell.get("target", "")
+        if not src_id or not tgt_id:
+            continue
+        src_name = id_to_name.get(src_id)
+        tgt_name = id_to_name.get(tgt_id)
+        if src_name is None or tgt_name is None:
+            continue
+        if src_name not in box_map or tgt_name not in box_map:
+            continue
+        style = cell.get("style", "")
+        if "edgeStyle=orthogonalEdgeStyle" not in style:
+            continue
+        if "dashed=1" in style and "block" in style and "diamondThin" not in style:
+            continue
+
+        sbb, tbb = box_map[src_name], box_map[tgt_name]
+        ex, ey, ix, iy = _infer_ports(style, sbb, tbb)
+        p0 = _pt(sbb, ex, ey)
+        p3 = _pt(tbb, ix, iy)
+        excl = {src_name, tgt_name}
+
+        segs_lh = [(p0[0], p0[1], p3[0], p0[1]), (p3[0], p0[1], p3[0], p3[1])]
+        segs_lv = [(p0[0], p0[1], p0[0], p3[1]), (p0[0], p3[1], p3[0], p3[1])]
+        if _count_hits(segs_lh, excl) == 0 and _count_hits(segs_lv, excl) == 0:
+            continue
+
+        mid_x = (p0[0] + p3[0]) / 2
+        mid_y = (p0[1] + p3[1]) / 2
+        candidates = [
+            ([(p3[0], p0[1])], "L-H"),
+            ([(p0[0], p3[1])], "L-V"),
+        ]
+        for ox in (0, 40, -40, 80, -80, 120, -120):
+            cx = mid_x + ox
+            candidates.append(([(cx, p0[1]), (cx, p3[1])], f"Z{ox}"))
+        for oy in (0, 40, -40, 80, -80, 120, -120):
+            cy = mid_y + oy
+            candidates.append(([(p0[0], cy), (p3[0], cy)], f"N{oy}"))
+
+        best = None
+        for wpts, tag in candidates:
+            segs = _segments_for_waypoints(p0, p3, wpts)
+            h = _count_hits(segs, excl)
+            L = _path_len(segs)
+            key = (h, L)
+            if best is None or key < best[0]:
+                best = (key, wpts, tag)
+
+        if best is None:
+            continue
+        (_, wpts, tag) = best
+
+        geo = cell.find("mxGeometry")
+        if geo is None:
+            geo = ET.SubElement(cell, "mxGeometry")
+            geo.set("relative", "1")
+            geo.set("as", "geometry")
+        existing = geo.find("Array[@as='points']")
+        if existing is not None:
+            geo.remove(existing)
+
+        pts = ET.SubElement(geo, "Array")
+        pts.set("as", "points")
+        for pwx, pwy in wpts:
+            pt = ET.SubElement(pts, "mxPoint")
+            pt.set("x", str(int(round(pwx))))
+            pt.set("y", str(int(round(pwy))))
+
+        fixed += 1
+        hits = best[0][0]
+        print(f"  ✓ {src_name}→{tgt_name}: orthogonal [{tag}] hits={hits}")
+
+    save_diagram(tree, args.file)
+    print(f"✓ fix-orthogonal-obstacles: updated {fixed} edge(s).")
+
+
+def cmd_routing_optimize(args):
+    """
+    Run multiple passes: edge styles (once), shared endpoints, duplicate ports,
+    orthogonal obstacle waypoints, straight-edge bypasses, then verify.
+    """
+    passes = getattr(args, "passes", None)
+    if passes is None or passes < 1:
+        passes = 3
+    for i in range(passes):
+        print(f"--- routing-optimize pass {i + 1}/{passes} ---")
+        if i == 0:
+            cmd_fix_edge_styles(args)
+        cmd_fix_shared_endpoints(args)
+        cmd_fix_duplicate_ports(args)
+        cmd_fix_orthogonal_obstacles(args)
+        cmd_fix_arrow_overlaps(args)
+    print("--- routing-optimize: verify ---")
+    cmd_verify(args)
+
+
 # ─── Commands ─────────────────────────────────────────────────────────────────
+
+def cmd_sequence_init(args):
+    """Copy the domain-realization sequence template into --file."""
+    src = _abd_ooad_template_path()
+    if not src.is_file():
+        raise FileNotFoundError(f"Template not found: {src}")
+    shutil.copy2(src, args.file)
+    print(f"✓ Initialized sequence diagram from template: {args.file}")
+
+
+def cmd_sequence_add_lifeline(args):
+    """Add a UML lifeline (object:Class label) to a sequence diagram."""
+    tree, root = load_diagram(args.file)
+    label = args.label.strip()
+    if not label:
+        raise ValueError("Lifeline label must not be empty.")
+
+    for plain, _cell in _lifeline_entries(root):
+        if plain == label:
+            print(f"⚠  Lifeline '{label}' already exists — skipping.")
+            return
+
+    nx, ny = _next_lifeline_xy(root)
+    x = args.x if args.x is not None else nx
+    y = args.y if args.y is not None else ny
+    w = args.width if args.width is not None else SEQ_LIFELINE_W
+    h = args.height if args.height is not None else SEQ_LIFELINE_H
+
+    cell_id = new_id()
+    cell = ET.SubElement(root, "mxCell")
+    cell.set("id", cell_id)
+    cell.set("value", label)
+    cell.set("style", SEQ_LIFELINE_STYLE)
+    cell.set("vertex", "1")
+    cell.set("parent", "1")
+    geo = ET.SubElement(cell, "mxGeometry")
+    geo.set("x", str(int(x)))
+    geo.set("y", str(int(y)))
+    geo.set("width", str(int(w)))
+    geo.set("height", str(int(h)))
+    geo.set("as", "geometry")
+
+    save_diagram(tree, args.file)
+    print(f"✓ Added lifeline: {label}")
+
+
+def cmd_sequence_add_sync(args):
+    """Add a synchronous call message (filled arrowhead) between lifelines."""
+    tree, root = load_diagram(args.file)
+    src = find_lifeline(root, args.from_lifeline)
+    tgt = find_lifeline(root, args.to_lifeline)
+    _add_sequence_message_edge(root, src, tgt, SEQ_SYNC_MSG_STYLE, label=args.label)
+    save_diagram(tree, args.file)
+    msg = f" {args.label}" if args.label else ""
+    print(f"✓ Added sync message: {args.from_lifeline} → {args.to_lifeline}{msg}")
+
+
+def cmd_sequence_add_return(args):
+    """Add a return message (dashed open arrow) between lifelines."""
+    tree, root = load_diagram(args.file)
+    src = find_lifeline(root, args.from_lifeline)
+    tgt = find_lifeline(root, args.to_lifeline)
+    _add_sequence_message_edge(root, src, tgt, SEQ_RETURN_MSG_STYLE, label=args.label)
+    save_diagram(tree, args.file)
+    msg = f" {args.label}" if args.label else ""
+    print(f"✓ Added return message: {args.from_lifeline} → {args.to_lifeline}{msg}")
+
+
+def cmd_sequence_list(args):
+    """List lifelines in a sequence (or mixed) diagram."""
+    tree, root = load_diagram(args.file)
+    entries = _lifeline_entries(root)
+    if not entries:
+        print("No lifelines (umlLifeline) found.")
+        return
+    print("Lifelines:")
+    for plain, cell in entries:
+        g = cell.find("mxGeometry")
+        pos = ""
+        if g is not None:
+            pos = f"  @ ({g.get('x', '?')}, {g.get('y', '?')})"
+        print(f"  • {plain}{pos}")
+
 
 def cmd_new(args):
     create_new_diagram(args.file)
@@ -1965,7 +2645,7 @@ def cmd_describe(args):
 def build_parser():
     parser = argparse.ArgumentParser(
         prog="drawio_cli.py",
-        description="Create and edit Draw.io UML class diagrams from the command line.",
+        description="Create and edit Draw.io UML class and sequence diagrams from the command line.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -1979,6 +2659,13 @@ Examples:
   python drawio_cli.py add-inheritance Car Vehicle --file vehicles.drawio
   python drawio_cli.py add-frame "Vehicles" --classes "Vehicle,Car,Wheel" --file vehicles.drawio
   python drawio_cli.py describe --file vehicles.drawio
+
+  # Sequence diagrams (from templates/domain realization template.drawio)
+  python drawio_cli.py sequence-init --file my-seq.drawio
+  python drawio_cli.py sequence-add-lifeline "cart:ShoppingCart" --file my-seq.drawio
+  python drawio_cli.py sequence-add-sync Initiator "cart:ShoppingCart" "addItem(i:Item)" --file my-seq.drawio
+  python drawio_cli.py sequence-add-return "cart:ShoppingCart" Initiator "ok" --file my-seq.drawio
+  python drawio_cli.py sequence-list --file my-seq.drawio
 """)
 
     parser.add_argument("--file", "-f", required=True, metavar="FILE",
@@ -1989,6 +2676,44 @@ Examples:
 
     # new
     p = sub.add_parser("new", help="Create a new empty .drawio diagram")
+
+    # sequence-init — copy domain realization template
+    p = sub.add_parser(
+        "sequence-init",
+        help="Initialize a sequence diagram by copying domain realization template.drawio",
+    )
+
+    # sequence-add-lifeline
+    p = sub.add_parser(
+        "sequence-add-lifeline",
+        help='Add a lifeline (label e.g. "obj:Class" or "Initiator")',
+    )
+    p.add_argument("label", help='Lifeline header text, e.g. "cart:ShoppingCart"')
+    p.add_argument("--x", type=int, help="X position (auto: to the right of existing lifelines)")
+    p.add_argument("--y", type=int, help="Y position (default from layout)")
+    p.add_argument("--width", type=int, help=f"Width (default {SEQ_LIFELINE_W})")
+    p.add_argument("--height", type=int, help=f"Height (default {SEQ_LIFELINE_H})")
+
+    # sequence-add-sync
+    p = sub.add_parser(
+        "sequence-add-sync",
+        help="Add synchronous call message (filled arrow) from source lifeline to target",
+    )
+    p.add_argument("from_lifeline", metavar="FROM", help="Source lifeline label (exact or unique partial)")
+    p.add_argument("to_lifeline", metavar="TO", help="Target lifeline label")
+    p.add_argument("label", nargs="?", default="", help="Message text on the arrow")
+
+    # sequence-add-return
+    p = sub.add_parser(
+        "sequence-add-return",
+        help="Add return message (dashed open arrow) from source lifeline to target",
+    )
+    p.add_argument("from_lifeline", metavar="FROM", help="Source lifeline (usually callee)")
+    p.add_argument("to_lifeline", metavar="TO", help="Target lifeline (usually caller)")
+    p.add_argument("label", nargs="?", default="", help="Optional return label")
+
+    # sequence-list
+    sub.add_parser("sequence-list", help="List lifelines in the diagram")
 
     # add-class
     p = sub.add_parser("add-class", help="Add a class to the diagram")
@@ -2118,6 +2843,24 @@ Examples:
     p.add_argument("--verbose", "-v", action="store_true",
                    help="Show XML-level detail and fix suggestions for each issue")
 
+    # diagnose — structured output for AI / tooling
+    p = sub.add_parser(
+        "diagnose",
+        help="JSON (or text) report: overlaps, verify codes, suggested CLI, ai_brief "
+             "for pasting into an AI chat.",
+    )
+    p.add_argument(
+        "--format",
+        choices=("json", "text"),
+        default="json",
+        help="Output format (default: json)",
+    )
+    p.add_argument(
+        "--include-bboxes",
+        action="store_true",
+        help="Include every class x,y,w,h in the JSON (for AI-assisted layout)",
+    )
+
     # fix-edge-styles
     sub.add_parser("fix-edge-styles",
         help="Fix V3/V4: add orthogonal routing to structural edges, "
@@ -2134,11 +2877,33 @@ Examples:
              "through an unrelated class — picks the shortest of 4 candidates "
              "(above / below / left / right of the blocking class).")
 
+    # fix-duplicate-ports
+    sub.add_parser("fix-duplicate-ports",
+        help="Spread entry/exit ports when multiple edges share the exact same "
+             "attachment coordinates on a class.")
+
+    # fix-orthogonal-obstacles
+    sub.add_parser("fix-orthogonal-obstacles",
+        help="Add L/Z-shaped waypoints on orthogonal edges when the default "
+             "L-route crosses unrelated class boxes.")
+
+    # routing-optimize
+    p = sub.add_parser("routing-optimize",
+        help="Multi-pass: fix-edge-styles (once), shared endpoints, duplicate "
+             "ports, orthogonal obstacles, arrow overlaps, then verify.")
+    p.add_argument("--passes", type=int, default=3, metavar="N",
+                   help="Number of optimization passes (default 3)")
+
     return parser
 
 
 COMMAND_MAP = {
     "new":              cmd_new,
+    "sequence-init":         cmd_sequence_init,
+    "sequence-add-lifeline": cmd_sequence_add_lifeline,
+    "sequence-add-sync":   cmd_sequence_add_sync,
+    "sequence-add-return": cmd_sequence_add_return,
+    "sequence-list":       cmd_sequence_list,
     "add-class":        cmd_add_class,
     "add-field":        cmd_add_field,
     "add-method":       cmd_add_method,
@@ -2155,9 +2920,13 @@ COMMAND_MAP = {
     "describe":         cmd_describe,
     "relayout":         cmd_relayout,
     "verify":                cmd_verify,
+    "diagnose":              cmd_diagnose,
     "fix-edge-styles":       cmd_fix_edge_styles,
     "fix-shared-endpoints":  cmd_fix_shared_endpoints,
     "fix-arrow-overlaps":    cmd_fix_arrow_overlaps,
+    "fix-duplicate-ports":   cmd_fix_duplicate_ports,
+    "fix-orthogonal-obstacles": cmd_fix_orthogonal_obstacles,
+    "routing-optimize":      cmd_routing_optimize,
 }
 
 

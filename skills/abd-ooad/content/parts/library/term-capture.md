@@ -82,7 +82,7 @@ Use `templates/terms-template.md` for the file format.
 | `State Candidate` | `State Candidate - states: {{list}} illegal transitions: {{list}}` | model-state-transitions |
 | `Bloat Signal` | `Bloat Signal - {{what_clusters_are_mixed}} suggest: {{extract}}` | watch-for-bloated-classes |
 | `Role Separation` | `Role Separation - {{merged_role}} splits into: {{role_a}}, {{role_b}}` | smashed-abstractions-and-hidden-roles |
-| `Cohesion Group` | `Cohesion Group - {{group_name}} changes with: {{related_terms}}` | what-changes-together |
+| `Cohesion Group` | `Cohesion Group - {{group_name}} changes with: {{related_terms}}` | design-bounded-contexts |
 | `Scenario Gap` | `Scenario Gap - {{scenario}} exposes: {{missing_responsibility_or_operation}}` | validate-with-scenarios |
 | `Promoted` | `Promoted - {{from_target}} → {{to_target}} {{reason}}` — e.g. Property → Class when a property warrants its own type | properties-and-operations, refine-names, any |
 | `Rejected` | `Rejected - {{why_not_modelled}}` | any |

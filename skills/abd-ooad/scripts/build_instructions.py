@@ -36,7 +36,7 @@ PART_FILES = [
     "abstract-classes-and-interfaces.md",
     "smashed-abstractions-and-hidden-roles.md",
     "watch-for-bloated-classes.md",
-    "what-changes-together.md",
+    "design-bounded-contexts.md",
     "tension-as-a-signal.md",
     "add-properties-semantically-tight.md",
     "turn-verbs-into-operations.md",

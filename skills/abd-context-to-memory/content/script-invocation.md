@@ -4,17 +4,34 @@ Run from workspace root.
 
 ## index_memory.py
 
-Full pipeline: convert → chunk → embed.
+Full pipeline: convert → draft spec → chunk → embed.
 
 ```bash
 python scripts/index_memory.py --path <source_folder>
 python scripts/index_memory.py --path <source_folder> --skip-convert
+python scripts/index_memory.py --path <source_folder> --skip-spec
+python scripts/index_memory.py --path <source_folder> --skip-convert --skip-spec
 python scripts/index_memory.py --path <source_folder> --rebuild
 ```
 
 - `--path`: Source folder of documents.
-- `--skip-convert`: Markdown already exists; start at chunking.
+- `--skip-convert`: Markdown already exists; skip convert step.
+- `--skip-spec`: Skip spec draft step (use existing `context_chunking_spec.yaml` or no spec).
 - `--rebuild`: Rebuild the FAISS index from existing chunks.
+
+## draft_chunking_spec.py
+
+Structural scan of markdown sources → draft `context_chunking_spec.yaml`.
+
+```bash
+python scripts/draft_chunking_spec.py --path <source_folder>
+python scripts/draft_chunking_spec.py --path <source_folder> --force
+```
+
+- `--path`: Folder containing `markdown/` (or markdown files directly).
+- `--force`: Overwrite an existing spec. Default: skip if already present.
+
+Prints a structural report (heading ladder, tables, chapter markers, assumptions) and writes the spec beside the source folder. **Review and edit the spec before running chunk_markdown.py.**
 
 ## convert_to_markdown.py
 
@@ -30,11 +47,13 @@ python scripts/convert_to_markdown.py --file <file_path>
 
 ## chunk_markdown.py
 
-Chunks markdown files into `<source>/memory/`.
+Chunks markdown files into `<source>/memory/`. Uses `context_chunking_spec.yaml` if present.
 
 ```bash
 python scripts/chunk_markdown.py --path <source_folder> --output <memory_folder>
 ```
+
+When a spec is present, chunks include YAML front matter with `chunk_id`, `evidence_type`, `modeling_kind`, and `section_path`.
 
 ## embed_and_index.py
 
