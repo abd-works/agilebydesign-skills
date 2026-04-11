@@ -2,9 +2,10 @@
 Search memory using semantic (vector) retrieval.
 
 Usage:
-  python search_memory.py "agile transformation approach" --rag <memory/rag> [--k 5] [--format text|json]
+  python search_memory.py "agile transformation approach" [--rag <memory/rag>] [--k 5] [--format text|json]
+  (--rag defaults to <ROOT>/memory/rag — same ROOT as _config.)
 
-Run from workspace root. Returns top-k chunks from the FAISS vector index.
+Run from your topic folder (or set CONTENT_MEMORY_ROOT). Returns top-k chunks from the FAISS vector index.
 Requires: pip install openai faiss-cpu numpy
 Set OPENAI_API_KEY environment variable.
 """
@@ -15,8 +16,10 @@ import sys
 from pathlib import Path
 
 import _config  # noqa: F401 — loads OPENAI_API_KEY from .env/.secrets
+from _config import MEMORY
 
 EMBEDDING_MODEL = "text-embedding-3-small"
+DEFAULT_RAG_DIR = MEMORY / "rag"
 DEFAULT_K = 5
 
 
@@ -86,7 +89,9 @@ def search(query: str, rag_dir: Path, k: int = DEFAULT_K) -> list[dict]:
 def main():
     args = sys.argv[1:]
     if not args or args[0].startswith("--"):
-        print('Usage: python search_memory.py "<query>" --rag <memory/rag> [--k 5] [--format text|json]')
+        print(
+            'Usage: python search_memory.py "<query>" [--rag <memory/rag>] [--k 5] [--format text|json]'
+        )
         return
 
     query = args[0]
@@ -108,8 +113,15 @@ def main():
             i += 1
 
     if rag_dir is None:
-        print("Error: --rag <memory/rag> is required", file=sys.stderr)
-        sys.exit(1)
+        rag_dir = DEFAULT_RAG_DIR.resolve()
+        if not rag_dir.is_dir():
+            print(
+                "Error: pass --rag <memory/rag>, or set CONTENT_MEMORY_ROOT / cd to your topic folder "
+                f"so default {rag_dir} exists.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        print(f"Using default RAG dir: {rag_dir}")
 
     results = search(query, rag_dir=rag_dir, k=k)
 

@@ -2,7 +2,7 @@
 Embed chunked markdown into a local FAISS vector store.
 
 Usage:
-  python embed_and_index.py --path <memory_folder>           # embed all .md under folder
+  python embed_and_index.py [--path <memory_folder>]        # default: <ROOT>/memory
   python embed_and_index.py --path <memory_folder> --replace # rebuild index from scratch
 
 Requires: pip install openai faiss-cpu numpy. Set OPENAI_API_KEY.
@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 
 import _config  # loads .env / .secrets
+from _config import MEMORY
 
 CHECKPOINT_INTERVAL = 200
 EMBEDDING_MODEL = "text-embedding-3-small"
@@ -261,11 +262,11 @@ def main():
     args = [a for a in args if a != "--replace"]
 
     path_idx = next((i for i, a in enumerate(args) if a == "--path"), None)
-    if path_idx is None or path_idx + 1 >= len(args):
-        print("Usage: python embed_and_index.py --path <memory_folder> [--replace]")
-        sys.exit(1)
-
-    memory_dir = Path(args[path_idx + 1]).resolve()
+    if path_idx is not None and path_idx + 1 < len(args):
+        memory_dir = Path(args[path_idx + 1]).resolve()
+    else:
+        memory_dir = MEMORY.resolve()
+        print(f"Using default memory folder: {memory_dir}")
     rag_dir = memory_dir / "rag"
 
     chunks = collect_chunks(memory_dir)

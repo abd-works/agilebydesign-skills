@@ -1,25 +1,31 @@
 """
 Full pipeline: convert → draft spec → chunk → embed into local FAISS vector store.
 
+**Ownership:** Step 1 (**convert** + ``pdf_markdown_post``) rewrites extracted markdown so structure
+is findable. Step 2 (**spec**) only observes and drafts YAML. Step 3 (**chunk**) splits along
+existing boundaries—it does not compose manuscript structure (see skill *Chunker vs converter*).
+
 Usage:
-  python index_memory.py --path <source_folder>                          # full pipeline
+  python index_memory.py [--path <source_folder>]                        # full pipeline (--path defaults from _config)
   python index_memory.py --path <source_folder> --skip-convert           # skip convert
   python index_memory.py --path <source_folder> --skip-spec              # skip spec draft
   python index_memory.py --path <source_folder> --skip-convert --skip-spec  # chunk + embed only
-  python index_memory.py --rebuild --path <source_folder>                # rebuild index from existing chunks
+  python index_memory.py --rebuild [--path <source_folder>]               # rebuild index from existing chunks
 
 Steps:
-  1. Convert  — source docs → markdown/
-  2. Spec     — structural scan → context_chunking_spec.yaml (skipped if file already exists)
-  3. Chunk    — apply spec → memory/
+  1. Convert  — source docs → markdown/ (post-process PDFs for headings/banners here)
+  2. Spec     — structural reports → markdown/; drafted YAML → memory/context_chunking_spec.yaml (skipped if present)
+  3. Chunk    — apply spec → memory/ (split only; no source .md rewrite)
   4. Embed    — chunks → memory/rag/ (FAISS)
 
-Run from workspace root.
+Run from your topic/corpus folder or set CONTENT_MEMORY_ROOT.
 """
 
 import subprocess
 import sys
 from pathlib import Path
+
+from _config import ROOT
 
 SCRIPTS = Path(__file__).resolve().parent
 SPEC_FILENAME = "context_chunking_spec.yaml"
@@ -41,11 +47,11 @@ def main():
     args = [a for a in args if a not in ("--skip-convert", "--skip-spec", "--rebuild")]
 
     path_idx = next((i for i, a in enumerate(args) if a == "--path"), None)
-    if path_idx is None or path_idx + 1 >= len(args):
-        print("Usage: python index_memory.py --path <source_folder> [--skip-convert] [--skip-spec] [--rebuild]")
-        sys.exit(1)
-
-    src = Path(args[path_idx + 1]).resolve()
+    if path_idx is not None and path_idx + 1 < len(args):
+        src = Path(args[path_idx + 1]).resolve()
+    else:
+        src = ROOT.resolve()
+        print(f"Using default topic folder (CONTENT_MEMORY_ROOT or cwd): {src}")
     if not src.exists():
         print(f"ERROR: source folder not found: {src}")
         sys.exit(1)
@@ -64,19 +70,19 @@ def main():
     else:
         print(f"[{step}/{total_steps}] Skipping convert (--skip-convert)")
 
-    # Step 2: Draft chunking spec
+    # Step 2: Structural reports → markdown/; chunking spec → memory/ (skipped if already there, unless --force on draft)
     step += 1
-    spec_path = src / SPEC_FILENAME
+    spec_path = memory_dir / SPEC_FILENAME
     if skip_spec:
         print(f"[{step}/{total_steps}] Skipping spec draft (--skip-spec)")
-    elif spec_path.exists():
-        print(f"[{step}/{total_steps}] Spec already present, skipping draft: {spec_path}")
     else:
-        print(f"[{step}/{total_steps}] Drafting chunking spec → {spec_path.name}")
+        print(
+            f"[{step}/{total_steps}] Structural scan → markdown/; chunking spec → {spec_path.name} under memory/ when new"
+        )
         run("draft_chunking_spec.py", ["--path", str(src)], cwd=src)
         print()
         print("  ─────────────────────────────────────────────────────")
-        print(f"  Spec drafted: {spec_path}")
+        print(f"  Review: markdown/structural_scan_report.*  |  Spec: {spec_path} (if drafted)")
         print("  RECOMMENDED: Review context_chunking_spec.yaml before continuing.")
         print("  Edit boundaries, taxonomy, and defaults to match your sources.")
         print("  Then re-run with --skip-spec (or just continue — the spec will be used as-is).")

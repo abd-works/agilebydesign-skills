@@ -56,8 +56,8 @@ npx skills add agilebydesign/agilebydesign-skills
 Shared Python modules live under `src/` and are copied into skills (for example DrawIO helpers into **abd-story-synthesizer**). After editing `src/`, regenerate and verify:
 
 ```bash
-python build.py
-python build.py check
+python scripts/sync_drawio_vendor.py
+python scripts/sync_drawio_vendor.py --check
 ```
 
 Details: [src/README.md](src/README.md).

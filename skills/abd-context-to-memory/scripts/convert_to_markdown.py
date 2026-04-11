@@ -1,6 +1,11 @@
 """
 Convert source files to markdown for agent memory.
 
+**Pipeline:** This is **step 1** of the memory pipeline. Full order (convert → assess
+headings → draft spec → chunk → embed), quality loops, and bespoke post-processors
+live in ``content/parts/process.md`` and ``content/parts/library/convert-to-markdown.md``.
+PDF post-processing details: ``content/parts/library/pdf-extraction-advanced.md``.
+
 Usage:
   python convert_to_markdown.py --memory <source_path>   # folder: all supported files
   python convert_to_markdown.py --memory <source_path> --sharepoint-base <url>  # inject SharePoint URLs
@@ -9,10 +14,28 @@ Usage:
 When source is in OneDrive, SharePoint URLs are auto-injected from sharepoint_mapping.json
 so links work for anyone. Configure mappings in skills/abd-context-to-memory/sharepoint_mapping.json
 
-Run from workspace root. Writes markdown under a single **topic-level** ``markdown/`` folder,
+Run from topic folder or set CONTENT_MEMORY_ROOT. Writes markdown under a single **topic-level** ``markdown/`` folder,
 parallel to ``memory/`` (e.g. ``notes/deck.pptx`` -> ``markdown/notes/deck.md``). If the topic
 folder is named ``context``, markdown goes next to it: ``../markdown/...``. Does not descend into
 ``markdown`` or ``memory`` when discovering files to convert.
+
+**PDF:** If PyMuPDF is installed and the file has bookmarks, ``pdf_outline_extract`` builds
+markdown from the outline + page text; otherwise MarkItDown extracts the PDF. **Both** paths then run ``postprocess_pdf_markdown``. MarkItDown extracts get the full pass;
+bookmark-outline extracts get banner dedupe, soft-wrap join, and ``promote_mnm_reference_tables``
+(heavy passes like TOC replace / stacked-``##`` tables would corrupt outline-structured text).
+Install PyMuPDF: ``pip install pymupdf``.
+
+**Dev / smoke test:** Set ``PDF_POSTPROCESS_MAX_LINES=5000`` (integer) to pass only the first N
+lines of the raw extract into post-processing and write a short excerpt (faster than full book).
+
+**PDF structure (simple path):** If PyMuPDF is installed and the PDF has bookmarks, conversion
+uses ``pdf_outline_extract`` (outline + per-page text) instead of MarkItDown for extraction only.
+To force MarkItDown extraction: ``PDF_USE_MARKITDOWN_PDF=1``.
+
+**Office XML:** ``.pptx`` / ``.docx`` / ``.xlsx`` / ``.xls`` use dedicated MarkItDown converters with
+``StreamInfo`` so Magika does not mis-route bad bytes to the PDF path. **PPTX:** chart export is
+monkeypatched so ``None`` never crashes the converter.
+
 Requires: pip install "markitdown[all]"
 
 CRITICAL: Use --file when user asks for ONE file. Use --memory only when user
@@ -20,16 +43,21 @@ explicitly wants a folder processed. Do not process entire folders when user
 specifies a single file.
 """
 
+import logging
 import os
 import sys
 from pathlib import Path
 from urllib.parse import quote
 
 try:
-    from markitdown import MarkItDown
+    from markitdown import MarkItDown, StreamInfo
+    from markitdown.converters import DocxConverter, PptxConverter, XlsConverter, XlsxConverter
 except ImportError:
     print('Missing dependency. Run: pip install "markitdown[all]"')
     sys.exit(1)
+
+# pdfminer (MarkItDown PDF path) can spam WARNING per bad FontBBox; conversion still succeeds.
+logging.getLogger("pdfminer").setLevel(logging.ERROR)
 
 # Import OneDrive→SharePoint resolution from same scripts dir
 _scripts_dir = Path(__file__).resolve().parent
@@ -56,8 +84,31 @@ from _config import ROOT, ASSETS, ensure_root
 
 ensure_root()
 
+from pdf_markdown_post import postprocess_pdf_markdown
+from pdf_outline_extract import extract_markdown_from_pdf_outline, prepend_outline_extract_notice
+
 # Converted markdown lives under ``<topic_root>/markdown/`` (parallel to ``<topic_root>/memory/``).
 MARKDOWN_SUBDIR = "markdown"
+
+
+def _maybe_truncate_pdf_extract_lines(text: str) -> str:
+    """If ``PDF_POSTPROCESS_MAX_LINES`` is a positive integer, keep only the first N lines."""
+    raw = os.environ.get("PDF_POSTPROCESS_MAX_LINES", "").strip()
+    if not raw.isdigit():
+        return text
+    n = int(raw)
+    if n <= 0:
+        return text
+    lines = text.splitlines()
+    if len(lines) <= n:
+        return text
+    body = "\n".join(lines[:n])
+    if text.endswith("\n") or body:
+        body += "\n"
+    return (
+        f"<!-- excerpt: first {n} lines of raw extract only — "
+        f"PDF_POSTPROCESS_MAX_LINES (unset env for full book) -->\n\n"
+    ) + body
 
 
 def _markdown_tree_root(src_full: Path) -> Path:
@@ -70,14 +121,17 @@ def _markdown_tree_root(src_full: Path) -> Path:
 def _default_topic_root_for_file(p: Path) -> Path:
     """Infer topic root for ``--file`` when ``--topic-root`` is omitted.
 
-    ``topic/file.ext`` → topic is ``file``'s parent. ``topic/sub/file.ext`` → topic is
-    ``parent.parent``. Deeper trees require ``--topic-root``.
+    ``topic/file.ext`` → topic is ``file``'s parent when ``markdown/`` or ``memory/`` exists
+    there. ``topic/sub/file.ext`` → topic is ``parent.parent`` when those dirs sit on the
+    grandparent. Otherwise ``file``'s parent. Pass ``--topic-root`` when ambiguous.
     """
+    p = p.resolve()
     parent = p.parent
-    anchor = p.anchor
-    # One subfolder under topic: drive|topic|sub → topic = parent.parent
-    if len(parent.parts) == len(anchor.parts) + 2:
-        return parent.parent
+    if (parent / MARKDOWN_SUBDIR).is_dir() or (parent / "memory").is_dir():
+        return parent
+    grand = parent.parent
+    if (grand / MARKDOWN_SUBDIR).is_dir() or (grand / "memory").is_dir():
+        return grand
     return parent
 
 SUPPORTED = {
@@ -86,6 +140,45 @@ SUPPORTED = {
 }
 
 _md = MarkItDown()
+
+
+def _patch_pptx_chart_never_returns_none() -> None:
+    """markitdown: _convert_chart_to_markdown can return None; get_shape_content does += and crashes."""
+    _orig = PptxConverter._convert_chart_to_markdown
+
+    def _safe(self, chart):  # type: ignore[no-untyped-def]
+        out = _orig(self, chart)
+        return out if out is not None else "\n\n*[chart could not be exported]*\n\n"
+
+    PptxConverter._convert_chart_to_markdown = _safe  # type: ignore[method-assign]
+
+
+_patch_pptx_chart_never_returns_none()
+
+
+# Magika can mis-guess type (cloud placeholders, partial sync). Direct OOXML converters avoid
+# falling through to PdfConverter with misleading PDFSyntaxError for real Office files.
+_OOXML_CONVERTERS = {
+    ".pptx": PptxConverter(),
+    ".docx": DocxConverter(),
+    ".xlsx": XlsxConverter(),
+    ".xls": XlsConverter(),
+}
+
+
+def _convert_src_to_markdown_text(src: Path) -> str:
+    ext = src.suffix.lower()
+    if ext == ".pdf":
+        outline_md = extract_markdown_from_pdf_outline(src)
+        if outline_md is not None:
+            return prepend_outline_extract_notice(outline_md)
+    conv = _OOXML_CONVERTERS.get(ext)
+    if conv is not None:
+        with open(src, "rb") as fh:
+            info = StreamInfo(extension=ext, filename=src.name, local_path=str(src))
+            return conv.convert(fh, info).text_content
+    return _md.convert(str(src)).text_content
+
 
 DEFAULT_SHAREPOINT_QUERY = "csf=1&web=1"
 
@@ -134,7 +227,10 @@ def convert_one(
     """Convert one file to markdown. Returns output path."""
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    text = _md.convert(str(src)).text_content
+    text = _convert_src_to_markdown_text(src)
+    if src.suffix.lower() == ".pdf":
+        text = _maybe_truncate_pdf_extract_lines(text)
+        text = postprocess_pdf_markdown(text, pdf_path=src)
 
     # Auto-resolve SharePoint URL when source is in OneDrive (from sharepoint_mapping.json)
     if sharepoint_base is None:
