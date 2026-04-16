@@ -1,0 +1,3 @@
+# If a FAISS index is ever created here by mistake, do not commit it.
+# Prefer `<your_project>/memory/rag/` next to your sources.
+rag/
