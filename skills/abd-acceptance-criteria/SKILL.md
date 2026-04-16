@@ -14,6 +14,144 @@ description: >-
 
 # abd-acceptance-criteria
 
+## Steps
+
+1. **Build** using **every** template file in this skill's `templates/` folder, and the `rules/` mentioned in this skill.
+2. **Validate** using rules mentioned in this skill. For the **mechanical** scanner pass, use the **execute_rules** skill (same repo): run **`run_scanners.py`** with **`--skill-root`** = this skill directory and **`--workspace`** = the tree that contains **`docs/story/story-graph.json`** (or **`story-graph.json`**). To **list** which scanners would run, use **`rule_inventory.py --list-scanners`** with the same **`--skill-root`**. Full intent (AI/rules pass **plus** scanner pass) and exact commands are in **`skills/execute_using_rules/SKILL.md`** (Commands **§2** and **§3** where applicable). Implementation details and parity with **agile_bots** live in `scanners/README.md` when present. **Which** scanners run is defined only by **`rules/*.md`** (`scanner:` frontmatter → `scanners/<stem>-scanner.py`), not a separate manifest. **Story graph** types (`StoryMap`, `StoryScanner`, …) live in **`skills/story-graph-ops/scripts/`** (`story_map.py`, `story_scanner.py`, …); generic scanner types come from **`execute_using_rules`** **`scanner_bases`**. **`scanner_runner`** (execute_rules) drives every scanner CLI the same way (context holds files and/or graph JSON). For **CLI** read/search/filter/write on `story-graph.json` without the bot, use **`skills/story-graph-ops/`** (**story-graph-ops** skill).
+
+### Use every template file (required)
+
+When you **create or rewrite** acceptance criteria from requirements, you **must** deliver **one output artifact per file** in `templates/`. **Do not** emit only Markdown or only plain text unless the user **explicitly** asks for a single format.
+
+| Template | What to produce |
+| --- | --- |
+| `templates/acceptance-criteria.md` | Story-level AC using WHEN/THEN/AND/BUT; include the **`## Instructions`** block from that template file at the end of the Markdown artifact (or equivalent rules summary). |
+| `templates/acceptance-criteria.txt` | The **same** behavioral coverage and story semantics as **plain text** only — structure matching `acceptance-criteria.txt` style (no requirement to duplicate the full Instructions block in `.txt`). |
+
+**Consistency:** WHEN/THEN semantics, story coverage, and ordering must match between `.md` and `.txt` for the same work. Only the Markdown file carries the full Instructions block.
+
+**If new files are added** under `templates/` later, produce a corresponding artifact for **each** new template the same way.
+
+**Purpose:** Describe what good **exploration-phase** acceptance criteria *are* (structure, language, rules). **How** to run the bot, workspace setup, and product-specific exploration flows belong in the agent and other skills — not here.
+
+**Includes:** `templates/` — see **Use every template file** above; `rules/` — see bundled rules at the end of this file.
+
+---
+
+## When to use this skill
+
+Load this skill when **any** of the following apply:
+
+- You are writing or reviewing **`acceptance_criteria`** arrays on stories in **`story-graph.json`** (exploration phase — not scenario BDD steps).
+- A user or agent wants to turn interviews, specs, or informal notes into **testable behavioral** AC (WHEN/THEN/AND/BUT).
+- You need **WHEN/THEN/AND** quality, **atomic** AC (no duplicated blocks), **actor alternation**, **BUT** for negatives, or **channel-specific** CLI/Panel wording.
+- An agent is asked to “explore” a story, “write AC”, “harden acceptance criteria”, or “align with exploration rules.”
+- You are running **execute_rules** scanners against a workspace that contains a story graph.
+- You want **parallel quality** with **abd-story-mapping** on **verb–noun** story elements while this skill owns exploration AC rules and scanners.
+
+---
+
+## What are acceptance criteria?
+
+**Acceptance criteria** (in this skill’s sense) are **story-level, behavioral statements** in `story-graph.json` that say **under what conditions** the product behaves **how**, including chained outcomes and explicit negatives. They sit **above** BDD **scenarios** (which use Given/When/Then on steps).
+
+Exploration-phase AC answer four questions for each story:
+
+1. **When** does the behavior apply? (trigger, precondition, or variant.)
+2. **Then** what is observable? (primary user- or system-visible outcome.)
+3. **And** what else happens in sequence? (extra outcomes, especially multiple system reactions — chain with AND, not a new WHEN for each micro-step unless the trigger truly changes.)
+4. **But** what must **not** happen? (errors, prevention, no persistence — negative paths.)
+
+They are **not** implementation checklists (API names, class names, file formats) unless the story is explicitly **`story_type: technical`** and scoped that way. A good AC set can be read by a **product owner**, a **tester**, and a **developer** — all at once — and still be **machine-checkable** via rules/scanners where applicable.
+
+**Relationship to other artifacts:**
+
+| Artifact | Role | Typical keywords |
+| --- | --- | --- |
+| **acceptance_criteria** (this skill) | Story-level outcomes in the graph | WHEN, THEN, AND, BUT |
+| **scenarios** (later / other workflow) | BDD flows with steps | Given, When, Then on **steps** |
+
+Reserve **Given** for **scenarios**, not for lines inside **`acceptance_criteria`** (per agile_bots exploration policy).
+
+---
+
+## Core concepts
+
+### Behavioral vs technical
+
+AC describe **observable** user/system behavior. Avoid implementation detail unless the story is explicitly technical.
+
+| Prefer | Avoid (unless technical story) |
+| --- | --- |
+| “WHEN user submits … THEN CLI returns success with timestamp” | “WHEN `submit()` is called on `CliSession`…” |
+| Concrete channels: `cli.shape.validate`, Panel label text | Generic “the bot does the right thing” |
+
+### WHEN / THEN / AND / BUT
+
+| Keyword | Role |
+| --- | --- |
+| **WHEN** | Trigger or precondition. |
+| **THEN** | Primary outcome. |
+| **AND** | Additional or chained outcomes (especially multiple system reactions). |
+| **BUT** | What does **not** happen (error/prevention paths). |
+
+### Atomic AC
+
+State the **general** case **once**; follow-on AC only describe **deltas**. Reduces duplicated WHEN/THEN blocks (see **Atomic acceptance criteria** rule).
+
+### Actor alternation
+
+Interleave user-visible and system-visible emphasis. Avoid long runs of the same actor without switching (see **Alternate actors in steps** rule + scanner).
+
+### Domain consistency
+
+As domains grow, keep **parallel** AC structure across related areas; **split stories** when one AC mixes incompatible domain behaviors.
+
+---
+
+## The shape of good acceptance criteria
+
+```
+Story: Submit Order
+  acceptance_criteria:
+  1. WHEN user has items in cart AND cart total is valid
+     THEN checkout shows confirmation
+     AND order id is displayed
+  2. WHEN payment gateway times out
+     THEN user sees retry message
+     BUT order is not marked paid
+```
+
+Notice:
+
+- **WHEN** sets scope; **THEN** is the main observable; **AND** chains extra outcomes; **BUT** guards negatives.
+- Second AC is a **delta** (error path), not a full repeat of the happy path.
+- Language stays **behavioral** and **channel-aware** where the product has distinct surfaces.
+
+---
+
+## Build
+
+Produce **both** **`acceptance-criteria.md`** and **`acceptance-criteria.txt`** artifacts (same coverage), following **`templates/acceptance-criteria.md`** and **`templates/acceptance-criteria.txt`** respectively. See **Steps → Use every template file** — delivering a single format is incorrect unless the user explicitly requested only one. Match the bar under **Validate** below. Structure follows **WHEN/THEN/AND/BUT** and **atomic** deltas as above; keep discovery to **story-level** AC unless a later workflow adds or edits **scenarios**.
+
+---
+
+## Validate
+
+Review **both** the **`.md`** and **`.txt`** and the story graph for:
+
+- **Structure** — WHEN/THEN/AND/BUT used appropriately; **Given** not used inside `acceptance_criteria`.
+- **Behavioral** language and **channel-specific** detail where CLI vs Panel differ.
+- **Atomic** AC (no duplicated base WHEN/THEN blocks).
+- **Actor** alternation and **AND** chaining for sequential reactions.
+- **Verb–noun** names for epics/sub-epics/stories (shared bar with **abd-story-mapping**; this skill ships the exploration **verb–noun** scanner migrated from agile_bots).
+
+Revise until a product owner, a tester, and a developer can agree on what “done” means for the story.
+
+Run mechanical scanners via **execute_rules** as described in **Steps**.
+
+---
+
 ## Migration source (agile_bots)
 
 This skill is **migrated from** the Agile Bots codebase — not merely “mapped” to it:
@@ -24,85 +162,6 @@ This skill is **migrated from** the Agile Bots codebase — not merely “mapped
 | Scanner implementations | `src/scanners/*` (classes referenced by those JSON files) |
 
 **Canonical product behavior** may continue to evolve in **agile_bots** first. When rules or scanners change there, **re-migrate** (copy + adapt imports) into this skill so Open Agent Skills / `execute_rules` stay aligned.
-
----
-
-## Steps
-
-1. **Build** using **every** template file in this skill's `templates/` folder, and the `rules/` in this skill.
-2. **Validate** using rules in `rules/`. For the **mechanical** scanner pass, use the **execute_rules** skill (same repo): run **`run_scanners.py`** with **`--skill-root`** = this skill directory and **`--workspace`** = the tree that contains **`docs/story/story-graph.json`** (or **`story-graph.json`**). To **list** scanners, use **`rule_inventory.py --list-scanners`** with the same **`--skill-root`**. Full intent (AI/rules pass **plus** scanner pass) and exact commands are in **`skills/execute_using_rules/SKILL.md`**. **Which** scanners run is defined by **`rules/*.md`** (`scanner:` frontmatter → `scanners/<stem>-scanner.py`), not a separate manifest. **Story graph** types live in **`skills/story-graph-ops/scripts/`**. **`scanner_runner`** (execute_rules) drives each scanner CLI the same way.
-
-### Use every template file (required)
-
-When you **create or rewrite** acceptance criteria from requirements, you **must** deliver **one output artifact per file** in `templates/`. **Do not** emit only Markdown or only plain text unless the user **explicitly** asks for a single format.
-
-| Template | What to produce |
-| --- | --- |
-| `templates/acceptance-criteria.md` | Story-level AC using WHEN/THEN/AND/BUT; include the **`## Instructions`** block from that template at the end (or equivalent summary). |
-| `templates/acceptance-criteria.txt` | The **same** behavioral coverage as **plain text** — matching structure; no need to duplicate long Instructions if the `.md` carries them. |
-
-**Consistency:** AC semantics and story coverage must match between `.md` and `.txt`.
-
-**If new files are added** under `templates/` later, produce a corresponding artifact for **each** new template the same way.
-
----
-
-## When to use this skill
-
-Load this skill when **any** of these apply:
-
-- You are writing or reviewing **`acceptance_criteria`** on stories in `story-graph.json`.
-- You need WHEN/THEN/AND quality, atomic AC, actor alternation, BUT for negatives, or channel-specific CLI/Panel wording.
-- An agent is asked to “explore” a story, “write AC”, or “align with exploration rules”.
-- You are running **execute_rules** scanners against a workspace with a story graph.
-
----
-
-## Core concepts
-
-### Behavioral vs technical
-
-AC describe **observable** user/system behavior. Avoid implementation detail (file formats, APIs, class names) unless the story is explicitly technical and scoped that way.
-
-### WHEN / THEN / AND / BUT
-
-- **WHEN** — trigger or precondition.
-- **THEN** — primary outcome.
-- **AND** — additional or chained outcomes (especially multiple system reactions).
-- **BUT** — what does **not** happen on error/prevention paths (negative conditions).
-
-Reserve **Given** for **scenarios** (BDD), not for AC lines in the story graph (per agile_bots exploration policy).
-
-### Atomic AC
-
-State the **general** case once; follow-on AC only describe **deltas**. Reduces duplicated WHEN/THEN blocks.
-
-### Actor alternation
-
-Interleave user-visible and system-visible steps. Avoid long runs of the same actor without switching (see rule + scanner).
-
-### Domain consistency
-
-As domains grow, keep **parallel** AC structure across related domains; split stories when one AC mixes incompatible domain behaviors.
-
----
-
-## Build
-
-Produce **both** **`acceptance-criteria.md`** and **`acceptance-criteria.txt`** artifacts (same coverage), following **`templates/`**. Delivering a single format is incorrect unless the user explicitly requested only one.
-
----
-
-## Validate
-
-Review **both** artifacts and the story graph for:
-
-- **Behavioral** language and appropriate **WHEN/THEN/AND/BUT** structure.
-- **Atomic** AC (no duplicated base blocks).
-- **Actor** alternation and **AND** chaining where applicable.
-- **Verb–noun** names for epics/sub-epics/stories (shared bar with **abd-story-mapping**; this skill ships the exploration **verb–noun** scanner migrated from agile_bots).
-
-Run mechanical scanners via **execute_rules** as described in **Steps**.
 
 ---
 

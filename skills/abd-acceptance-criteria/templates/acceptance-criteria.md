@@ -9,20 +9,23 @@ For each **story**, list **acceptance_criteria** as behavioral outcomes using **
 **Story type:** user | system | technical
 
 ### Acceptance criteria
-//more complex
+
+**Complex flow (multiple reactions):**
+
 1. **WHEN** (trigger or condition)  
-      **AND** (additional outcome or chained reaction)
-      **AND** (additional outcome or chained reaction)
-      **BUT** (what does **not** happen — e.g. does not persist, does not allow)
    **THEN** (observable outcome)  
-      **AND** (additional outcome or chained reaction)
-      **BUT** (what does **not** happen — e.g. does not persist, does not allow)
-      
-//simpler
+   **AND** (additional outcome or chained reaction)  
+   **AND** (additional outcome or chained reaction)  
+   **BUT** (what does **not** happen — e.g. does not persist, does not allow)
+
+**Variant (delta only — atomic rule):**
+
 2. **WHEN** (variant)  
    **THEN** (only what differs from the general case above)  
    *(Avoid repeating the same WHEN/THEN/AND block across multiple AC — see atomic AC rule.)*
-//negative
+
+**Negative / error path:**
+
 3. **WHEN** (error path)  
    **THEN** (error or prevention behavior)  
    **BUT** (what does **not** happen — e.g. does not persist, does not allow)
