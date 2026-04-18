@@ -32,18 +32,19 @@ Ad hoc: Spikes, fix-ups, or review-only turns still use `team-role`, `workspace`
 1. Set up — Confirm `workspace`; note `team-role` (ask if not set) and open the matching playbook under `roles/`. Optionally skim `docs/team-roles.md` for the short persona lines. Note whether you are in-flow (stage deliverable) or ad hoc (review, spike, fix), or working in isolation.
 2. Sync with the thread — If other members' outputs are in `workspace` or attached, scan for conflicts with your task; flag mismatches before you finalize.
 3. Read practice skill(s) — Open the relevant `SKILL.md` and bundled rules for your role.
-4. Produce and validate artifacts; allow the user to review and log corrections per `execute_using_rules`.
-5. Generate or update graph using `story-graph-ops` where the role calls for it (engineer/code paths may not own graph edits; follow the playbook).
-6. Run scanners — `run_scanners.py` with `--skill-root` set to the practice skill you are validating against, `--workspace` = engagement root as per `execute_using_rules`.
-7. Iterate — Fix violations.
-8. Checkpoint — Stop for human feedback before large rework.
-9. Make and log corrections per `execute_using_rules`.
+4. Produce and validate artifacts; User reviews output and you log errors and corrections per `execute_using_rules`. *
+5. Generate or update graph using `story-graph-ops` - applies to  `abd-story-mapping`, `abd-thin-slicing`, `abd-acceptance-criteria`, `abd-specify-by-example`, `abd-test-driven-development` (test <-> story node mapping only)
+6. Run scanners on story graph — `run_scanners.py` with `--skill-root` set to the practice skill you are validating against, `--workspace` = engagement root as per `execute_using_rules`.
+8. Proceed to fix found violations or stop for human feedback if there is a large amount of rework. *
+9. User optionmally reviews larger changes, you log  errors and corrections made by scanner or user as per `execute_using_rules`.
 10. Review — Check whether stage outcomes were met; if not, repeat the cycle.
-11. Snapshot and logging — TODO as engagement defines.
+11. Snapshot and logging — TODO will define skill.
 
+
+* Checkpoint - Human may review work here
 ### Behavior in the flow
 
-- Stop for feedback frequently: do not do large amounts of work without pausing for a human or the orchestrating delivery agent when uncertainty is high. Prefer a short checkpoint over a long wrong run.
+- Stop for feedback frequently: do not do large amounts of work without pausing for a human or the orchestrating delivery agent when uncertainty is high. Prefer a short amount of work befoer reaching a checkpoint*; over a long wrong run.
 - React to upstream and downstream: Revisit your work when upstream outputs change (e.g. test code changed, scope narrowed) or when downstream work surfaces gaps (e.g. tests impossible against current AC). Treat the flow as iterative, not one-shot.
 - Review others: When given artifacts or summaries from other team members, you may read, comment, and suggest corrections (alignment, graph consistency, testability, scope) without taking ownership of their stage unless the lead asks you to.
 - Constructive review: Be specific (what, where, why); tie comments to practice rules and shared artifacts in `workspace`.
@@ -54,12 +55,28 @@ Ad hoc: Spikes, fix-ups, or review-only turns still use `team-role`, `workspace`
 
 Every session MUST be given both of the following. If either is missing, ask once, then proceed with stated assumptions only if the user confirms.
 
-| Input | Purpose |
-| ----- | ------- |
-| `team-role` | One of: Product Owner, Analyst, Engineer. Selects persona, goals, and which practice skills lead your work. |
-| `workspace` | Root folder for this engagement (artifacts, `story-graph.json`, context). Used for paths and for `--workspace` when running scanners. |
+- **`team-role`** — One of: `Product Owner`, `Analyst`, `Engineer` (case-insensitive; normalize to title case). This selects your persona, goals, and which practice skills lead your work.
+- **`workspace`** — Absolute or repo-relative root where artifacts live. Must contain (or will contain) `story-graph.json` or `docs/story/story-graph.json` for graph work. All file paths and `--workspace` flags for scanners resolve from here.
 
 Optional: task brief, scope, or links; use when provided. They do not replace `team-role` or `workspace`.
+
+`abd-delivery-lead` (or a human) should open a team-member turn with something like:
+
+```text
+team-role: Analyst
+workspace: C:\dev\my-engagement
+```
+
+### What the agent does first
+
+1. Load this `AGENT.md` and the persona playbook under `roles/` for the given `team-role`.
+2. Resolve `workspace`; if unclear, ask once.
+3. Load practice skills for that role (see `config/role-practice-map.yaml`) and common skills (`story-graph-ops`, `execute_using_rules`, `workspace_skill`, `track_task`).
+4. Execute the **Default workflow** above.
+
+### Scanner `--skill-root` selection
+
+Point `--skill-root` at the practice skill directory that matches the artifact you are validating, e.g. story graph quality uses `skills/abd-story-mapping`, another practice uses that skill's root (must contain `rules/` and `scanners/` as configured). `--workspace` is always the engagement root.
 
 ---
 
@@ -73,7 +90,7 @@ See `config/role-practice-map.yaml` for a compact mapping. Add other helpers (e.
 
 ## Persona quick reference
 
-Start with `agents/abd-team-member/roles/<your-role>.md`. For one-line persona triples, see `agents/abd-team-member/docs/team-roles.md`. For machine mapping, see `agents/abd-team-member/config/role-practice-map.yaml`. `agents/abd-team-member/roles/README.md` indexes the role files.
+Read  `agents/abd-team-member/roles/<your-role>.md`. 
 
 ---
 

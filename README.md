@@ -1,67 +1,61 @@
 # Agile by Design Agent Skills
 
-Reusable agent skills from [Agile by Design](https://agilebydesign.com).
+Reusable agent skills from [Agile by Design](https://agilebydesign.com), covering everything from story mapping to clean code.
 
 ## Skills
 
-### content-memory
+### [abd-story-mapping](skills/abd-story-mapping/SKILL.md)
 
-Converts documents (PDF, PPTX, DOCX, XLSX, etc.) to markdown and chunks them for agent memory. Use when adding content to agent context, refreshing memory, or ingesting a folder of documents.
+Build Patton-style story maps: epics, sub-epics, stories, verb–noun naming, and actors via story_type.
+Outputs `story-map.md` and `story-map.txt` templates with identical tree coverage.
 
-**Install:**
+### [abd-thin-slicing](skills/abd-thin-slicing/SKILL.md)
 
-```bash
-npx skills add agilebydesign/agilebydesign-skills --skill content-memory
-```
+Produce thin-sliced delivery increments: vertical MVIs, spine vs optional paths, and marketable increment names.
+Writes `thin-slicing.md` and `thin-slicing.txt` from a story map with full increment and story coverage.
 
-**Usage:** See [skills/content-memory/SKILL.md](skills/content-memory/SKILL.md) for full instructions.
+### [abd-acceptance-criteria](skills/abd-acceptance-criteria/SKILL.md)
 
-### solution-shaping
+Write exploration-phase acceptance criteria for story-graph.json using WHEN/THEN/AND/BUT behavioral language.
+Ships Markdown rules and Python scanners for mechanical checks alongside human review.
 
-Shape source material into an Interaction Tree and State Model (story map and domain model). Use when shaping requirements, deriving epics and stories from source documents, or building a hierarchical structure of actor exchanges and domain concepts.
+### [abd-specification-by-example](skills/abd-specification-by-example/SKILL.md)
 
-**Install:**
+Produce concrete Given/When/Then scenarios with real domain values, bold concept names, and italic values.
+Supports plain scenarios (inline values) and outline format (shared steps, multiple data rows).
 
-```bash
-npx skills add agilebydesign/agilebydesign-skills --skill solution-shaping
-```
+### [abd-acceptance-test-driven-development](skills/abd-acceptance-test-driven-development/SKILL.md)
 
-**Usage:** See [skills/solution-shaping/SKILL.md](skills/solution-shaping/SKILL.md) for full instructions.
+Write tests first, then drive code to pass them. Creates executable Given-When-Then test files from behavioral context—specs, AC, stories, or rough descriptions.
 
-### abd-ooad (Object Oriented Analysis and Design)
+### [abd-clean-code](skills/abd-clean-code/SKILL.md)
 
-Single-file skill: linear OOAD from specs, code, manuals, or policies—nouns/verbs/rules/states, responsibilities, relationships, invariants, inheritance vs composition, and scenario validation. No multi-phase build; all instructions are in [skills/abd-ooad/SKILL.md](skills/abd-ooad/SKILL.md).
+Write production code using domain language, clean functions, explicit dependencies, and observable design.
+Covers single-responsibility, intention-revealing names, guard-clause flow, domain exceptions, and DRY structure.
 
-**Install:**
+---
+# Helper Skills
 
-```bash
-npx skills add agilebydesign/agilebydesign-skills --skill abd-ooad
-```
+Install  any / each of these to make youre skills more robust
 
-## Install All Skills
+### [execute_using_rules](skills/execute_using_rules/SKILL.md)
 
-```bash
-npx skills add agilebydesign/agilebydesign-skills
-```
+Run codescanners when validating output from skills, and enforce quality steps.
+Enable correction-improvement log when fixing ai mistakes.
 
-## Publish to skills.sh
+### [workspace_skill](skills/workspace_skill/SKILL.md)
 
-1. Create the repository on GitHub: [github.com/agilebydesign/agilebydesign-skills](https://github.com/agilebydesign/agilebydesign-skills)
-2. Push this content
-3. Submit at [agentskill.sh/submit](https://agentskill.sh/submit) with `https://github.com/agilebydesign/agilebydesign-skills`
-4. Skills appear on the leaderboard as users install them via `npx skills add`
+Set and get folder that all skills use.
+Skills use same folder without constantly reminding them.
 
-## Development (repository contributors)
+### [track_task](skills/track_task/SKILL.md)
 
-Shared Python modules live under `src/` and are copied into skills (for example DrawIO helpers into **abd-story-synthesizer**). After editing `src/`, regenerate and verify:
+Track multiple-step skills or multi-skill workflows you create with markdown checkboxes for skill or agent-pipeline phases, per-phase steps, or ad-hoc lists.
+Stored under the engagement workspace.
 
-```bash
-python scripts/sync_drawio_vendor.py
-python scripts/sync_drawio_vendor.py --check
-```
 
-Details: [src/README.md](src/README.md).
+## Install
 
-## License
+copy to `<your workspace>~/.github/skills/`
 
-MIT
+
