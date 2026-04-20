@@ -20,11 +20,6 @@ YAML_BLOCK_RE = re.compile(
     r"^(\w[\w-]*):\s*>-?\s*\n((?:[ \t]+.*\n?)+)", re.MULTILINE
 )
 
-PREAMBLE_RE = re.compile(
-    r"^(load this skill|use when|use this skill|any of the following)\b",
-    re.IGNORECASE,
-)
-
 KNOWN_DIR_SUMMARY: dict[str, str] = {
     "rules": "Practice rules (DO/DON'T) and constraints used with scanners.",
     "templates": "Authoring templates and structural skeletons.",
@@ -42,8 +37,7 @@ KNOWN_DIR_SUMMARY: dict[str, str] = {
 class SkillEntry(NamedTuple):
     name: str
     dir_name: str
-    challenge: str
-    solution: str
+    summary: str
     description: str
     rel_skill_md: str
 
@@ -52,8 +46,7 @@ class AgentEntry(NamedTuple):
     name: str
     dir_name: str
     entry_file: str
-    challenge: str
-    solution: str
+    summary: str
     description: str
     rel_entry_md: str
 
@@ -87,7 +80,7 @@ def _extract_section(body: str, heading: str) -> str | None:
 def _strip_md(text: str) -> str:
     text = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
     text = re.sub(r"\*([^*]+)\*", r"\1", text)
-    text = re.sub(r"`[^`]+`", "", text)
+    text = re.sub(r"`([^`]*)`", r"\1", text)
     text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
     return text
 
@@ -100,102 +93,9 @@ def _truncate(text: str, limit: int = 200) -> str:
     return cut.rstrip(".,;: ") + " …"
 
 
-def _first_meaningful_line(text: str) -> str:
-    text = _strip_md(text)
-    for line in text.splitlines():
-        line = line.strip().lstrip("- ").strip()
-        if len(line) < 15:
-            continue
-        if line.startswith("#"):
-            continue
-        if PREAMBLE_RE.match(line):
-            continue
-        sent = re.split(r"(?<=[.!?])\s", line, maxsplit=1)[0]
-        return _truncate(sent)
-    return _truncate(text.strip())
-
-
-def _first_bullet(text: str) -> str:
-    text = _strip_md(text)
-    for line in text.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("- "):
-            content = stripped[2:].strip()
-            content = re.sub(r"^[—\-–]\s*", "", content)
-            if len(content) > 15:
-                return _truncate(content)
-    return ""
-
-
-def _derive_challenge_skill(body: str) -> str:
-    purpose = _extract_section(body, "Purpose")
-    if purpose:
-        result = _first_meaningful_line(purpose)
-        if result and not PREAMBLE_RE.match(result):
-            return result
-
-    for heading in ("When to use this skill", "When to use", "When to Apply"):
-        section = _extract_section(body, heading)
-        if section:
-            bullet = _first_bullet(section)
-            if bullet:
-                return bullet
-            result = _first_meaningful_line(section)
-            if result and not PREAMBLE_RE.match(result):
-                return result
-
-    h1_match = re.search(r"^#\s+(.+)", body, re.MULTILINE)
-    if h1_match:
-        return _truncate(h1_match.group(1).strip())
-
-    return "See SKILL.md for details."
-
-
-def _derive_solution_skill(fm: dict[str, str], body: str) -> str:
-    desc = fm.get("description", "")
-    if desc:
-        clean = _strip_md(desc)
-        return _truncate(clean, 280)
-    section = _extract_section(body, "Purpose")
-    if section:
-        return _first_meaningful_line(section)
-    return "See SKILL.md for details."
-
-
-def _description_skill(fm: dict[str, str], body: str) -> str:
-    purpose = _extract_section(body, "Purpose")
-    if purpose:
-        return _truncate(_strip_md(purpose), 900)
-    desc = fm.get("description", "")
-    if desc:
-        return _truncate(_strip_md(desc), 900)
-    return _truncate(_strip_md(body), 500)
-
-
 def _h1_title(body: str) -> str | None:
     m = re.search(r"^#\s+(.+)$", body, re.MULTILINE)
     return m.group(1).strip() if m else None
-
-
-def _non_hr_lines(text: str) -> list[str]:
-    lines: list[str] = []
-    for ln in text.splitlines():
-        s = ln.strip()
-        if not s or s == "---":
-            continue
-        lines.append(s)
-    return lines
-
-
-def _agent_display_name(fm: dict[str, str], body: str, dir_name: str) -> str:
-    n = fm.get("name", "").strip()
-    if n:
-        return n
-    h1 = _h1_title(body)
-    if h1:
-        h1 = re.sub(r"^AGENTS\s+—\s*", "", h1, flags=re.IGNORECASE).strip()
-        return h1 or dir_name
-    return dir_name
 
 
 def _opening_blurb_after_h1(body: str, max_len: int = 260) -> str:
@@ -222,55 +122,41 @@ def _opening_blurb_after_h1(body: str, max_len: int = 260) -> str:
     return _truncate(joined, max_len) if joined else ""
 
 
-def _derive_challenge_agent(body: str) -> str:
-    purpose = _extract_section(body, "Purpose")
-    if purpose:
-        s = _first_meaningful_line(purpose)
-        if s:
-            return s
-    intro = _extract_section(body, "Introduction")
-    if intro:
-        s = _first_meaningful_line(intro)
-        if s:
-            return s
-    blurb = _opening_blurb_after_h1(body)
-    if blurb:
-        return blurb
-    t = _h1_title(body)
-    if t:
-        return _truncate(t)
-    return "See agent entry file for details."
-
-
-def _derive_solution_agent(fm: dict[str, str], body: str) -> str:
+def _table_blurb(fm: dict[str, str], body: str, max_len: int = 300) -> str:
+    """One paragraph for summary tables and HTML cards: YAML description, else Purpose, else opening text."""
     desc = fm.get("description", "").strip()
     if desc and desc != "---":
-        return _truncate(_strip_md(desc), 280)
+        flat = _strip_md(" ".join(desc.split()))
+        return _truncate(flat, max_len)
     purpose = _extract_section(body, "Purpose")
     if purpose:
-        lines = _non_hr_lines(purpose)
-        if len(lines) >= 2:
-            return _truncate(_strip_md(lines[1]), 280)
-        if lines:
-            joined = _strip_md(" ".join(lines))
-            return _truncate(joined, 280)
-        return _truncate(_strip_md(purpose), 280)
-    for heading in (
-        "Your skills",
-        "Team member skills",
-        "Orchestration workflow",
-        "Default workflow",
-        "Role playbooks",
-    ):
-        sec = _extract_section(body, heading)
-        if sec:
-            bullet = _first_bullet(sec)
-            if bullet:
-                return _truncate(bullet, 280)
-    blurb = _opening_blurb_after_h1(body, max_len=400)
+        flat = _strip_md(re.sub(r"\s+", " ", purpose.replace("\n", " ")))
+        return _truncate(flat, max_len)
+    blurb = _opening_blurb_after_h1(body, max_len=700)
     if blurb:
-        return _truncate(blurb, 280)
-    return _truncate(_first_meaningful_line(body), 280)
+        return _truncate(blurb, max_len)
+    return _truncate(_strip_md(body), max_len)
+
+
+def _description_skill(fm: dict[str, str], body: str) -> str:
+    purpose = _extract_section(body, "Purpose")
+    if purpose:
+        return _truncate(_strip_md(purpose), 900)
+    desc = fm.get("description", "")
+    if desc:
+        return _truncate(_strip_md(desc), 900)
+    return _truncate(_strip_md(body), 500)
+
+
+def _agent_display_name(fm: dict[str, str], body: str, dir_name: str) -> str:
+    n = fm.get("name", "").strip()
+    if n:
+        return n
+    h1 = _h1_title(body)
+    if h1:
+        h1 = re.sub(r"^AGENTS\s+—\s*", "", h1, flags=re.IGNORECASE).strip()
+        return h1 or dir_name
+    return dir_name
 
 
 def _description_agent(fm: dict[str, str], body: str) -> str:
@@ -300,8 +186,7 @@ def discover_skills(skills_dir: Path, repo_root: Path) -> list[SkillEntry]:
             SkillEntry(
                 name=name,
                 dir_name=child.name,
-                challenge=_derive_challenge_skill(body),
-                solution=_derive_solution_skill(fm, body),
+                summary=_table_blurb(fm, body),
                 description=_description_skill(fm, body),
                 rel_skill_md=rel,
             )
@@ -332,8 +217,7 @@ def discover_agents(agents_dir: Path, repo_root: Path) -> list[AgentEntry]:
                 name=name,
                 dir_name=child.name,
                 entry_file=entry_name,
-                challenge=_derive_challenge_agent(body),
-                solution=_derive_solution_agent(fm, body),
+                summary=_table_blurb(fm, body),
                 description=_description_agent(fm, body),
                 rel_entry_md=rel,
             )
@@ -409,30 +293,28 @@ def generate_outline_md(
         "> Run `python skills/abd-skill-catalog/scripts/generate_abd_catalog.py` to refresh.",
         "",
         "This outline mirrors the reader-facing style of `process-outline.md`:",
-        "each row states the **challenge**, the **solution**, and where to open the source.",
+        "each row gives a **short description** and where to open the source.",
         "",
         "## Summary — Practice skills",
         "",
-        "| Skill | Challenge | Solution | Open |",
-        "| --- | --- | --- | --- |",
+        "| Skill | Description | Open |",
+        "| --- | --- | --- |",
     ]
     for s in skills:
         link = f"{md_link_prefix}{s.rel_skill_md}"
-        ch = s.challenge.replace("|", "\\|")
-        sol = s.solution.replace("|", "\\|")
-        lines.append(f"| **{s.name}** | {ch} | {sol} | [SKILL.md]({link}) |")
+        desc = s.summary.replace("|", "\\|")
+        lines.append(f"| **{s.name}** | {desc} | [SKILL.md]({link}) |")
     lines += [
         "",
         "## Summary — Agents",
         "",
-        "| Agent | Challenge | Solution | Open |",
-        "| --- | --- | --- | --- |",
+        "| Agent | Description | Open |",
+        "| --- | --- | --- |",
     ]
     for a in agents:
         link = f"{md_link_prefix}{a.rel_entry_md}"
-        ch = a.challenge.replace("|", "\\|")
-        sol = a.solution.replace("|", "\\|")
-        lines.append(f"| **{a.name}** | {ch} | {sol} | [{a.entry_file}]({link}) |")
+        desc = a.summary.replace("|", "\\|")
+        lines.append(f"| **{a.name}** | {desc} | [{a.entry_file}]({link}) |")
 
     lines += ["", "---", "", "## Skills (detail)", ""]
     skills_root = repo_root / "skills"
@@ -443,13 +325,9 @@ def generate_outline_md(
             "",
             f"- **Directory:** [`skills/{s.dir_name}/`]({md_link_prefix}skills/{s.dir_name}/)",
             "",
-            "**Challenge:**",
+            "**Summary:**",
             "",
-            s.challenge,
-            "",
-            "**Solution:**",
-            "",
-            s.solution,
+            s.summary,
             "",
             "**Description (from Purpose / body):**",
             "",
@@ -471,13 +349,9 @@ def generate_outline_md(
             f"- **Directory:** [`agents/{a.dir_name}/`]({md_link_prefix}agents/{a.dir_name}/)",
             f"- **Entry:** [`{a.rel_entry_md}`]({md_link_prefix}{a.rel_entry_md})",
             "",
-            "**Challenge:**",
+            "**Summary:**",
             "",
-            a.challenge,
-            "",
-            "**Solution:**",
-            "",
-            a.solution,
+            a.summary,
             "",
             "**Description:**",
             "",
@@ -504,13 +378,8 @@ def _card_block_skills(entries: list[SkillEntry], up_to_repo: str) -> str:
                 f"""\
         <a class="cap-card" href="{href}">
           <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>{_h(e.name)}</p>
-          <p class="cap-card__label">Challenge</p>
-          <p class="cap-card__problem">{_h(e.challenge)}</p>
-          <hr class="cap-card__sep">
-          <p class="cap-card__label">Solution</p>
-          <p class="cap-card__solution">{_h(e.solution)}</p>
-          <p class="cap-card__label" style="margin-top:10px">Description</p>
-          <p class="cap-card__solution">{_h(e.description)}</p>
+          <p class="cap-card__label">Description</p>
+          <p class="cap-card__summary">{_h(e.summary)}</p>
           <p class="cap-card__more">Open skill folder →</p>
         </a>"""
             )
@@ -527,13 +396,8 @@ def _card_block_agents(entries: list[AgentEntry], up_to_repo: str) -> str:
                 f"""\
         <a class="cap-card" href="{href}">
           <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>{_h(e.name)}</p>
-          <p class="cap-card__label">Challenge</p>
-          <p class="cap-card__problem">{_h(e.challenge)}</p>
-          <hr class="cap-card__sep">
-          <p class="cap-card__label">Solution</p>
-          <p class="cap-card__solution">{_h(e.solution)}</p>
-          <p class="cap-card__label" style="margin-top:10px">Description</p>
-          <p class="cap-card__solution">{_h(e.description)}</p>
+          <p class="cap-card__label">Description</p>
+          <p class="cap-card__summary">{_h(e.summary)}</p>
           <p class="cap-card__more">Open agent folder →</p>
         </a>"""
             )
@@ -618,8 +482,8 @@ def write_html_pages(
 
     skills_intro = (
         "<p>Each card links to the skill folder under "
-        f"<code>{_h('skills/')}</code>. Challenge, solution, and description are derived from "
-        "<code>SKILL.md</code>.</p>"
+        f"<code>{_h('skills/')}</code>. The short description is derived from "
+        "<code>SKILL.md</code> (YAML <code>description</code>, <code>## Purpose</code>, or opening text).</p>"
     )
     skills_body = f'<h2>Skills ({len(skills)})</h2><div class="cap-grid">{_card_block_skills(skills, up_to_repo)}</div>'
     (output_catalog_dir / "skills.html").write_text(

@@ -136,9 +136,7 @@ h2:first-child { margin-top: 0; }
   opacity: 0.55;
   margin-bottom: 1px;
 }
-.cap-card__problem { font-size: 0.85rem; color: #d4868e; line-height: 1.45; margin: 0 0 8px; }
-.cap-card__solution { font-size: 0.85rem; color: var(--muted); line-height: 1.45; margin: 0 0 8px; }
-.cap-card__sep { border: none; border-top: 1px solid var(--border-muted); margin: 10px 0; }
+.cap-card__summary { font-size: 0.85rem; color: var(--muted); line-height: 1.45; margin: 0 0 8px; }
 .cap-card__more {
   font-size: 0.78rem;
   color: var(--orange);
@@ -177,97 +175,36 @@ h2:first-child { margin-top: 0; }
 
 <p>Each card links to the agent folder under <code>agents/</code>. The generator prefers <code>AGENT.md</code>, then <code>AGENTS.md</code>, then <code>SKILL.md</code>.</p>
 
-<h2>Agents (5)</h2><div class="cap-grid">        <a class="cap-card" href="../../agents/abd-context-to-memory/">
-          <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-context-to-memory</p>
-          <p class="cap-card__label">Challenge</p>
-          <p class="cap-card__problem">Orchestrate convert → chunk → embed → search by coordinating this agent&#x27;s skills.</p>
-          <hr class="cap-card__sep">
-          <p class="cap-card__label">Solution</p>
-          <p class="cap-card__solution">Per-stage procedures: * and each skill&#x27;s **.</p>
-          <p class="cap-card__label" style="margin-top:10px">Description</p>
-          <p class="cap-card__solution">Orchestrate convert → chunk → embed → search by coordinating this agent&#x27;s skills. Decide when each stage runs, whether to use a strategy pass (review  before chunk + embed) or straight-through, and hold cross-stage quality (real headings before chunking, sane splits after chunking).
-
-Per-stage procedures: * and each skill&#x27;s **.
-
----</p>
-          <p class="cap-card__more">Open agent folder →</p>
-        </a>
-        <a class="cap-card" href="../../agents/abd-delivery-lead/">
-          <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>ABD Delivery Lead</p>
-          <p class="cap-card__label">Challenge</p>
-          <p class="cap-card__problem">You are a delivery lead agent orchestrating an Agile by Design (ABD) delivery flow.</p>
-          <hr class="cap-card__sep">
-          <p class="cap-card__label">Solution</p>
-          <p class="cap-card__solution">Build and revise the agile delivery plan (context assessment, risks, strategies, runs, checkpoints). Read this before Step 2 in every engagement.</p>
-          <p class="cap-card__label" style="margin-top:10px">Description</p>
-          <p class="cap-card__solution"># ABD Delivery Lead
-
-You are a delivery lead agent orchestrating an Agile by Design (ABD) delivery flow.
-
-You own the orchestration lifecycle: workspace, planning checkpoints (when to stop and confirm), sequencing runs and stages, bootstrapping  agents, handoff gates, and cross-stage quality. You do not produce deliverables yourself — you delegate to team members with the right role, workspace, and practice skills.
-
-Planning detail lives in the skill, not in this file. For every planning decision — what a plan and run are, how to assess context, risk types, strategies, example plans, and how to design runs — read  ( and the  folder — start with , then the strategy file(s) that match context). Follow that skill when you build, present, or revise the plan.
-
-## Bootstrap inputs (required …</p>
-          <p class="cap-card__more">Open agent folder →</p>
-        </a>
-        <a class="cap-card" href="../../agents/abd-skill-builder/">
-          <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-skill-builder</p>
-          <p class="cap-card__label">Challenge</p>
-          <p class="cap-card__problem">Provide portable repository standards aligned with Open Agent Skills: a focused  for discovery, a merged  for multi-step workflow, plus documentation of build and validation (merge, , scanners, CI) …</p>
-          <hr class="cap-card__sep">
-          <p class="cap-card__label">Solution</p>
-          <p class="cap-card__solution">Provide portable repository standards aligned with Open Agent Skills: a focused  for discovery, a merged  for multi-step workflow, plus documentation of build and validation (merge, , scanners, CI), and a scaffold CLI so new skills match skills.sh-style layout without …</p>
-          <p class="cap-card__label" style="margin-top:10px">Description</p>
-          <p class="cap-card__solution">Provide portable repository standards aligned with Open Agent Skills: a focused  for discovery, a merged  for multi-step workflow, plus documentation of build and validation (merge, , scanners, CI), and a scaffold CLI so new skills match skills.sh-style layout without hand-copying fixtures.
-
-
----</p>
-          <p class="cap-card__more">Open agent folder →</p>
-        </a>
-        <a class="cap-card" href="../../agents/abd-team-member/">
-          <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>ABD Team Member</p>
-          <p class="cap-card__label">Challenge</p>
-          <p class="cap-card__problem">You are an ABD team member agent.</p>
-          <hr class="cap-card__sep">
-          <p class="cap-card__label">Solution</p>
-          <p class="cap-card__solution">Resolve and use the engagement workspace root.</p>
-          <p class="cap-card__label" style="margin-top:10px">Description</p>
-          <p class="cap-card__solution"># ABD Team Member
-
-You are an ABD team member agent.
-
-You sit in a delivery flow: sometimes orchestrated by an  agent, you take a specific team-role (Product Owner, Analyst, or Engineer; see below) and own your part of going from raw context to working software.
-
-This means accepting handoffs from upstream, doing the work required based on your specific role, and using the by Design practice skills that come with that role. You generate outputs (story graphs, specs, tests, code, etc.) so they are available for downstream agents or the user can continue work required to achieve this outcome.
-
-## Bootstrap inputs (required from outside)
-
-Every session MUST be given both of the following. If either is missing, ask once, then proceed with stated assumptions only if the user confirms.
-
--  — …</p>
-          <p class="cap-card__more">Open agent folder →</p>
-        </a>
-        <a class="cap-card" href="../../agents/ai-research-assistant/">
-          <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>ai-research-assistant</p>
-          <p class="cap-card__label">Challenge</p>
-          <p class="cap-card__problem">Orchestrate hypothesis-driven research on AI-augmented delivery and context</p>
-          <hr class="cap-card__sep">
-          <p class="cap-card__label">Solution</p>
-          <p class="cap-card__solution">engineering practices. You coordinate three skills in sequence to produce a</p>
-          <p class="cap-card__label" style="margin-top:10px">Description</p>
-          <p class="cap-card__solution">Orchestrate hypothesis-driven research on AI-augmented delivery and context
-engineering practices. You coordinate three skills in sequence to produce a
-research report that helps the user decide whether their approach is
-well-founded, exposed, or genuinely novel.
-
-You are an impartial advisor — not a cheerleader. The user has explicitly
-asked you to be the voice of reason, to go online, search your model knowledge,
-and keep them from going in directions that are not well-established.
-
----</p>
-          <p class="cap-card__more">Open agent folder →</p>
-        </a></div>
+<h2>Agents (5)</h2><div class="cap-grid"><a class="cap-card" href="../../agents/abd-context-to-memory/">
+  <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-context-to-memory</p>
+  <p class="cap-card__label">Description</p>
+  <p class="cap-card__summary">Orchestrate convert → chunk → embed → search by coordinating this agent&#x27;s skills. Decide when each stage runs, whether to use a strategy pass (review context_chunking_spec.yaml before chunk + embed) or straight-through, and hold cross-stage quality (real headings before chunking, sane splits after …</p>
+  <p class="cap-card__more">Open agent folder →</p>
+</a>
+<a class="cap-card" href="../../agents/abd-delivery-lead/">
+  <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>ABD Delivery Lead</p>
+  <p class="cap-card__label">Description</p>
+  <p class="cap-card__summary">You are a delivery lead agent orchestrating an Agile by Design (ABD) delivery flow.</p>
+  <p class="cap-card__more">Open agent folder →</p>
+</a>
+<a class="cap-card" href="../../agents/abd-skill-builder/">
+  <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-skill-builder</p>
+  <p class="cap-card__label">Description</p>
+  <p class="cap-card__summary">Provide portable repository standards aligned with Open Agent Skills: a focused SKILL.md for discovery, a merged AGENTS.md for multi-step workflow, plus documentation of build and validation (merge, build.py, scanners, CI), and a scaffold CLI so new skills match skills.sh-style layout without …</p>
+  <p class="cap-card__more">Open agent folder →</p>
+</a>
+<a class="cap-card" href="../../agents/abd-team-member/">
+  <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>ABD Team Member</p>
+  <p class="cap-card__label">Description</p>
+  <p class="cap-card__summary">You are an ABD team member agent.</p>
+  <p class="cap-card__more">Open agent folder →</p>
+</a>
+<a class="cap-card" href="../../agents/ai-research-assistant/">
+  <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>ai-research-assistant</p>
+  <p class="cap-card__label">Description</p>
+  <p class="cap-card__summary">Orchestrate hypothesis-driven research on AI-augmented delivery and context engineering practices. You coordinate three skills in sequence to produce a research report that helps the user decide whether their approach is well-founded, exposed, or genuinely novel. You are an impartial advisor — not …</p>
+  <p class="cap-card__more">Open agent folder →</p>
+</a></div>
 
 </div>
 </div>

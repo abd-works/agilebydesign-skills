@@ -3,10 +3,10 @@ name: abd-skill-catalog
 description: >-
   Scan the agilebydesign-skills repository (root skills/ and agents/), then
   regenerate a reader-facing Markdown outline plus a small multi-page HTML
-  site. Each skill and agent entry includes Challenge, Solution, and
-  Description (purpose pulled from SKILL.md or the agent entry doc). Optional
-  repository layout summarizes files (with links) and common folders in one
-  line each.
+  site. Each skill and agent entry includes a short **summary** paragraph (for
+  tables and cards) plus a longer **description** from `## Purpose` when
+  present. Optional repository layout summarizes files (with links) and common
+  folders in one line each.
 license: MIT
 metadata:
   author: agilebydesign
@@ -37,9 +37,10 @@ used under `agents/abd-skill-builder/docs/overview/`.
 
 Each catalogue entry includes:
 
-- **Challenge** — the situation or friction the package addresses.
-- **Solution** — what the package does about it (usually YAML `description`).
-- **Description** — expanded purpose text from `## Purpose` when present.
+- **Summary** — one paragraph for summary tables and HTML cards: YAML
+  `description`, else flattened `## Purpose`, else opening text after the H1.
+- **Description** — expanded purpose text from `## Purpose` when present, else
+  YAML `description` or body excerpt (used in the outline detail sections).
 - **Repository layout** — top-level files with a one-line blurb and relative
   link; common directories (`rules`, `templates`, `scripts`, …) get **one**
   folder-level sentence instead of enumerating every file inside.
@@ -69,18 +70,17 @@ Each catalogue entry includes:
 3. **Extraction (skills).** Same heuristics as `skill-garden-catalogue`:
 
    - *Name* — YAML `name`, else directory name.
-   - *Challenge* — first meaningful sentence from `## Purpose`, else first
-     substantive bullet from “When to use”, else the H1 title.
-   - *Solution* — YAML `description` (trimmed).
-   - *Description* — full `## Purpose` body when present, else beginning of
-     the markdown body.
+   - *Summary* — YAML `description` when present, else first paragraph of
+     `## Purpose`, else text between H1 and the first `##` heading.
+   - *Description* — full `## Purpose` body when present, else YAML
+     `description`, else beginning of the markdown body.
 
 4. **Extraction (agents).**
 
    - *Name* — YAML `name` if present, else markdown H1 heading text.
-   - *Challenge / Solution / Description* — prefer `## Purpose` when present;
-     otherwise derive from the opening sections (`## Introduction`, first
-     paragraphs). YAML `description` feeds **Solution** when present.
+   - *Summary / Description* — prefer `## Purpose` when present; otherwise derive
+     from the opening sections (`## Introduction`, first paragraphs). YAML
+     `description` feeds the summary when present.
 
 5. **Templates.** HTML shell and CSS live under
    `skills/abd-skill-catalog/templates/` and are copied with token replacement.
