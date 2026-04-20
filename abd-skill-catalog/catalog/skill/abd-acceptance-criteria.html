@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ABD catalogue — skill · abd-acceptance-criteria</title>
+<style>
 :root {
   --orange: #ff7a00;
   --bg: #09090b;
@@ -212,3 +219,78 @@ h2:first-child { margin-top: 0; }
 .file-list a {
   font-weight: 600;
 }
+
+</style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="panel" role="main">
+
+<header class="panel-header entry-detail-header">
+  <div class="header-icon">
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:6px;">
+      <rect width="52" height="52" rx="8" fill="#0e0e10"/>
+      <path d="M16 14h20a2 2 0 0 1 2 2v20a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2V16a2 2 0 0 1 2-2z" stroke="#FF7A00" stroke-width="1.5" fill="rgba(255,122,0,0.06)"/>
+      <path d="M20 22h12M20 26h9M20 30h12" stroke="#FF7A00" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="header-text">
+    <p class="brand"><strong>Agile by Design</strong> &middot; abd-skill-catalog</p>
+    <a class="back-link" href="../skills.html">← All skills</a>
+    <p class="cap-badge">Practice skill</p>
+    <h1>abd-acceptance-criteria</h1>
+    <p class="tagline">Teaches exploration-phase acceptance criteria for story-graph.json: WHEN/THEN/AND/BUT, behavioral language, per-story domain terms, atomic AC, actor alternation, channel-specific detail, and verb–noun naming for story elements. Ships Markdown rules and Python scanners under this skill root for …</p>
+  </div>
+</header>
+
+<div class="panel-body">
+
+<nav class="nav" aria-label="Catalogue sections">
+  <a href="../index.html" class="nav__link">Hub</a>
+  <a href="../skills.html" class="nav__link nav__link--current">Skills</a>
+  <a href="../agents.html" class="nav__link">Agents</a>
+</nav>
+
+<h2>Description</h2>
+<div class="entry-prose">Build acceptance criteria per story, that explain what must be true when users and systems interact: observable triggers (WHEN), expected outcomes (THEN), chained effects (AND), and explicit negatives (BUT). These act as informal first-draft BDD-style steps that guide downstream scenario work. Focus on interactions using domain terms, avoid implementation detail unless the story is technical, and even then keep it minimal.<br>
+<br>
+This skill is the practice standard for that work: templates for deliverables, rules for what “good” means (atomic AC, actor alternation, domain emphasis, channel-specific detail, source evidence when AC come from documents), and scanners that can run predictable mechanical checks alongside human review.</div>
+
+<hr class="entry-divider">
+
+<h2>Package layout</h2>
+<p class="entry-caption">ASCII overview (same spirit as <code>agents/abd-skill-builder/docs/overview/</code> capability pages).</p>
+<pre class="ascii-diagram" role="img" aria-label="Package structure">       repository
+           │
+           ▼
+  ┌─────────────────────────┐
+  │ SKILL.md                  │
+  │ (entry document)        │
+  └────────────┬────────────┘
+               │
+  peers at package root:
+               │
+               ▼
+
+skills/abd-acceptance-criteria/
+├── rules/
+├── scanners/
+├── templates/
+└── SKILL.md</pre>
+
+<hr class="entry-divider">
+
+<h2>Contents</h2>
+<p class="entry-caption">Each file: short preview and link. Folders: one summary line for the whole folder (not every nested file).</p>
+<ul class="file-list">
+<li><strong>rules/</strong><span class="file-meta"> → Practice rules (DO/DON&#x27;T) and constraints used with scanners.</span> <a href="../../../skills/abd-acceptance-criteria/rules/">open folder</a></li>
+<li><strong>scanners/</strong><span class="file-meta"> → Supporting folder (14 items).</span> <a href="../../../skills/abd-acceptance-criteria/scanners/">open folder</a></li>
+<li><strong>templates/</strong><span class="file-meta"> → Authoring templates and structural skeletons.</span> <a href="../../../skills/abd-acceptance-criteria/templates/">open folder</a></li>
+<li><strong>SKILL.md</strong><span class="file-meta"> → name: abd-acceptance-criteria</span> <a href="../../../skills/abd-acceptance-criteria/SKILL.md">open file</a></li>
+</ul>
+
+</div>
+</div>
+</div>
+</body>
+</html>

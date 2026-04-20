@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ABD catalogue — skill · abd-specification-by-example</title>
+<style>
 :root {
   --orange: #ff7a00;
   --bg: #09090b;
@@ -212,3 +219,76 @@ h2:first-child { margin-top: 0; }
 .file-list a {
   font-weight: 600;
 }
+
+</style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="panel" role="main">
+
+<header class="panel-header entry-detail-header">
+  <div class="header-icon">
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:6px;">
+      <rect width="52" height="52" rx="8" fill="#0e0e10"/>
+      <path d="M16 14h20a2 2 0 0 1 2 2v20a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2V16a2 2 0 0 1 2-2z" stroke="#FF7A00" stroke-width="1.5" fill="rgba(255,122,0,0.06)"/>
+      <path d="M20 22h12M20 26h9M20 30h12" stroke="#FF7A00" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="header-text">
+    <p class="brand"><strong>Agile by Design</strong> &middot; abd-skill-catalog</p>
+    <a class="back-link" href="../skills.html">← All skills</a>
+    <p class="cap-badge">Practice skill</p>
+    <h1>abd-specification-by-example</h1>
+    <p class="tagline">Produce specification-by-example scenarios: concrete Given/When/Then steps with real domain values, bold concept names, italic values. Two templates: plain scenarios (inline values, default) and outline (same steps, multiple data rows). Use when writing BDD scenarios, refining AC into specs, or …</p>
+  </div>
+</header>
+
+<div class="panel-body">
+
+<nav class="nav" aria-label="Catalogue sections">
+  <a href="../index.html" class="nav__link">Hub</a>
+  <a href="../skills.html" class="nav__link nav__link--current">Skills</a>
+  <a href="../agents.html" class="nav__link">Agents</a>
+</nav>
+
+<h2>Description</h2>
+<div class="entry-prose">Write Given/When/Then scenarios that make a story&#x27;s expected behavior concrete and testable, using real domain values and named outcomes so the team can verify what the system must do.</div>
+
+<hr class="entry-divider">
+
+<h2>Package layout</h2>
+<p class="entry-caption">ASCII overview (same spirit as <code>agents/abd-skill-builder/docs/overview/</code> capability pages).</p>
+<pre class="ascii-diagram" role="img" aria-label="Package structure">       repository
+           │
+           ▼
+  ┌─────────────────────────┐
+  │ SKILL.md                  │
+  │ (entry document)        │
+  └────────────┬────────────┘
+               │
+  peers at package root:
+               │
+               ▼
+
+skills/abd-specification-by-example/
+├── rules/
+├── scanners/
+├── templates/
+└── SKILL.md</pre>
+
+<hr class="entry-divider">
+
+<h2>Contents</h2>
+<p class="entry-caption">Each file: short preview and link. Folders: one summary line for the whole folder (not every nested file).</p>
+<ul class="file-list">
+<li><strong>rules/</strong><span class="file-meta"> → Practice rules (DO/DON&#x27;T) and constraints used with scanners.</span> <a href="../../../skills/abd-specification-by-example/rules/">open folder</a></li>
+<li><strong>scanners/</strong><span class="file-meta"> → Supporting folder (2 items).</span> <a href="../../../skills/abd-specification-by-example/scanners/">open folder</a></li>
+<li><strong>templates/</strong><span class="file-meta"> → Authoring templates and structural skeletons.</span> <a href="../../../skills/abd-specification-by-example/templates/">open folder</a></li>
+<li><strong>SKILL.md</strong><span class="file-meta"> → name: abd-specification-by-example</span> <a href="../../../skills/abd-specification-by-example/SKILL.md">open file</a></li>
+</ul>
+
+</div>
+</div>
+</div>
+</body>
+</html>

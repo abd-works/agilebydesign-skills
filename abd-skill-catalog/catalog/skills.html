@@ -144,6 +144,82 @@ h2:first-child { margin-top: 0; }
   margin: 10px 0 0;
 }
 
+/* Entry detail pages (skill/*.html, agent/*.html) — overview-style */
+.entry-detail-header .back-link {
+  font-size: 0.82rem;
+  color: var(--muted);
+  display: inline-block;
+  margin: 0 0 10px;
+}
+.entry-detail-header .back-link:hover {
+  color: var(--orange);
+}
+.cap-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--orange);
+  background: rgba(255, 122, 0, 0.08);
+  border: 1px solid rgba(255, 122, 0, 0.25);
+  border-radius: 3px;
+  padding: 2px 8px;
+  margin: 0 0 8px;
+}
+.entry-caption {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.entry-prose {
+  white-space: pre-wrap;
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+.entry-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 26px 0;
+}
+.ascii-diagram {
+  background: #111114;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.83em;
+  line-height: 1.55;
+  color: #b8b8c2;
+  margin: 0 0 18px;
+}
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.file-list li {
+  margin: 0 0 14px;
+  padding: 10px 12px 10px 14px;
+  border-left: 3px solid var(--border-muted);
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 0 4px 4px 0;
+}
+.file-list .file-meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+  display: block;
+  margin-top: 4px;
+}
+.file-list a {
+  font-weight: 600;
+}
+
 </style>
 </head>
 <body>
@@ -173,109 +249,109 @@ h2:first-child { margin-top: 0; }
   <a href="agents.html" class="nav__link">Agents</a>
 </nav>
 
-<p>Each card links to the skill folder under <code>skills/</code>. The short description is derived from <code>SKILL.md</code> (YAML <code>description</code>, <code>## Purpose</code>, or opening text).</p>
+<p>Each card opens a <strong>skill detail page</strong> (description, ASCII package layout in a <code>&lt;pre&gt;</code>, and a contents list with links into the repo). Summaries come from <code>SKILL.md</code> (YAML <code>description</code>, <code>## Purpose</code>, or opening text).</p>
 
-<h2>Skills (17)</h2><div class="cap-grid"><a class="cap-card" href="../../skills/abd-acceptance-criteria/">
+<h2>Skills (17)</h2><div class="cap-grid"><a class="cap-card" href="skill/abd-acceptance-criteria.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-acceptance-criteria</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Teaches exploration-phase acceptance criteria for story-graph.json: WHEN/THEN/AND/BUT, behavioral language, per-story domain terms, atomic AC, actor alternation, channel-specific detail, and verb–noun naming for story elements. Ships Markdown rules and Python scanners under this skill root for …</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/abd-acceptance-test-driven-development/">
+<a class="cap-card" href="skill/abd-acceptance-test-driven-development.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-acceptance-test-driven-development</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Write tests first. Write code to pass them. This skill creates executable test files — in whatever language and framework the project uses — from whatever behavioral context is available: specification scenarios, acceptance criteria, stories, notes, or a rough description of what the system should …</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/abd-clean-code/">
+<a class="cap-card" href="skill/abd-clean-code.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-clean-code</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Write production code that implements story behavior using domain language, clean functions, explicit dependencies, and observable design. This skill covers the full quality bar for implementation code: single-responsibility functions and classes, intention-revealing names, explicit constructor …</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/abd-delivery-planning/">
+<a class="cap-card" href="skill/abd-delivery-planning.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-delivery-planning</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Build and revise agile delivery plans: context assessment, risk types, strategies (scan strategies/ for matching When to use), runs (stages, scope, checkpoints, rationale), and example plans. Planning only — not for producing story artifacts, tests, or code (those come from downstream practice …</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/abd-skill-catalog/">
+<a class="cap-card" href="skill/abd-skill-catalog.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-skill-catalog</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Scan the agilebydesign-skills repository (root skills/ and agents/), then regenerate a reader-facing Markdown outline plus a small multi-page HTML site. Each skill and agent entry includes a short summary paragraph (for tables and cards) plus a longer description from ## Purpose when present …</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/abd-specification-by-example/">
+<a class="cap-card" href="skill/abd-specification-by-example.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-specification-by-example</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Produce specification-by-example scenarios: concrete Given/When/Then steps with real domain values, bold concept names, italic values. Two templates: plain scenarios (inline values, default) and outline (same steps, multiple data rows). Use when writing BDD scenarios, refining AC into specs, or …</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/abd-story-mapping/">
+<a class="cap-card" href="skill/abd-story-mapping.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-story-mapping</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Teaches Patton-style story mapping: epics, sub-epics, stories, verb–noun naming, and actors via story_type. When building a map from sources, outputs all template artifacts in templates/ (currently story-map.md and story-map.txt) with the same tree — not one or the other. Use when structuring …</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/abd-thin-slicing/">
+<a class="cap-card" href="skill/abd-thin-slicing.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-thin-slicing</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Produce thin-sliced delivery increments: vertical MVIs, spine vs optional paths, quality trade-offs, marketable increment names, and early risk validation. From a story map, write all template artifacts in templates/ (thin-slicing.md and thin-slicing.txt) with identical increment and story …</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/commit-msg/">
+<a class="cap-card" href="skill/commit-msg.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-commit-msg</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Generate meaningful commit messages from scope and changed files. No story_graph — scope from conversation, changed files, and persisted state. Use when user types /commit or requests a commit.</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/deploy-skill-to-cursor/">
+<a class="cap-card" href="skill/deploy-skill-to-cursor.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>deploy-skill-to-cursor</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Deploy a skill from agilebydesign-skills into Cursor&#x27;s user skills folder using a Windows directory junction (no duplicate copy). Run scripts/Deploy-SkillToCursor.ps1 with the skill folder name. Use when you want the global Cursor skills path to point at the repo canonical skill.</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/execute_using_rules/">
+<a class="cap-card" href="skill/execute_using_rules.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>execute-rules</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Bundle rules into SKILL.md, run scanners, quality steps (rules before work), and the correction process after mistakes — commands first, details after.</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/ooad/">
+<a class="cap-card" href="skill/ooad.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-ooad</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Object-Oriented Analysis and Design (OOAD) from raw material. Use this skill whenever you&#x27;re working with specifications, game manuals, policy docs, messy code, or rule books that need to be modeled as object-oriented domain models. Agile by Design methodology: Steps 0–2 (Domain Scan, Extraction …</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/proposal-respond/">
+<a class="cap-card" href="skill/proposal-respond.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-proposal-respond</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Respond to client proposals (RFP, Q&amp;A, requirements) by converting materials to memory, creating a response strategy, and answering questions iteratively. Depends on abd-context-to-memory for RAG. Use when responding to proposals, creating response plans, answering RFP questions, or iterating on …</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/skill-garden-catalogue/">
+<a class="cap-card" href="skill/skill-garden-catalogue.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>skill-garden-catalogue</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Scan a folder of deployed skills and regenerate a one-pager Markdown inventory and an HTML catalogue. Each entry shows the challenge the skill addresses and the solution it provides, hyperlinked to the skill directory. Re-run on command to keep the catalogue current.</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/story-graph-ops/">
+<a class="cap-card" href="skill/story-graph-ops.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>story-graph-ops</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Create, read, update, and delete story-graph.json (whole file or parts—epics, sub-epics, stories, AC, scenarios) as a standalone artifact—no host app required. Agents must complete the ops loop: use this skill’s CLI or Python modules under scripts/, then validate the file—do not stop after …</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/track_task/">
+<a class="cap-card" href="skill/track_task.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>track-task</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Track multi-step work with markdown checkboxes (- [ ] / - [x]) for any skill or agent—pipeline phases, per-phase steps, or ad-hoc lists—under the engagement workspace, without editing normative skill sources.</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a>
-<a class="cap-card" href="../../skills/workspace_skill/">
+<a class="cap-card" href="skill/workspace_skill.html">
   <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>workspace</p>
   <p class="cap-card__label">Description</p>
   <p class="cap-card__summary">Set and read the agent engagement root (skill-config.json → workspace.active_skill_workspace). Run scripts from this folder; they resolve the agent root automatically.</p>
-  <p class="cap-card__more">Open skill folder →</p>
+  <p class="cap-card__more">Open skill page →</p>
 </a></div>
 
 </div>

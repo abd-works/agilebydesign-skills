@@ -34,6 +34,8 @@ used under `agents/abd-skill-builder/docs/overview/`.
 | **Site hub** | HTML | `abd-skill-catalog/catalog/index.html` |
 | **Skills grid** | HTML | `abd-skill-catalog/catalog/skills.html` |
 | **Agents grid** | HTML | `abd-skill-catalog/catalog/agents.html` |
+| **Skill detail pages** | HTML | `abd-skill-catalog/catalog/skill/<dir>.html` (one per skill; cards link here) |
+| **Agent detail pages** | HTML | `abd-skill-catalog/catalog/agent/<dir>.html` (one per agent; cards link here) |
 
 Each catalogue entry includes:
 
@@ -44,6 +46,9 @@ Each catalogue entry includes:
 - **Repository layout** — top-level files with a one-line blurb and relative
   link; common directories (`rules`, `templates`, `scripts`, …) get **one**
   folder-level sentence instead of enumerating every file inside.
+- **Detail pages** — full description, an ASCII package diagram inside a
+  `<pre>` (same spirit as `agents/abd-skill-builder/docs/overview/` capability
+  pages), and a contents list with links into the repository.
 
 ## Agent instructions
 

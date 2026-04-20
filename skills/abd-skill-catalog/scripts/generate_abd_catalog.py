@@ -6,9 +6,11 @@ from __future__ import annotations
 import argparse
 import html as html_mod
 import re
+import shutil
 import textwrap
 from pathlib import Path
 from typing import NamedTuple
+from urllib.parse import quote
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 SKILL_DIR = SCRIPT_DIR.parent
@@ -280,6 +282,211 @@ def _path_up_to_ancestor(from_dir: Path, ancestor: Path) -> str:
     return "../" * n
 
 
+def _h(text: str) -> str:
+    return html_mod.escape(text)
+
+
+def _repo_href(href_to_repo: str, rel_posix: str) -> str:
+    rel_posix = rel_posix.replace("\\", "/").strip("/")
+    if not rel_posix:
+        return href_to_repo
+    parts = [quote(p, safe="") for p in rel_posix.split("/") if p]
+    return href_to_repo + "/".join(parts)
+
+
+def _full_purpose_plain(fm: dict[str, str], body: str) -> str:
+    """Full description text from ## Purpose (preferred), else YAML description, else body."""
+    purpose = _extract_section(body, "Purpose")
+    if purpose:
+        return _strip_md(purpose)
+    desc = fm.get("description", "")
+    if desc.strip():
+        return _strip_md(desc)
+    return _strip_md(body)
+
+
+def _load_package_source(package_dir: Path, kind: str) -> tuple[dict[str, str], str, str]:
+    """kind is 'skill' or 'agent'. Returns (frontmatter, body, entry_filename)."""
+    if kind == "skill":
+        path = package_dir / "SKILL.md"
+        if not path.is_file():
+            return {}, "", ""
+        text = path.read_text(encoding="utf-8", errors="replace")
+        fm = _parse_frontmatter(text)
+        body = FRONTMATTER_RE.sub("", text).strip()
+        return fm, body, "SKILL.md"
+    for fname in ("AGENT.md", "AGENTS.md", "SKILL.md"):
+        path = package_dir / fname
+        if path.is_file():
+            text = path.read_text(encoding="utf-8", errors="replace")
+            fm = _parse_frontmatter(text)
+            body = FRONTMATTER_RE.sub("", text).strip()
+            return fm, body, fname
+    return {}, "", ""
+
+
+def _ascii_package_diagram(repo_rel: str, entry_filename: str, package_dir: Path) -> str:
+    """ASCII diagram (abd-skill-builder overview style): flow + top-level tree."""
+    ef = entry_filename if len(entry_filename) <= 24 else entry_filename[:21] + "…"
+    lines = [
+        "       repository",
+        "           │",
+        "           ▼",
+        "  ┌─────────────────────────┐",
+        f"  │ {ef:<25} │",
+        "  │ (entry document)        │",
+        "  └────────────┬────────────┘",
+        "               │",
+        "  peers at package root:",
+        "               │",
+        "               ▼",
+        "",
+    ]
+    if not package_dir.is_dir():
+        lines.append("(could not read package directory)")
+        return "\n".join(lines)
+    try:
+        kids = sorted(package_dir.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower()))
+    except OSError:
+        lines.append("(could not read directory)")
+        return "\n".join(lines)
+    lines.append(f"{repo_rel}/")
+    for i, p in enumerate(kids):
+        branch = "└── " if i == len(kids) - 1 else "├── "
+        label = p.name + ("/" if p.is_dir() else "")
+        lines.append(branch + label)
+    return "\n".join(lines)
+
+
+def _html_contents_list(repo_root: Path, package_dir: Path, href_to_repo: str) -> str:
+    """HTML list: files with 1–2 sentence blurbs + link; dirs one summary + folder link."""
+    if not package_dir.is_dir():
+        return '<p class="entry-caption">(missing directory)</p>'
+    try:
+        kids = sorted(package_dir.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower()))
+    except OSError:
+        return '<p class="entry-caption">(could not read directory)</p>'
+    parts: list[str] = []
+    for p in kids:
+        rel = p.relative_to(repo_root).as_posix()
+        if p.is_dir():
+            try:
+                n = len(list(p.iterdir()))
+            except OSError:
+                n = 0
+            summary = KNOWN_DIR_SUMMARY.get(p.name, f"Supporting folder ({n} items).")
+            url = _repo_href(href_to_repo, rel) + "/"
+            parts.append(
+                "<li><strong>"
+                + _h(p.name)
+                + "/</strong><span class=\"file-meta\"> → "
+                + _h(summary)
+                + '</span> <a href="'
+                + _h(url)
+                + '">open folder</a></li>'
+            )
+        else:
+            blurb = _file_blurb(p, max_len=260)
+            url = _repo_href(href_to_repo, rel)
+            parts.append(
+                "<li><strong>"
+                + _h(p.name)
+                + "</strong><span class=\"file-meta\"> → "
+                + _h(blurb)
+                + '</span> <a href="'
+                + _h(url)
+                + '">open file</a></li>'
+            )
+    if not parts:
+        return '<p class="entry-caption">(no top-level files)</p>'
+    return '<ul class="file-list">\n' + "\n".join(parts) + "\n</ul>"
+
+
+def _nav_cls(which: str, current: str) -> str:
+    return "nav__link nav__link--current" if which == current else "nav__link"
+
+
+def write_entry_detail_pages(
+    output_catalog_dir: Path,
+    repo_root: Path,
+    skills: list[SkillEntry],
+    agents: list[AgentEntry],
+    detail_css: str,
+    detail_tpl: str,
+) -> tuple[int, int]:
+    """Write catalog/skill/<dir>.html and catalog/agent/<dir>.html. Returns counts."""
+    href_to_repo = _path_up_to_ancestor(output_catalog_dir / "skill", repo_root)
+    if not href_to_repo:
+        href_to_repo = "./"
+    nav_prefix = "../"
+    brand = "<strong>Agile by Design</strong> &middot; abd-skill-catalog"
+
+    skill_out = output_catalog_dir / "skill"
+    agent_out = output_catalog_dir / "agent"
+    if skill_out.exists():
+        shutil.rmtree(skill_out)
+    if agent_out.exists():
+        shutil.rmtree(agent_out)
+    skill_out.mkdir(parents=True)
+    agent_out.mkdir(parents=True)
+
+    for s in skills:
+        pkg = repo_root / "skills" / s.dir_name
+        fm, body, entry_fn = _load_package_source(pkg, "skill")
+        desc_plain = _full_purpose_plain(fm, body) if body or fm else s.summary
+        desc_html = _h(desc_plain).replace("\n", "<br>\n")
+        rel_posix = f"skills/{s.dir_name}"
+        ascii_art = _ascii_package_diagram(rel_posix, entry_fn or "SKILL.md", pkg)
+        file_list = _html_contents_list(repo_root, pkg, href_to_repo)
+        html = (
+            detail_tpl.replace("{{CSS}}", detail_css)
+            .replace("{{TITLE}}", _h(f"ABD catalogue — skill · {s.name}"))
+            .replace("{{BRAND}}", brand)
+            .replace("{{BACK_HREF}}", f"{nav_prefix}skills.html")
+            .replace("{{BACK_LABEL}}", "← All skills")
+            .replace("{{BADGE}}", "Practice skill")
+            .replace("{{H1}}", _h(s.name))
+            .replace("{{TAGLINE}}", _h(s.summary))
+            .replace("{{NAV_PREFIX}}", nav_prefix)
+            .replace("{{NAV_HUB}}", _nav_cls("hub", "skills"))
+            .replace("{{NAV_SKILLS}}", _nav_cls("skills", "skills"))
+            .replace("{{NAV_AGENTS}}", _nav_cls("agents", "skills"))
+            .replace("{{DESCRIPTION}}", desc_html)
+            .replace("{{ASCII_DIAGRAM}}", _h(ascii_art))
+            .replace("{{FILE_LIST}}", file_list)
+        )
+        (skill_out / f"{s.dir_name}.html").write_text(html, encoding="utf-8")
+
+    for a in agents:
+        pkg = repo_root / "agents" / a.dir_name
+        fm, body, entry_fn = _load_package_source(pkg, "agent")
+        desc_plain = _full_purpose_plain(fm, body) if body or fm else a.summary
+        desc_html = _h(desc_plain).replace("\n", "<br>\n")
+        rel_posix = f"agents/{a.dir_name}"
+        ascii_art = _ascii_package_diagram(rel_posix, entry_fn or a.entry_file, pkg)
+        file_list = _html_contents_list(repo_root, pkg, href_to_repo)
+        html = (
+            detail_tpl.replace("{{CSS}}", detail_css)
+            .replace("{{TITLE}}", _h(f"ABD catalogue — agent · {a.name}"))
+            .replace("{{BRAND}}", brand)
+            .replace("{{BACK_HREF}}", f"{nav_prefix}agents.html")
+            .replace("{{BACK_LABEL}}", "← All agents")
+            .replace("{{BADGE}}", "Agent")
+            .replace("{{H1}}", _h(a.name))
+            .replace("{{TAGLINE}}", _h(a.summary))
+            .replace("{{NAV_PREFIX}}", nav_prefix)
+            .replace("{{NAV_HUB}}", _nav_cls("hub", "agents"))
+            .replace("{{NAV_SKILLS}}", _nav_cls("skills", "agents"))
+            .replace("{{NAV_AGENTS}}", _nav_cls("agents", "agents"))
+            .replace("{{DESCRIPTION}}", desc_html)
+            .replace("{{ASCII_DIAGRAM}}", _h(ascii_art))
+            .replace("{{FILE_LIST}}", file_list)
+        )
+        (agent_out / f"{a.dir_name}.html").write_text(html, encoding="utf-8")
+
+    return len(skills), len(agents)
+
+
 def generate_outline_md(
     repo_root: Path,
     skills: list[SkillEntry],
@@ -365,22 +572,18 @@ def generate_outline_md(
     return "\n".join(lines)
 
 
-def _h(text: str) -> str:
-    return html_mod.escape(text)
-
-
 def _card_block_skills(entries: list[SkillEntry], up_to_repo: str) -> str:
     parts: list[str] = []
     for e in entries:
-        href = f"{up_to_repo}skills/{_h(e.dir_name)}/"
+        href = f"skill/{quote(e.dir_name, safe='')}.html"
         parts.append(
             textwrap.dedent(
                 f"""\
-        <a class="cap-card" href="{href}">
+        <a class="cap-card" href="{_h(href)}">
           <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M7 8h10M7 12h7M7 16h10" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>{_h(e.name)}</p>
           <p class="cap-card__label">Description</p>
           <p class="cap-card__summary">{_h(e.summary)}</p>
-          <p class="cap-card__more">Open skill folder →</p>
+          <p class="cap-card__more">Open skill page →</p>
         </a>"""
             )
         )
@@ -390,15 +593,15 @@ def _card_block_skills(entries: list[SkillEntry], up_to_repo: str) -> str:
 def _card_block_agents(entries: list[AgentEntry], up_to_repo: str) -> str:
     parts: list[str] = []
     for e in entries:
-        href = f"{up_to_repo}agents/{_h(e.dir_name)}/"
+        href = f"agent/{quote(e.dir_name, safe='')}.html"
         parts.append(
             textwrap.dedent(
                 f"""\
-        <a class="cap-card" href="{href}">
+        <a class="cap-card" href="{_h(href)}">
           <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>{_h(e.name)}</p>
           <p class="cap-card__label">Description</p>
           <p class="cap-card__summary">{_h(e.summary)}</p>
-          <p class="cap-card__more">Open agent folder →</p>
+          <p class="cap-card__more">Open agent page →</p>
         </a>"""
             )
         )
@@ -417,13 +620,17 @@ def write_html_pages(
     repo_root: Path,
     skills: list[SkillEntry],
     agents: list[AgentEntry],
-) -> None:
-    """Write index.html, skills.html, agents.html under output_catalog_dir."""
+) -> tuple[int, int]:
+    """Write index.html, skills.html, agents.html and per-entry detail pages.
+
+    Returns (skill_detail_count, agent_detail_count).
+    """
     up_to_repo = _path_up_to_ancestor(output_catalog_dir, repo_root)
     if not up_to_repo:
         up_to_repo = "./"
     idx_tpl = _load_template("page-catalog.html")
     css = _load_template("catalog.css")
+    detail_tpl = _load_template("page-entry-detail.html")
 
     def fill(
         tpl: str,
@@ -481,8 +688,8 @@ def write_html_pages(
     (output_catalog_dir / "index.html").write_text(index_html, encoding="utf-8")
 
     skills_intro = (
-        "<p>Each card links to the skill folder under "
-        f"<code>{_h('skills/')}</code>. The short description is derived from "
+        "<p>Each card opens a <strong>skill detail page</strong> (description, ASCII package layout in a "
+        "<code>&lt;pre&gt;</code>, and a contents list with links into the repo). Summaries come from "
         "<code>SKILL.md</code> (YAML <code>description</code>, <code>## Purpose</code>, or opening text).</p>"
     )
     skills_body = f'<h2>Skills ({len(skills)})</h2><div class="cap-grid">{_card_block_skills(skills, up_to_repo)}</div>'
@@ -501,8 +708,8 @@ def write_html_pages(
     )
 
     agents_intro = (
-        "<p>Each card links to the agent folder under "
-        f"<code>{_h('agents/')}</code>. The generator prefers <code>AGENT.md</code>, then "
+        "<p>Each card opens an <strong>agent detail page</strong> (same layout as skills: description, "
+        "ASCII layout diagram, contents). Entry file is <code>AGENT.md</code>, then "
         "<code>AGENTS.md</code>, then <code>SKILL.md</code>.</p>"
     )
     agents_body = f'<h2>Agents ({len(agents)})</h2><div class="cap-grid">{_card_block_agents(agents, up_to_repo)}</div>'
@@ -519,6 +726,11 @@ def write_html_pages(
         ),
         encoding="utf-8",
     )
+
+    n_skill_pages, n_agent_pages = write_entry_detail_pages(
+        output_catalog_dir, repo_root, skills, agents, css, detail_tpl
+    )
+    return n_skill_pages, n_agent_pages
 
 
 def main() -> None:
@@ -567,10 +779,12 @@ def main() -> None:
     )
     print(f"  wrote {outline_path}")
 
-    write_html_pages(catalog_dir, repo_root, skills, agents)
+    n_sk_detail, n_ag_detail = write_html_pages(catalog_dir, repo_root, skills, agents)
     print(f"  wrote {catalog_dir / 'index.html'}")
     print(f"  wrote {catalog_dir / 'skills.html'}")
     print(f"  wrote {catalog_dir / 'agents.html'}")
+    print(f"  wrote {n_sk_detail} skill detail pages under catalog/skill/")
+    print(f"  wrote {n_ag_detail} agent detail pages under catalog/agent/")
     print(f"  ({len(skills)} skills, {len(agents)} agents)")
 
 

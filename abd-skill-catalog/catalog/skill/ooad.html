@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ABD catalogue — Agents</title>
+<title>ABD catalogue — skill · abd-ooad</title>
 <style>
 :root {
   --orange: #ff7a00;
@@ -226,7 +226,7 @@ h2:first-child { margin-top: 0; }
 <div class="page-wrap">
 <div class="panel" role="main">
 
-<header class="panel-header">
+<header class="panel-header entry-detail-header">
   <div class="header-icon">
     <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:6px;">
       <rect width="52" height="52" rx="8" fill="#0e0e10"/>
@@ -236,51 +236,70 @@ h2:first-child { margin-top: 0; }
   </div>
   <div class="header-text">
     <p class="brand"><strong>Agile by Design</strong> &middot; abd-skill-catalog</p>
-    <h1>Agents</h1>
-    <p class="tagline">5 entries.</p>
+    <a class="back-link" href="../skills.html">← All skills</a>
+    <p class="cap-badge">Practice skill</p>
+    <h1>abd-ooad</h1>
+    <p class="tagline">Object-Oriented Analysis and Design (OOAD) from raw material. Use this skill whenever you&#x27;re working with specifications, game manuals, policy docs, messy code, or rule books that need to be modeled as object-oriented domain models. Agile by Design methodology: Steps 0–2 (Domain Scan, Extraction …</p>
   </div>
 </header>
 
 <div class="panel-body">
 
 <nav class="nav" aria-label="Catalogue sections">
-  <a href="index.html" class="nav__link">Hub</a>
-  <a href="skills.html" class="nav__link">Skills</a>
-  <a href="agents.html" class="nav__link nav__link--current">Agents</a>
+  <a href="../index.html" class="nav__link">Hub</a>
+  <a href="../skills.html" class="nav__link nav__link--current">Skills</a>
+  <a href="../agents.html" class="nav__link">Agents</a>
 </nav>
 
-<p>Each card opens an <strong>agent detail page</strong> (same layout as skills: description, ASCII layout diagram, contents). Entry file is <code>AGENT.md</code>, then <code>AGENTS.md</code>, then <code>SKILL.md</code>.</p>
+<h2>Description</h2>
+<div class="entry-prose">Object-Oriented Analysis and Design (OOAD) from raw material. Use this skill whenever you&#x27;re working with specifications, game manuals, policy docs, messy code, or rule books that need to be modeled as object-oriented domain models. Agile by Design methodology: Steps 0–2 (Domain Scan, Extraction, Refinement) with built-in Draw.io diagram generation via scripts/drawio_cli.py. ALWAYS use this skill when a user provides domain material and asks you to extract domain concepts, build class diagrams, identify responsibilities, or create object models. Create domain-scan-model.md and domain-scan-model.drawio files in the project workspace.</div>
 
-<h2>Agents (5)</h2><div class="cap-grid"><a class="cap-card" href="agent/abd-context-to-memory.html">
-  <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-context-to-memory</p>
-  <p class="cap-card__label">Description</p>
-  <p class="cap-card__summary">Orchestrate convert → chunk → embed → search by coordinating this agent&#x27;s skills. Decide when each stage runs, whether to use a strategy pass (review context_chunking_spec.yaml before chunk + embed) or straight-through, and hold cross-stage quality (real headings before chunking, sane splits after …</p>
-  <p class="cap-card__more">Open agent page →</p>
-</a>
-<a class="cap-card" href="agent/abd-delivery-lead.html">
-  <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>ABD Delivery Lead</p>
-  <p class="cap-card__label">Description</p>
-  <p class="cap-card__summary">You are a delivery lead agent orchestrating an Agile by Design (ABD) delivery flow.</p>
-  <p class="cap-card__more">Open agent page →</p>
-</a>
-<a class="cap-card" href="agent/abd-skill-builder.html">
-  <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-skill-builder</p>
-  <p class="cap-card__label">Description</p>
-  <p class="cap-card__summary">Provide portable repository standards aligned with Open Agent Skills: a focused SKILL.md for discovery, a merged AGENTS.md for multi-step workflow, plus documentation of build and validation (merge, build.py, scanners, CI), and a scaffold CLI so new skills match skills.sh-style layout without …</p>
-  <p class="cap-card__more">Open agent page →</p>
-</a>
-<a class="cap-card" href="agent/abd-team-member.html">
-  <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>ABD Team Member</p>
-  <p class="cap-card__label">Description</p>
-  <p class="cap-card__summary">You are an ABD team member agent.</p>
-  <p class="cap-card__more">Open agent page →</p>
-</a>
-<a class="cap-card" href="agent/ai-research-assistant.html">
-  <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>ai-research-assistant</p>
-  <p class="cap-card__label">Description</p>
-  <p class="cap-card__summary">Orchestrate hypothesis-driven research on AI-augmented delivery and context engineering practices. You coordinate three skills in sequence to produce a research report that helps the user decide whether their approach is well-founded, exposed, or genuinely novel. You are an impartial advisor — not …</p>
-  <p class="cap-card__more">Open agent page →</p>
-</a></div>
+<hr class="entry-divider">
+
+<h2>Package layout</h2>
+<p class="entry-caption">ASCII overview (same spirit as <code>agents/abd-skill-builder/docs/overview/</code> capability pages).</p>
+<pre class="ascii-diagram" role="img" aria-label="Package structure">       repository
+           │
+           ▼
+  ┌─────────────────────────┐
+  │ SKILL.md                  │
+  │ (entry document)        │
+  └────────────┬────────────┘
+               │
+  peers at package root:
+               │
+               ▼
+
+skills/ooad/
+├── content/
+├── docs/
+├── potential/
+├── runs/
+├── scripts/
+├── templates/
+├── _fix_md2.py
+├── AGENTS.md
+├── README.md
+├── skill-config.json
+└── SKILL.md</pre>
+
+<hr class="entry-divider">
+
+<h2>Contents</h2>
+<p class="entry-caption">Each file: short preview and link. Folders: one summary line for the whole folder (not every nested file).</p>
+<ul class="file-list">
+<li><strong>content/</strong><span class="file-meta"> → Source parts merged into agent instructions or outputs.</span> <a href="../../../skills/ooad/content/">open folder</a></li>
+<li><strong>docs/</strong><span class="file-meta"> → Human-oriented documentation for the package.</span> <a href="../../../skills/ooad/docs/">open folder</a></li>
+<li><strong>potential/</strong><span class="file-meta"> → Supporting folder (4 items).</span> <a href="../../../skills/ooad/potential/">open folder</a></li>
+<li><strong>runs/</strong><span class="file-meta"> → Supporting folder (1 items).</span> <a href="../../../skills/ooad/runs/">open folder</a></li>
+<li><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span> <a href="../../../skills/ooad/scripts/">open folder</a></li>
+<li><strong>templates/</strong><span class="file-meta"> → Authoring templates and structural skeletons.</span> <a href="../../../skills/ooad/templates/">open folder</a></li>
+<li><strong>_fix_md2.py</strong><span class="file-meta"> → import re</span> <a href="../../../skills/ooad/_fix_md2.py">open file</a></li>
+<li><strong>AGENTS.md</strong><span class="file-meta"> → AGENTS — abd-ooad</span> <a href="../../../skills/ooad/AGENTS.md">open file</a></li>
+<li><strong>README.md</strong><span class="file-meta"> → abd-diagrams</span> <a href="../../../skills/ooad/README.md">open file</a></li>
+<li><strong>skill-config.json</strong><span class="file-meta"> → &quot;name&quot;: &quot;abd-ooad&quot;,</span> <a href="../../../skills/ooad/skill-config.json">open file</a></li>
+<li><strong>SKILL.md</strong><span class="file-meta"> → name: abd-ooad</span> <a href="../../../skills/ooad/SKILL.md">open file</a></li>
+</ul>
 
 </div>
 </div>
