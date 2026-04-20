@@ -35,6 +35,9 @@ KNOWN_DIR_SUMMARY: dict[str, str] = {
     "images": "Figures referenced by nearby HTML or markdown docs.",
 }
 
+# Open repo file/folder links in a new tab so the catalogue page (dark UI) stays open.
+_REPO_LINK_NEW_TAB = ' target="_blank" rel="noopener noreferrer"'
+
 
 class SkillEntry(NamedTuple):
     name: str
@@ -385,7 +388,9 @@ def _html_nested_files_in_folder(repo_root: Path, folder: Path, href_to_repo: st
             + _h(blurb)
             + '</span> <a href="'
             + _h(url)
-            + '">open file</a></li>'
+            + '"'
+            + _REPO_LINK_NEW_TAB
+            + '>open file</a></li>'
         )
     return '<ul class="file-list file-list--nested">\n' + "\n".join(inner) + "\n</ul>"
 
@@ -417,7 +422,9 @@ def _html_contents_list(repo_root: Path, package_dir: Path, href_to_repo: str) -
                 + _h(summary)
                 + '</span> <a href="'
                 + _h(url)
-                + '">open folder</a></div>'
+                + '"'
+                + _REPO_LINK_NEW_TAB
+                + '>open folder</a></div>'
                 + nested
                 + "</li>"
             )
@@ -431,7 +438,9 @@ def _html_contents_list(repo_root: Path, package_dir: Path, href_to_repo: str) -
                 + _h(blurb)
                 + '</span> <a href="'
                 + _h(url)
-                + '">open file</a></li>'
+                + '"'
+                + _REPO_LINK_NEW_TAB
+                + '>open file</a></li>'
             )
     if not parts:
         return '<p class="entry-caption">(no top-level files)</p>'

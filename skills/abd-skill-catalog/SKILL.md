@@ -49,7 +49,9 @@ Each catalogue entry includes:
   directory level deep, not recursive into subfolders).
 - **Detail pages** — full description, an ASCII package diagram inside a
   `<pre>` (same spirit as `agents/abd-skill-builder/docs/overview/` capability
-  pages), and a contents list with links into the repository.
+  pages), and a contents list with links into the repository. Those repo links
+  use `target="_blank"` so the dark catalogue page stays open while `.md` and
+  other files open in another tab.
 
 ## Agent instructions
 
