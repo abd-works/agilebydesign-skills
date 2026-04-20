@@ -63,6 +63,14 @@ Under `test/invoke_bot/edit_story_map/` (and related helpers): graph edits, incr
 
 **story-graph-ops** exposes **apply report → updated graph on disk** (and general CRUD on the file). It does **not** own “read `.drawio` and diff.”
 
+### Type model: DrawIO extends graph nodes (not a second tree)
+
+- **Canonical nodes** (`StoryNode`, `Epic`, `SubEpic`, `Story`, …) live with **story-graph-ops** (vendored from today’s `story_graph.nodes`): they describe the **story graph** domain and `story-graph.json`.
+- **DrawIO** code (`drawio-story-sync` / synchronizers) should use a **DrawIO hierarchy** of types—`DrawIOElement`, `DrawIOEpic`, `DrawIOStory`, …—that **extend** those graph node types (plus XML/cell identity, layout, styles). Diagram-specific behavior stays in subclasses; shared naming, children, and merge semantics stay on the base graph types.
+- **Avoid** a parallel “DrawIO-only” epic/story tree that duplicates the graph model with no inheritance; that is what causes drift and confusion.
+
+(Aligned with the existing agile_bots direction: `DrawIOStoryNode` bridges DrawIO cells and the story map—keep that **specialization** on the DrawIO side, **bases** on the story-graph side.)
+
 ---
 
-**Summary:** Confusion comes from two `StoryMap`s and a CLI that only covers half the skill’s stated obligations. Full migration means **nodes-level domain + dependencies + mutation CLI + tests**; TTY tests should reappear as **skill CLI or API tests**, not abandoned. **DrawIO generates the report and depends on story-graph-ops (or story bot) to apply it—story-graph-ops never depends on DrawIO.**
+**Summary:** Confusion comes from two `StoryMap`s and a CLI that only covers half the skill’s stated obligations. Full migration means **nodes-level domain + dependencies + mutation CLI + tests**; TTY tests should reappear as **skill CLI or API tests**, not abandoned. **DrawIO generates the report and depends on story-graph-ops (or story bot) to apply it—story-graph-ops never depends on DrawIO.** **DrawIO diagram types extend story-graph node types; one graph domain, DrawIO as a specialized layer.**
