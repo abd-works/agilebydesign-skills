@@ -458,8 +458,6 @@ def _html_folder_branch(
     """One directory as <details>: summary + recursive files/subfolders."""
     if not folder.is_dir():
         return ""
-    rel = folder.relative_to(repo_root).as_posix()
-    url = _repo_href(href_to_repo, rel) + "/"
     try:
         kids = sorted(folder.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower()))
         kids = [p for p in kids if not p.name.startswith(".")]
@@ -479,17 +477,10 @@ def _html_folder_branch(
             inner_parts.append(_html_file_row(repo_root, p, href_to_repo))
         elif p.is_dir():
             if depth + 1 > max_depth:
-                crel = p.relative_to(repo_root).as_posix()
-                curl = _repo_href(href_to_repo, crel) + "/"
                 inner_parts.append(
                     "<li class=\"file-tree__dir file-tree__dir--truncated\"><strong>"
                     + _h(p.name)
-                    + "/</strong> <span class=\"file-meta\">(deeper nesting omitted)</span> "
-                    + '<a href="'
-                    + _h(curl)
-                    + '"'
-                    + _REPO_LINK_NEW_TAB
-                    + ">open folder</a></li>"
+                    + "/</strong> <span class=\"file-meta\">(deeper nesting omitted)</span></li>"
                 )
             else:
                 sub = _html_folder_branch(repo_root, p, href_to_repo, depth=depth + 1, max_depth=max_depth)
@@ -511,11 +502,7 @@ def _html_folder_branch(
         + _h(folder.name)
         + "/</strong><span class=\"file-meta\"> → "
         + _h(summary)
-        + '</span> <a class="file-tree__folder-link" href="'
-        + _h(url)
-        + '"'
-        + _REPO_LINK_NEW_TAB
-        + ">open folder</a></summary><div class=\"file-tree__inner\">"
+        + '</span></summary><div class=\"file-tree__inner\">'
         + inner_body
         + "</div></details>"
     )

@@ -268,10 +268,6 @@ h2:first-child { margin-top: 0; }
   font-size: 0.9rem;
   color: var(--muted);
 }
-.file-tree__folder-link {
-  margin-left: 10px;
-  font-weight: 600;
-}
 .file-tree__inner {
   padding: 8px 10px 12px 14px;
   border-top: 1px solid var(--border-muted);
