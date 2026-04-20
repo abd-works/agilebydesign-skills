@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ABD catalogue — skill · deploy-skill-to-cursor</title>
+<title>ABD catalogue — skill · skill-garden-catalogue</title>
 <style>
 :root {
   --orange: #ff7a00;
@@ -256,11 +256,11 @@ h2:first-child { margin-top: 0; }
     </svg>
   </div>
   <div class="header-text">
-    <p class="brand"><strong>Agile by Design</strong> &middot; abd-skill-catalog</p>
+    <p class="brand"><strong>Agile by Design</strong> &middot; catalog</p>
     <a class="back-link" href="../skills.html">← All skills</a>
     <p class="cap-badge">Practice skill</p>
-    <h1>deploy-skill-to-cursor</h1>
-    <p class="tagline">Deploy a skill from agilebydesign-skills into Cursor&#x27;s user skills folder using a Windows directory junction (no duplicate copy). Run scripts/Deploy-SkillToCursor.ps1 with the skill folder name. Use when you want the global Cursor skills path to point at the repo canonical skill.</p>
+    <h1>skill-garden-catalogue</h1>
+    <p class="tagline">Scan a folder of deployed skills and regenerate a one-pager Markdown inventory and an HTML catalogue. Each entry shows the challenge the skill addresses and the solution it provides, hyperlinked to the skill directory. Re-run on command to keep the catalogue current.</p>
   </div>
 </header>
 
@@ -273,7 +273,7 @@ h2:first-child { margin-top: 0; }
 </nav>
 
 <h2>Description</h2>
-<div class="entry-prose">Deploy a skill from agilebydesign-skills into Cursor&#x27;s user skills folder using a Windows directory junction (no duplicate copy). Run scripts/Deploy-SkillToCursor.ps1 with the skill folder name. Use when you want the global Cursor skills path to point at the repo canonical skill.</div>
+<div class="entry-prose">Scan a folder of deployed skills and regenerate a one-pager Markdown inventory and an HTML catalogue. Each entry shows the challenge the skill addresses and the solution it provides, hyperlinked to the skill directory. Re-run on command to keep the catalogue current.</div>
 
 <hr class="entry-divider">
 
@@ -291,8 +291,9 @@ h2:first-child { margin-top: 0; }
                │
                ▼
 
-skills/deploy-skill-to-cursor/
+skills/skill-garden-catalogue/
 ├── scripts/
+├── templates/
 └── SKILL.md</pre>
 
 <hr class="entry-divider">
@@ -300,10 +301,14 @@ skills/deploy-skill-to-cursor/
 <h2>Contents</h2>
 <p class="entry-caption">Each file: short preview and link. Folders: one summary line plus every file directly inside that folder (same preview + link). Links into the repository open in a <strong>new tab</strong> so this catalogue page stays here.</p>
 <ul class="file-list">
-<li class="file-list__folder"><div><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span> <a href="../../../skills/deploy-skill-to-cursor/scripts/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
-<li><strong>Deploy-SkillToCursor.ps1</strong><span class="file-meta"> → .SYNOPSIS</span> <a href="../../../skills/deploy-skill-to-cursor/scripts/Deploy-SkillToCursor.ps1" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li class="file-list__folder"><div><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span> <a href="../../skills/skill-garden-catalogue/scripts/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
+<li><strong>generate_catalogue.py</strong><span class="file-meta"> → !/usr/bin/env python3</span> <a href="../../skills/skill-garden-catalogue/scripts/generate_catalogue.py" target="_blank" rel="noopener noreferrer">open file</a></li>
 </ul></li>
-<li><strong>SKILL.md</strong><span class="file-meta"> → name: deploy-skill-to-cursor</span> <a href="../../../skills/deploy-skill-to-cursor/SKILL.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li class="file-list__folder"><div><strong>templates/</strong><span class="file-meta"> → Authoring templates and structural skeletons.</span> <a href="../../skills/skill-garden-catalogue/templates/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
+<li><strong>catalog-index.html</strong><span class="file-meta"> → &lt;!DOCTYPE html&gt;</span> <a href="../../skills/skill-garden-catalogue/templates/catalog-index.html" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>skill-inventory.md</strong><span class="file-meta"> → Skill Garden — Inventory</span> <a href="../../skills/skill-garden-catalogue/templates/skill-inventory.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+</ul></li>
+<li><strong>SKILL.md</strong><span class="file-meta"> → name: skill-garden-catalogue</span> <a href="../../skills/skill-garden-catalogue/SKILL.md" target="_blank" rel="noopener noreferrer">open file</a></li>
 </ul>
 
 </div>

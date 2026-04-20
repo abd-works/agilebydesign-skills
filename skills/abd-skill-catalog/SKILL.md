@@ -30,13 +30,13 @@ used under `agents/abd-skill-builder/docs/overview/`.
 
 | Artifact | Format | Location (default) |
 | --- | --- | --- |
-| **Outline** | Markdown | `abd-skill-catalog/outline.md` (repository root) |
-| **Site hub** | HTML | `abd-skill-catalog/catalog/index.html` |
-| **Skills grid** | HTML | `abd-skill-catalog/catalog/skills.html` |
-| **Agents grid** | HTML | `abd-skill-catalog/catalog/agents.html` |
+| **Outline** | Markdown | `catalog/outline.md` (repository root) |
+| **Site hub** | HTML | `catalog/index.html` |
+| **Skills grid** | HTML | `catalog/skills.html` |
+| **Agents grid** | HTML | `catalog/agents.html` |
 | **Hub / grid intros** | HTML fragments | `skills/abd-skill-catalog/templates/intros/*.html` (short lines above grids; optional polish) |
-| **Skill detail pages** | HTML | `abd-skill-catalog/catalog/skill/<dir>.html` (one per skill; cards link here) |
-| **Agent detail pages** | HTML | `abd-skill-catalog/catalog/agent/<dir>.html` (one per agent; cards link here) |
+| **Skill detail pages** | HTML | `catalog/skill/<dir>.html` (one per skill; cards link here) |
+| **Agent detail pages** | HTML | `catalog/agent/<dir>.html` (one per agent; cards link here) |
 
 Each catalogue entry includes:
 
@@ -67,7 +67,7 @@ Each catalogue entry includes:
 
    - `--repo-root <path>` — defaults to the parent of the repo `skills/`
      directory (detected from this script location).
-   - `--output-dir <path>` — overrides `<repo-root>/abd-skill-catalog` if you need a different folder.
+   - `--output-dir <path>` — overrides `<repo-root>/catalog` if you need a different folder.
 
 2. **Discovery rules.**
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ABD catalogue — skill · abd-skill-catalog</title>
+<title>ABD catalogue — skill · abd-thin-slicing</title>
 <style>
 :root {
   --orange: #ff7a00;
@@ -256,11 +256,11 @@ h2:first-child { margin-top: 0; }
     </svg>
   </div>
   <div class="header-text">
-    <p class="brand"><strong>Agile by Design</strong> &middot; abd-skill-catalog</p>
+    <p class="brand"><strong>Agile by Design</strong> &middot; catalog</p>
     <a class="back-link" href="../skills.html">← All skills</a>
     <p class="cap-badge">Practice skill</p>
-    <h1>abd-skill-catalog</h1>
-    <p class="tagline">Scan the agilebydesign-skills repository (root skills/ and agents/), then regenerate a reader-facing Markdown outline plus a small multi-page HTML site. Each skill and agent entry includes a short summary paragraph (for tables and cards) plus a longer description from ## Purpose when present …</p>
+    <h1>abd-thin-slicing</h1>
+    <p class="tagline">Produce thin-sliced delivery increments: vertical MVIs, spine vs optional paths, quality trade-offs, marketable increment names, and early risk validation. From a story map, write all template artifacts in templates/ (thin-slicing.md and thin-slicing.txt) with identical increment and story …</p>
   </div>
 </header>
 
@@ -273,7 +273,7 @@ h2:first-child { margin-top: 0; }
 </nav>
 
 <h2>Description</h2>
-<div class="entry-prose">Scan the agilebydesign-skills repository (root skills/ and agents/), then regenerate a reader-facing Markdown outline plus a small multi-page HTML site. Each skill and agent entry includes a short summary paragraph (for tables and cards) plus a longer description from ## Purpose when present. Optional repository layout summarizes files (with links) and common folders in one line each.</div>
+<div class="entry-prose">Define prioritized increments. Group stories in a story map (and any notes on risk, constraints, or learning goals) into prioritized increments that can be delivered together. Each incremement includes its priority order, outcomes, slicing notes, and an ordered list od stories.</div>
 
 <hr class="entry-divider">
 
@@ -291,8 +291,8 @@ h2:first-child { margin-top: 0; }
                │
                ▼
 
-skills/abd-skill-catalog/
-├── scripts/
+skills/abd-thin-slicing/
+├── rules/
 ├── templates/
 └── SKILL.md</pre>
 
@@ -301,15 +301,19 @@ skills/abd-skill-catalog/
 <h2>Contents</h2>
 <p class="entry-caption">Each file: short preview and link. Folders: one summary line plus every file directly inside that folder (same preview + link). Links into the repository open in a <strong>new tab</strong> so this catalogue page stays here.</p>
 <ul class="file-list">
-<li class="file-list__folder"><div><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span> <a href="../../../skills/abd-skill-catalog/scripts/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
-<li><strong>generate_abd_catalog.py</strong><span class="file-meta"> → !/usr/bin/env python3</span> <a href="../../../skills/abd-skill-catalog/scripts/generate_abd_catalog.py" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li class="file-list__folder"><div><strong>rules/</strong><span class="file-meta"> → Practice rules (DO/DON&#x27;T) and constraints used with scanners.</span> <a href="../../skills/abd-thin-slicing/rules/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
+<li><strong>apply-quality-tradeoffs-for-minimal-spine.md</strong><span class="file-meta"> → Rule: Apply quality trade-offs for a minimal spine</span> <a href="../../skills/abd-thin-slicing/rules/apply-quality-tradeoffs-for-minimal-spine.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>decision-prompts-for-increments.md</strong><span class="file-meta"> → Rule: Decision prompts for increments</span> <a href="../../skills/abd-thin-slicing/rules/decision-prompts-for-increments.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>design-vertical-slice-increments.md</strong><span class="file-meta"> → Rule: Design vertical-slice increments</span> <a href="../../skills/abd-thin-slicing/rules/design-vertical-slice-increments.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>identify-marketable-increments.md</strong><span class="file-meta"> → Rule: Identify marketable increments</span> <a href="../../skills/abd-thin-slicing/rules/identify-marketable-increments.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>map-sequential-spine-vs-optional-paths.md</strong><span class="file-meta"> → Rule: Map sequential spine vs optional paths</span> <a href="../../skills/abd-thin-slicing/rules/map-sequential-spine-vs-optional-paths.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>prioritize-architectural-risk-validation.md</strong><span class="file-meta"> → Rule: Prioritize architectural risk validation</span> <a href="../../skills/abd-thin-slicing/rules/prioritize-architectural-risk-validation.md" target="_blank" rel="noopener noreferrer">open file</a></li>
 </ul></li>
-<li class="file-list__folder"><div><strong>templates/</strong><span class="file-meta"> → Authoring templates and structural skeletons.</span> <a href="../../../skills/abd-skill-catalog/templates/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
-<li><strong>catalog.css</strong><span class="file-meta"> → --orange: #ff7a00;</span> <a href="../../../skills/abd-skill-catalog/templates/catalog.css" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>page-catalog.html</strong><span class="file-meta"> → &lt;!DOCTYPE html&gt;</span> <a href="../../../skills/abd-skill-catalog/templates/page-catalog.html" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>page-entry-detail.html</strong><span class="file-meta"> → &lt;!DOCTYPE html&gt;</span> <a href="../../../skills/abd-skill-catalog/templates/page-entry-detail.html" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li class="file-list__folder"><div><strong>templates/</strong><span class="file-meta"> → Authoring templates and structural skeletons.</span> <a href="../../skills/abd-thin-slicing/templates/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
+<li><strong>thin-slicing.md</strong><span class="file-meta"> → Thin slicing — incremental backlog</span> <a href="../../skills/abd-thin-slicing/templates/thin-slicing.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>thin-slicing.txt</strong><span class="file-meta"> → Thin slicing — incremental backlog — plain text template</span> <a href="../../skills/abd-thin-slicing/templates/thin-slicing.txt" target="_blank" rel="noopener noreferrer">open file</a></li>
 </ul></li>
-<li><strong>SKILL.md</strong><span class="file-meta"> → name: abd-skill-catalog</span> <a href="../../../skills/abd-skill-catalog/SKILL.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>SKILL.md</strong><span class="file-meta"> → name: abd-thin-slicing</span> <a href="../../skills/abd-thin-slicing/SKILL.md" target="_blank" rel="noopener noreferrer">open file</a></li>
 </ul>
 
 </div>

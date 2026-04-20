@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ABD catalogue — skill · abd-proposal-respond</title>
+<title>ABD catalogue — skill · abd-delivery-planning</title>
 <style>
 :root {
   --orange: #ff7a00;
@@ -256,11 +256,11 @@ h2:first-child { margin-top: 0; }
     </svg>
   </div>
   <div class="header-text">
-    <p class="brand"><strong>Agile by Design</strong> &middot; abd-skill-catalog</p>
+    <p class="brand"><strong>Agile by Design</strong> &middot; catalog</p>
     <a class="back-link" href="../skills.html">← All skills</a>
     <p class="cap-badge">Practice skill</p>
-    <h1>abd-proposal-respond</h1>
-    <p class="tagline">Respond to client proposals (RFP, Q&amp;A, requirements) by converting materials to memory, creating a response strategy, and answering questions iteratively. Depends on abd-context-to-memory for RAG. Use when responding to proposals, creating response plans, answering RFP questions, or iterating on …</p>
+    <h1>abd-delivery-planning</h1>
+    <p class="tagline">Build and revise agile delivery plans: context assessment, risk types, strategies (scan strategies/ for matching When to use), runs (stages, scope, checkpoints, rationale), and example plans. Planning only — not for producing story artifacts, tests, or code (those come from downstream practice …</p>
   </div>
 </header>
 
@@ -273,7 +273,7 @@ h2:first-child { margin-top: 0; }
 </nav>
 
 <h2>Description</h2>
-<div class="entry-prose">Respond to client proposals (RFP, Q&amp;A, requirements) by converting materials to memory, creating a response strategy, and answering questions iteratively. Depends on abd-context-to-memory for RAG. Use when responding to proposals, creating response plans, answering RFP questions, or iterating on proposal strategy.</div>
+<div class="entry-prose">Build and revise agile delivery plans: context assessment, risk types, strategies (scan strategies/ for matching When to use), runs (stages, scope, checkpoints, rationale), and example plans. Planning only — not for producing story artifacts, tests, or code (those come from downstream practice work).</div>
 
 <hr class="entry-divider">
 
@@ -291,13 +291,8 @@ h2:first-child { margin-top: 0; }
                │
                ▼
 
-skills/proposal-respond/
-├── content/
-├── rules/
-├── scripts/
-├── AGENTS.md
-├── README.md
-├── skill-config.json
+skills/abd-delivery-planning/
+├── strategies/
 └── SKILL.md</pre>
 
 <hr class="entry-divider">
@@ -305,29 +300,18 @@ skills/proposal-respond/
 <h2>Contents</h2>
 <p class="entry-caption">Each file: short preview and link. Folders: one summary line plus every file directly inside that folder (same preview + link). Links into the repository open in a <strong>new tab</strong> so this catalogue page stays here.</p>
 <ul class="file-list">
-<li class="file-list__folder"><div><strong>content/</strong><span class="file-meta"> → Source parts merged into agent instructions or outputs.</span> <a href="../../../skills/proposal-respond/content/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
-<li><strong>core.md</strong><span class="file-meta"> → Core Definitions</span> <a href="../../../skills/proposal-respond/content/core.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>output.md</strong><span class="file-meta"> → Output Structure</span> <a href="../../../skills/proposal-respond/content/output.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>process.md</strong><span class="file-meta"> → Process Overview</span> <a href="../../../skills/proposal-respond/content/process.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>script-invocation.md</strong><span class="file-meta"> → Script Invocation</span> <a href="../../../skills/proposal-respond/content/script-invocation.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>strategy.md</strong><span class="file-meta"> → Strategy Phase</span> <a href="../../../skills/proposal-respond/content/strategy.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>validation.md</strong><span class="file-meta"> → Validation</span> <a href="../../../skills/proposal-respond/content/validation.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li class="file-list__folder"><div><strong>strategies/</strong><span class="file-meta"> → Supporting folder (9 items).</span> <a href="../../skills/abd-delivery-planning/strategies/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
+<li><strong>bug-fix.md</strong><span class="file-meta"> → Strategy: Bug Fix</span> <a href="../../skills/abd-delivery-planning/strategies/bug-fix.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>legacy-migration.md</strong><span class="file-meta"> → Strategy: Legacy Migration</span> <a href="../../skills/abd-delivery-planning/strategies/legacy-migration.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>new-initiative-business-user-experience-risk.md</strong><span class="file-meta"> → Strategy: New Initiative — Business / User Experience Risk</span> <a href="../../skills/abd-delivery-planning/strategies/new-initiative-business-user-experience-risk.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>new-initiative-no-documented-architecture.md</strong><span class="file-meta"> → Strategy: New Initiative — No Documented Architecture</span> <a href="../../skills/abd-delivery-planning/strategies/new-initiative-no-documented-architecture.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>new-initiative-proprietary-technology-risk.md</strong><span class="file-meta"> → Strategy: New Initiative — Proprietary Technology Risk</span> <a href="../../skills/abd-delivery-planning/strategies/new-initiative-proprietary-technology-risk.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>new-thin-slice.md</strong><span class="file-meta"> → Strategy: New Thin Slice</span> <a href="../../skills/abd-delivery-planning/strategies/new-thin-slice.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>new-user-story.md</strong><span class="file-meta"> → Strategy: New User Story</span> <a href="../../skills/abd-delivery-planning/strategies/new-user-story.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>regulatory-compliance-heavy.md</strong><span class="file-meta"> → Strategy: Regulatory / Compliance-Heavy</span> <a href="../../skills/abd-delivery-planning/strategies/regulatory-compliance-heavy.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>spike-proof-of-concept.md</strong><span class="file-meta"> → Strategy: Spike / Proof of Concept</span> <a href="../../skills/abd-delivery-planning/strategies/spike-proof-of-concept.md" target="_blank" rel="noopener noreferrer">open file</a></li>
 </ul></li>
-<li class="file-list__folder"><div><strong>rules/</strong><span class="file-meta"> → Practice rules (DO/DON&#x27;T) and constraints used with scanners.</span> <a href="../../../skills/proposal-respond/rules/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
-<li><strong>answer-from-memory.md</strong><span class="file-meta"> → Answer from Memory</span> <a href="../../../skills/proposal-respond/rules/answer-from-memory.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>response-format.md</strong><span class="file-meta"> → Response Format — Common Instructions</span> <a href="../../../skills/proposal-respond/rules/response-format.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>scanners.json</strong><span class="file-meta"> → &quot;scanners&quot;: []</span> <a href="../../../skills/proposal-respond/rules/scanners.json" target="_blank" rel="noopener noreferrer">open file</a></li>
-</ul></li>
-<li class="file-list__folder"><div><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span> <a href="../../../skills/proposal-respond/scripts/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
-<li><strong>build.py</strong><span class="file-meta"> → !/usr/bin/env python3</span> <a href="../../../skills/proposal-respond/scripts/build.py" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>build_appendix_deck.py</strong><span class="file-meta"> → !/usr/bin/env python3</span> <a href="../../../skills/proposal-respond/scripts/build_appendix_deck.py" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>setup_response.py</strong><span class="file-meta"> → !/usr/bin/env python3</span> <a href="../../../skills/proposal-respond/scripts/setup_response.py" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>split_pptx_by_section.py</strong><span class="file-meta"> → !/usr/bin/env python3</span> <a href="../../../skills/proposal-respond/scripts/split_pptx_by_section.py" target="_blank" rel="noopener noreferrer">open file</a></li>
-</ul></li>
-<li><strong>AGENTS.md</strong><span class="file-meta"> → Core Definitions</span> <a href="../../../skills/proposal-respond/AGENTS.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>README.md</strong><span class="file-meta"> → abd-proposal-respond</span> <a href="../../../skills/proposal-respond/README.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>skill-config.json</strong><span class="file-meta"> → &quot;name&quot;: &quot;abd-proposal-respond&quot;,</span> <a href="../../../skills/proposal-respond/skill-config.json" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>SKILL.md</strong><span class="file-meta"> → name: abd-proposal-respond</span> <a href="../../../skills/proposal-respond/SKILL.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>SKILL.md</strong><span class="file-meta"> → name: abd-delivery-planning</span> <a href="../../skills/abd-delivery-planning/SKILL.md" target="_blank" rel="noopener noreferrer">open file</a></li>
 </ul>
 
 </div>

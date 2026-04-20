@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Scan repo-root skills/ and agents/; emit Markdown outline + HTML mini-site."""
+"""Scan repo-root skills/ and agents/; emit outline.md + HTML under repo catalog/."""
 
 from __future__ import annotations
 
@@ -15,6 +15,9 @@ from urllib.parse import quote
 SCRIPT_DIR = Path(__file__).resolve().parent
 SKILL_DIR = SCRIPT_DIR.parent
 TEMPLATE_DIR = SKILL_DIR / "templates"
+
+# Subtitle in generated pages (repo output folder is <root>/catalog/).
+CATALOG_BRAND_HTML = "<strong>Agile by Design</strong> &middot; catalog"
 
 FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
 YAML_FIELD_RE = re.compile(r"^(\w[\w-]*):\s*(.+)", re.MULTILINE)
@@ -464,7 +467,7 @@ def write_entry_detail_pages(
     if not href_to_repo:
         href_to_repo = "./"
     nav_prefix = "../"
-    brand = "<strong>Agile by Design</strong> &middot; abd-skill-catalog"
+    brand = CATALOG_BRAND_HTML
 
     skill_out = output_catalog_dir / "skill"
     agent_out = output_catalog_dir / "agent"
@@ -712,9 +715,9 @@ def write_html_pages(
             .replace("{{BODY_INNER}}", body_inner)
         )
 
-    brand = "<strong>Agile by Design</strong> &middot; abd-skill-catalog"
+    brand = CATALOG_BRAND_HTML
 
-    outline_href = "../outline.md"
+    outline_href = "outline.md"
     hub_intro = _load_intro_fragment(
         "catalog-hub-intro.html",
         (
@@ -808,15 +811,14 @@ def main() -> None:
         "--output-dir",
         type=Path,
         default=None,
-        help="Output directory for outline.md and catalog/ subfolder. "
-        "Default: <repo-root>/abd-skill-catalog",
+        help="Output directory for outline.md and all HTML (default: <repo-root>/catalog).",
     )
     args = parser.parse_args()
 
     repo_root = (args.repo_root or SKILL_DIR.parent.parent).resolve()
     skills_dir = repo_root / "skills"
     agents_dir = repo_root / "agents"
-    output_dir = (args.output_dir or (repo_root / "abd-skill-catalog")).resolve()
+    output_dir = (args.output_dir or (repo_root / "catalog")).resolve()
 
     if not skills_dir.is_dir():
         raise SystemExit(f"skills/ not found: {skills_dir}")
@@ -829,10 +831,8 @@ def main() -> None:
         raise SystemExit("No skills or agents discovered.")
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    catalog_dir = output_dir / "catalog"
-    catalog_dir.mkdir(parents=True, exist_ok=True)
 
-    # outline.md lives in output_dir; links are relative to that file
+    # outline.md, index/skills/agents, skill/, agent/ all live directly under catalog/
     outline_path = output_dir / "outline.md"
     md_prefix = _path_up_to_ancestor(output_dir, repo_root)
     outline_path.write_text(
@@ -841,10 +841,10 @@ def main() -> None:
     )
     print(f"  wrote {outline_path}")
 
-    n_sk_detail, n_ag_detail = write_html_pages(catalog_dir, repo_root, skills, agents)
-    print(f"  wrote {catalog_dir / 'index.html'}")
-    print(f"  wrote {catalog_dir / 'skills.html'}")
-    print(f"  wrote {catalog_dir / 'agents.html'}")
+    n_sk_detail, n_ag_detail = write_html_pages(output_dir, repo_root, skills, agents)
+    print(f"  wrote {output_dir / 'index.html'}")
+    print(f"  wrote {output_dir / 'skills.html'}")
+    print(f"  wrote {output_dir / 'agents.html'}")
     print(f"  wrote {n_sk_detail} skill detail pages under catalog/skill/")
     print(f"  wrote {n_ag_detail} agent detail pages under catalog/agent/")
     print(f"  ({len(skills)} skills, {len(agents)} agents)")

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ABD catalogue — skill · workspace</title>
+<title>ABD catalogue — Agents</title>
 <style>
 :root {
   --orange: #ff7a00;
@@ -247,7 +247,7 @@ h2:first-child { margin-top: 0; }
 <div class="page-wrap">
 <div class="panel" role="main">
 
-<header class="panel-header entry-detail-header">
+<header class="panel-header">
   <div class="header-icon">
     <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:6px;">
       <rect width="52" height="52" rx="8" fill="#0e0e10"/>
@@ -256,58 +256,52 @@ h2:first-child { margin-top: 0; }
     </svg>
   </div>
   <div class="header-text">
-    <p class="brand"><strong>Agile by Design</strong> &middot; abd-skill-catalog</p>
-    <a class="back-link" href="../skills.html">← All skills</a>
-    <p class="cap-badge">Practice skill</p>
-    <h1>workspace</h1>
-    <p class="tagline">Set and read the agent engagement root (skill-config.json → workspace.active_skill_workspace). Run scripts from this folder; they resolve the agent root automatically.</p>
+    <p class="brand"><strong>Agile by Design</strong> &middot; catalog</p>
+    <h1>Agents</h1>
+    <p class="tagline">5 entries.</p>
   </div>
 </header>
 
 <div class="panel-body">
 
 <nav class="nav" aria-label="Catalogue sections">
-  <a href="../index.html" class="nav__link">Hub</a>
-  <a href="../skills.html" class="nav__link nav__link--current">Skills</a>
-  <a href="../agents.html" class="nav__link">Agents</a>
+  <a href="index.html" class="nav__link">Hub</a>
+  <a href="skills.html" class="nav__link">Skills</a>
+  <a href="agents.html" class="nav__link nav__link--current">Agents</a>
 </nav>
 
-<h2>Description</h2>
-<div class="entry-prose">Set and read the agent engagement root (skill-config.json → workspace.active_skill_workspace). Run scripts from this folder; they resolve the agent root automatically.</div>
+<p>Each card opens the agent detail page. Entry file: <code>AGENT.md</code>, then <code>AGENTS.md</code>, then <code>SKILL.md</code>.</p>
 
-<hr class="entry-divider">
-
-<h2>Package layout</h2>
-<p class="entry-caption">ASCII overview (same spirit as <code>agents/abd-skill-builder/docs/overview/</code> capability pages).</p>
-<pre class="ascii-diagram" role="img" aria-label="Package structure">       repository
-           │
-           ▼
-  ┌─────────────────────────┐
-  │ SKILL.md                  │
-  │ (entry document)        │
-  └────────────┬────────────┘
-               │
-  peers at package root:
-               │
-               ▼
-
-skills/workspace_skill/
-├── scripts/
-├── SKILL.md
-└── Untitled</pre>
-
-<hr class="entry-divider">
-
-<h2>Contents</h2>
-<p class="entry-caption">Each file: short preview and link. Folders: one summary line plus every file directly inside that folder (same preview + link). Links into the repository open in a <strong>new tab</strong> so this catalogue page stays here.</p>
-<ul class="file-list">
-<li class="file-list__folder"><div><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span> <a href="../../../skills/workspace_skill/scripts/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
-<li><strong>get_workspace.py</strong><span class="file-meta"> → !/usr/bin/env python3</span> <a href="../../../skills/workspace_skill/scripts/get_workspace.py" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>set_workspace.py</strong><span class="file-meta"> → !/usr/bin/env python3</span> <a href="../../../skills/workspace_skill/scripts/set_workspace.py" target="_blank" rel="noopener noreferrer">open file</a></li>
-</ul></li>
-<li><strong>SKILL.md</strong><span class="file-meta"> → name: workspace</span> <a href="../../../skills/workspace_skill/SKILL.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>Untitled</strong><span class="file-meta"> → workspace_skill</span> <a href="../../../skills/workspace_skill/Untitled" target="_blank" rel="noopener noreferrer">open file</a></li>
-</ul>
+<h2>Agents (5)</h2><div class="cap-grid"><a class="cap-card" href="agent/abd-context-to-memory.html">
+  <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-context-to-memory</p>
+  <p class="cap-card__label">Description</p>
+  <p class="cap-card__summary">Orchestrate convert → chunk → embed → search by coordinating this agent&#x27;s skills. Decide when each stage runs, whether to use a strategy pass (review context_chunking_spec.yaml before chunk + embed) or straight-through, and hold cross-stage quality (real headings before chunking, sane splits after …</p>
+  <p class="cap-card__more">Open agent page →</p>
+</a>
+<a class="cap-card" href="agent/abd-delivery-lead.html">
+  <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>ABD Delivery Lead</p>
+  <p class="cap-card__label">Description</p>
+  <p class="cap-card__summary">You are a delivery lead agent orchestrating an Agile by Design (ABD) delivery flow.</p>
+  <p class="cap-card__more">Open agent page →</p>
+</a>
+<a class="cap-card" href="agent/abd-skill-builder.html">
+  <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-skill-builder</p>
+  <p class="cap-card__label">Description</p>
+  <p class="cap-card__summary">Provide portable repository standards aligned with Open Agent Skills: a focused SKILL.md for discovery, a merged AGENTS.md for multi-step workflow, plus documentation of build and validation (merge, build.py, scanners, CI), and a scaffold CLI so new skills match skills.sh-style layout without …</p>
+  <p class="cap-card__more">Open agent page →</p>
+</a>
+<a class="cap-card" href="agent/abd-team-member.html">
+  <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>ABD Team Member</p>
+  <p class="cap-card__label">Description</p>
+  <p class="cap-card__summary">You are an ABD team member agent.</p>
+  <p class="cap-card__more">Open agent page →</p>
+</a>
+<a class="cap-card" href="agent/ai-research-assistant.html">
+  <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>ai-research-assistant</p>
+  <p class="cap-card__label">Description</p>
+  <p class="cap-card__summary">Orchestrate hypothesis-driven research on AI-augmented delivery and context engineering practices. You coordinate three skills in sequence to produce a research report that helps the user decide whether their approach is well-founded, exposed, or genuinely novel. You are an impartial advisor — not …</p>
+  <p class="cap-card__more">Open agent page →</p>
+</a></div>
 
 </div>
 </div>

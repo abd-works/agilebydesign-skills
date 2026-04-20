@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ABD catalogue — skill · abd-commit-msg</title>
+<title>ABD catalogue — skill · abd-skill-catalog</title>
 <style>
 :root {
   --orange: #ff7a00;
@@ -256,11 +256,11 @@ h2:first-child { margin-top: 0; }
     </svg>
   </div>
   <div class="header-text">
-    <p class="brand"><strong>Agile by Design</strong> &middot; abd-skill-catalog</p>
+    <p class="brand"><strong>Agile by Design</strong> &middot; catalog</p>
     <a class="back-link" href="../skills.html">← All skills</a>
     <p class="cap-badge">Practice skill</p>
-    <h1>abd-commit-msg</h1>
-    <p class="tagline">Generate meaningful commit messages from scope and changed files. No story_graph — scope from conversation, changed files, and persisted state. Use when user types /commit or requests a commit.</p>
+    <h1>abd-skill-catalog</h1>
+    <p class="tagline">Scan the agilebydesign-skills repository (root skills/ and agents/), then regenerate a reader-facing Markdown outline plus a small multi-page HTML site. Each skill and agent entry includes a short summary paragraph (for tables and cards) plus a longer description from ## Purpose when present …</p>
   </div>
 </header>
 
@@ -273,7 +273,7 @@ h2:first-child { margin-top: 0; }
 </nav>
 
 <h2>Description</h2>
-<div class="entry-prose">Generate meaningful commit messages from scope and changed files. No story_graph — scope from conversation, changed files, and persisted state. Use when user types /commit or requests a commit.</div>
+<div class="entry-prose">Scan the agilebydesign-skills repository (root skills/ and agents/), then regenerate a reader-facing Markdown outline plus a small multi-page HTML site. Each skill and agent entry includes a short summary paragraph (for tables and cards) plus a longer description from ## Purpose when present. Optional repository layout summarizes files (with links) and common folders in one line each.</div>
 
 <hr class="entry-divider">
 
@@ -291,14 +291,9 @@ h2:first-child { margin-top: 0; }
                │
                ▼
 
-skills/commit-msg/
-├── content/
-├── docs/
-├── rules/
+skills/abd-skill-catalog/
 ├── scripts/
-├── AGENTS.md
-├── README.md
-├── skill-config.json
+├── templates/
 └── SKILL.md</pre>
 
 <hr class="entry-divider">
@@ -306,26 +301,15 @@ skills/commit-msg/
 <h2>Contents</h2>
 <p class="entry-caption">Each file: short preview and link. Folders: one summary line plus every file directly inside that folder (same preview + link). Links into the repository open in a <strong>new tab</strong> so this catalogue page stays here.</p>
 <ul class="file-list">
-<li class="file-list__folder"><div><strong>content/</strong><span class="file-meta"> → Source parts merged into agent instructions or outputs.</span> <a href="../../../skills/commit-msg/content/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
-<li><strong>core.md</strong><span class="file-meta"> → Core Definitions</span> <a href="../../../skills/commit-msg/content/core.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>output.md</strong><span class="file-meta"> → Output Structure</span> <a href="../../../skills/commit-msg/content/output.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>process.md</strong><span class="file-meta"> → When to Run</span> <a href="../../../skills/commit-msg/content/process.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>script-invocation.md</strong><span class="file-meta"> → Script Invocation</span> <a href="../../../skills/commit-msg/content/script-invocation.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>validation.md</strong><span class="file-meta"> → Validation</span> <a href="../../../skills/commit-msg/content/validation.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li class="file-list__folder"><div><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span> <a href="../../skills/abd-skill-catalog/scripts/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
+<li><strong>generate_abd_catalog.py</strong><span class="file-meta"> → !/usr/bin/env python3</span> <a href="../../skills/abd-skill-catalog/scripts/generate_abd_catalog.py" target="_blank" rel="noopener noreferrer">open file</a></li>
 </ul></li>
-<li class="file-list__folder"><div><strong>docs/</strong><span class="file-meta"> → Human-oriented documentation for the package.</span> <a href="../../../skills/commit-msg/docs/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
-<li><strong>abd-commit-msg-output.md</strong><span class="file-meta"> → Interaction Tree and State Model — Ace Commit Message</span> <a href="../../../skills/commit-msg/docs/abd-commit-msg-output.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li class="file-list__folder"><div><strong>templates/</strong><span class="file-meta"> → Authoring templates and structural skeletons.</span> <a href="../../skills/abd-skill-catalog/templates/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
+<li><strong>catalog.css</strong><span class="file-meta"> → --orange: #ff7a00;</span> <a href="../../skills/abd-skill-catalog/templates/catalog.css" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>page-catalog.html</strong><span class="file-meta"> → &lt;!DOCTYPE html&gt;</span> <a href="../../skills/abd-skill-catalog/templates/page-catalog.html" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>page-entry-detail.html</strong><span class="file-meta"> → &lt;!DOCTYPE html&gt;</span> <a href="../../skills/abd-skill-catalog/templates/page-entry-detail.html" target="_blank" rel="noopener noreferrer">open file</a></li>
 </ul></li>
-<li class="file-list__folder"><div><strong>rules/</strong><span class="file-meta"> → Practice rules (DO/DON&#x27;T) and constraints used with scanners.</span> <a href="../../../skills/commit-msg/rules/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
-<li><strong>scanners.json</strong><span class="file-meta"> → &quot;scanners&quot;: []</span> <a href="../../../skills/commit-msg/rules/scanners.json" target="_blank" rel="noopener noreferrer">open file</a></li>
-</ul></li>
-<li class="file-list__folder"><div><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span> <a href="../../../skills/commit-msg/scripts/" target="_blank" rel="noopener noreferrer">open folder</a></div><ul class="file-list file-list--nested">
-<li><strong>build.py</strong><span class="file-meta"> → !/usr/bin/env python3</span> <a href="../../../skills/commit-msg/scripts/build.py" target="_blank" rel="noopener noreferrer">open file</a></li>
-</ul></li>
-<li><strong>AGENTS.md</strong><span class="file-meta"> → Core Definitions</span> <a href="../../../skills/commit-msg/AGENTS.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>README.md</strong><span class="file-meta"> → ace-commit-msg</span> <a href="../../../skills/commit-msg/README.md" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>skill-config.json</strong><span class="file-meta"> → &quot;name&quot;: &quot;abd-commit-msg&quot;,</span> <a href="../../../skills/commit-msg/skill-config.json" target="_blank" rel="noopener noreferrer">open file</a></li>
-<li><strong>SKILL.md</strong><span class="file-meta"> → name: abd-commit-msg</span> <a href="../../../skills/commit-msg/SKILL.md" target="_blank" rel="noopener noreferrer">open file</a></li>
+<li><strong>SKILL.md</strong><span class="file-meta"> → name: abd-skill-catalog</span> <a href="../../skills/abd-skill-catalog/SKILL.md" target="_blank" rel="noopener noreferrer">open file</a></li>
 </ul>
 
 </div>
