@@ -30,10 +30,10 @@ used under `agents/abd-skill-builder/docs/overview/`.
 
 | Artifact | Format | Location (default) |
 | --- | --- | --- |
-| **Outline** | Markdown | `agents/abd-skill-builder/docs/abd-skill-catalog/outline.md` |
-| **Site hub** | HTML | `agents/abd-skill-builder/docs/abd-skill-catalog/catalog/index.html` |
-| **Skills grid** | HTML | `agents/abd-skill-builder/docs/abd-skill-catalog/catalog/skills.html` |
-| **Agents grid** | HTML | `agents/abd-skill-builder/docs/abd-skill-catalog/catalog/agents.html` |
+| **Outline** | Markdown | `abd-skill-catalog/outline.md` (repository root) |
+| **Site hub** | HTML | `abd-skill-catalog/catalog/index.html` |
+| **Skills grid** | HTML | `abd-skill-catalog/catalog/skills.html` |
+| **Agents grid** | HTML | `abd-skill-catalog/catalog/agents.html` |
 
 Each catalogue entry includes:
 
@@ -57,7 +57,7 @@ Each catalogue entry includes:
 
    - `--repo-root <path>` — defaults to the parent of the repo `skills/`
      directory (detected from this script location).
-   - `--output-dir <path>` — overrides the default output directory above.
+   - `--output-dir <path>` — overrides `<repo-root>/abd-skill-catalog` if you need a different folder.
 
 2. **Discovery rules.**
 

@@ -382,6 +382,20 @@ def layout_lines(repo_root: Path, package_dir: Path, md_prefix: str) -> list[str
     return lines
 
 
+def _path_up_to_ancestor(from_dir: Path, ancestor: Path) -> str:
+    """Return a relative URL prefix like ../../ to ascend from from_dir to ancestor."""
+    from_dir = from_dir.resolve()
+    ancestor = ancestor.resolve()
+    try:
+        rel = from_dir.relative_to(ancestor)
+    except ValueError:
+        return ""
+    n = len(rel.parts)
+    if n == 0:
+        return ""
+    return "../" * n
+
+
 def generate_outline_md(
     repo_root: Path,
     skills: list[SkillEntry],
@@ -536,12 +550,14 @@ def _load_template(name: str) -> str:
 
 def write_html_pages(
     output_catalog_dir: Path,
+    repo_root: Path,
     skills: list[SkillEntry],
     agents: list[AgentEntry],
 ) -> None:
     """Write index.html, skills.html, agents.html under output_catalog_dir."""
-    # From .../docs/abd-skill-catalog/catalog/foo.html → repo root is ../../../../../
-    up_to_repo = "../../../../../"
+    up_to_repo = _path_up_to_ancestor(output_catalog_dir, repo_root)
+    if not up_to_repo:
+        up_to_repo = "./"
     idx_tpl = _load_template("page-catalog.html")
     css = _load_template("catalog.css")
 
@@ -574,7 +590,7 @@ def write_html_pages(
 
     brand = "<strong>Agile by Design</strong> &middot; abd-skill-catalog"
 
-    outline_href = f"{up_to_repo}agents/abd-skill-builder/docs/abd-skill-catalog/outline.md"
+    outline_href = "../outline.md"
     hub_intro = (
         "<p>Browse practice <a href=\"skills.html\">skills</a> and "
         "<a href=\"agents.html\">agents</a> in this repository. "
@@ -593,7 +609,7 @@ def write_html_pages(
         title="ABD catalogue — Hub",
         brand=brand,
         h1="Skills &amp; agents catalogue",
-        tagline="Repository-wide index aligned with abd-skill-builder docs.",
+        tagline="Repository-wide index; outputs live at the repository root.",
         intro=hub_intro,
         nav_current="hub",
         body_inner=hub_body,
@@ -654,18 +670,15 @@ def main() -> None:
         "--output-dir",
         type=Path,
         default=None,
-        help="Output directory for outline.md and catalog/. "
-        "Default: agents/abd-skill-builder/docs/abd-skill-catalog under repo root.",
+        help="Output directory for outline.md and catalog/ subfolder. "
+        "Default: <repo-root>/abd-skill-catalog",
     )
     args = parser.parse_args()
 
     repo_root = (args.repo_root or SKILL_DIR.parent.parent).resolve()
     skills_dir = repo_root / "skills"
     agents_dir = repo_root / "agents"
-    output_dir = (
-        args.output_dir
-        or (repo_root / "agents" / "abd-skill-builder" / "docs" / "abd-skill-catalog")
-    ).resolve()
+    output_dir = (args.output_dir or (repo_root / "abd-skill-catalog")).resolve()
 
     if not skills_dir.is_dir():
         raise SystemExit(f"skills/ not found: {skills_dir}")
@@ -683,14 +696,14 @@ def main() -> None:
 
     # outline.md lives in output_dir; links are relative to that file
     outline_path = output_dir / "outline.md"
-    md_prefix = "../../../"
+    md_prefix = _path_up_to_ancestor(output_dir, repo_root)
     outline_path.write_text(
         generate_outline_md(repo_root, skills, agents, md_prefix),
         encoding="utf-8",
     )
     print(f"  wrote {outline_path}")
 
-    write_html_pages(catalog_dir, skills, agents)
+    write_html_pages(catalog_dir, repo_root, skills, agents)
     print(f"  wrote {catalog_dir / 'index.html'}")
     print(f"  wrote {catalog_dir / 'skills.html'}")
     print(f"  wrote {catalog_dir / 'agents.html'}")
