@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ABD catalogue — Agents</title>
+<style>
+:root {
+  --orange: #ff7a00;
+  --bg: #09090b;
+  --surface: #0e0e10;
+  --raised: #161618;
+  --border: #2a2a30;
+  --border-muted: #1a1a1e;
+  --text: #e8e8ed;
+  --muted: #9b9ba8;
+  --radius: 4px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  font-family: system-ui, "Segoe UI", Roboto, Ubuntu, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+}
+a { color: #8ab4ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+strong { font-weight: 700; }
+code {
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.88em;
+  background: #1f1f24;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: #d4d4d4;
+}
+.page-wrap { padding: 16px clamp(8px,3vw,28px); }
+.panel {
+  max-width: min(96vw, 1100px);
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.panel-header {
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  border-left: 4px solid var(--orange);
+  background: var(--raised);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.header-icon {
+  flex-shrink: 0;
+  background: #000;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-muted);
+  box-shadow: inset 0 0 0 1px rgba(255,122,0,0.12);
+}
+.header-text { flex: 1; min-width: 200px; }
+.brand { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.brand strong { color: var(--orange); }
+h1 { margin: 0; font-size: 2rem; font-weight: 700; line-height: 1.15; }
+.tagline { margin: 8px 0 0; font-size: 1.05rem; color: var(--muted); max-width: 52rem; }
+.panel-body { padding: 28px 22px 36px; }
+p { margin: 0 0 14px; }
+h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 32px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+h2:first-child { margin-top: 0; }
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 0 0 18px;
+  padding: 0 0 14px;
+  border-bottom: 1px solid var(--border-muted);
+}
+.nav a {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.nav a.nav__link--current {
+  color: var(--orange);
+  pointer-events: none;
+}
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  margin: 18px 0 0;
+}
+.cap-card {
+  display: block;
+  text-decoration: none;
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  transition: background 0.15s, border-color 0.15s;
+  cursor: pointer;
+}
+.cap-card:hover {
+  background: rgba(255,122,0,0.06);
+  border-color: rgba(255,122,0,0.4);
+  text-decoration: none;
+}
+.cap-card__title {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--orange);
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cap-card__icon { flex-shrink: 0; width: 24px; height: 24px; }
+.cap-card__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.55;
+  margin-bottom: 1px;
+}
+.cap-card__problem { font-size: 0.85rem; color: #d4868e; line-height: 1.45; margin: 0 0 8px; }
+.cap-card__solution { font-size: 0.85rem; color: var(--muted); line-height: 1.45; margin: 0 0 8px; }
+.cap-card__sep { border: none; border-top: 1px solid var(--border-muted); margin: 10px 0; }
+.cap-card__more {
+  font-size: 0.78rem;
+  color: var(--orange);
+  opacity: 0.7;
+  margin: 10px 0 0;
+}
+
+</style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="panel" role="main">
+
+<header class="panel-header">
+  <div class="header-icon">
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:6px;">
+      <rect width="52" height="52" rx="8" fill="#0e0e10"/>
+      <path d="M16 14h20a2 2 0 0 1 2 2v20a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2V16a2 2 0 0 1 2-2z" stroke="#FF7A00" stroke-width="1.5" fill="rgba(255,122,0,0.06)"/>
+      <path d="M20 22h12M20 26h9M20 30h12" stroke="#FF7A00" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="header-text">
+    <p class="brand"><strong>Agile by Design</strong> &middot; abd-skill-catalog</p>
+    <h1>Agents</h1>
+    <p class="tagline">5 entries.</p>
+  </div>
+</header>
+
+<div class="panel-body">
+
+<nav class="nav" aria-label="Catalogue sections">
+  <a href="index.html" class="nav__link">Hub</a>
+  <a href="skills.html" class="nav__link">Skills</a>
+  <a href="agents.html" class="nav__link nav__link--current">Agents</a>
+</nav>
+
+<p>Each card links to the agent folder under <code>agents/</code>. The generator prefers <code>AGENT.md</code>, then <code>AGENTS.md</code>, then <code>SKILL.md</code>.</p>
+
+<h2>Agents (5)</h2><div class="cap-grid">        <a class="cap-card" href="../../../../../agents/abd-context-to-memory/">
+          <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-context-to-memory</p>
+          <p class="cap-card__label">Challenge</p>
+          <p class="cap-card__problem">Orchestrate convert → chunk → embed → search by coordinating this agent&#x27;s skills.</p>
+          <hr class="cap-card__sep">
+          <p class="cap-card__label">Solution</p>
+          <p class="cap-card__solution">Per-stage procedures: * and each skill&#x27;s **.</p>
+          <p class="cap-card__label" style="margin-top:10px">Description</p>
+          <p class="cap-card__solution">Orchestrate convert → chunk → embed → search by coordinating this agent&#x27;s skills. Decide when each stage runs, whether to use a strategy pass (review  before chunk + embed) or straight-through, and hold cross-stage quality (real headings before chunking, sane splits after chunking).
+
+Per-stage procedures: * and each skill&#x27;s **.
+
+---</p>
+          <p class="cap-card__more">Open agent folder →</p>
+        </a>
+        <a class="cap-card" href="../../../../../agents/abd-delivery-lead/">
+          <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>ABD Delivery Lead</p>
+          <p class="cap-card__label">Challenge</p>
+          <p class="cap-card__problem">You are a delivery lead agent orchestrating an Agile by Design (ABD) delivery flow.</p>
+          <hr class="cap-card__sep">
+          <p class="cap-card__label">Solution</p>
+          <p class="cap-card__solution">Build and revise the agile delivery plan (context assessment, risks, strategies, runs, checkpoints). Read this before Step 2 in every engagement.</p>
+          <p class="cap-card__label" style="margin-top:10px">Description</p>
+          <p class="cap-card__solution"># ABD Delivery Lead
+
+You are a delivery lead agent orchestrating an Agile by Design (ABD) delivery flow.
+
+You own the orchestration lifecycle: workspace, planning checkpoints (when to stop and confirm), sequencing runs and stages, bootstrapping  agents, handoff gates, and cross-stage quality. You do not produce deliverables yourself — you delegate to team members with the right role, workspace, and practice skills.
+
+Planning detail lives in the skill, not in this file. For every planning decision — what a plan and run are, how to assess context, risk types, strategies, example plans, and how to design runs — read  ( and the  folder — start with , then the strategy file(s) that match context). Follow that skill when you build, present, or revise the plan.
+
+## Bootstrap inputs (required …</p>
+          <p class="cap-card__more">Open agent folder →</p>
+        </a>
+        <a class="cap-card" href="../../../../../agents/abd-skill-builder/">
+          <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>abd-skill-builder</p>
+          <p class="cap-card__label">Challenge</p>
+          <p class="cap-card__problem">Provide portable repository standards aligned with Open Agent Skills: a focused  for discovery, a merged  for multi-step workflow, plus documentation of build and validation (merge, , scanners, CI) …</p>
+          <hr class="cap-card__sep">
+          <p class="cap-card__label">Solution</p>
+          <p class="cap-card__solution">Provide portable repository standards aligned with Open Agent Skills: a focused  for discovery, a merged  for multi-step workflow, plus documentation of build and validation (merge, , scanners, CI), and a scaffold CLI so new skills match skills.sh-style layout without …</p>
+          <p class="cap-card__label" style="margin-top:10px">Description</p>
+          <p class="cap-card__solution">Provide portable repository standards aligned with Open Agent Skills: a focused  for discovery, a merged  for multi-step workflow, plus documentation of build and validation (merge, , scanners, CI), and a scaffold CLI so new skills match skills.sh-style layout without hand-copying fixtures.
+
+
+---</p>
+          <p class="cap-card__more">Open agent folder →</p>
+        </a>
+        <a class="cap-card" href="../../../../../agents/abd-team-member/">
+          <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>ABD Team Member</p>
+          <p class="cap-card__label">Challenge</p>
+          <p class="cap-card__problem">You are an ABD team member agent.</p>
+          <hr class="cap-card__sep">
+          <p class="cap-card__label">Solution</p>
+          <p class="cap-card__solution">Resolve and use the engagement workspace root.</p>
+          <p class="cap-card__label" style="margin-top:10px">Description</p>
+          <p class="cap-card__solution"># ABD Team Member
+
+You are an ABD team member agent.
+
+You sit in a delivery flow: sometimes orchestrated by an  agent, you take a specific team-role (Product Owner, Analyst, or Engineer; see below) and own your part of going from raw context to working software.
+
+This means accepting handoffs from upstream, doing the work required based on your specific role, and using the by Design practice skills that come with that role. You generate outputs (story graphs, specs, tests, code, etc.) so they are available for downstream agents or the user can continue work required to achieve this outcome.
+
+## Bootstrap inputs (required from outside)
+
+Every session MUST be given both of the following. If either is missing, ask once, then proceed with stated assumptions only if the user confirms.
+
+-  — …</p>
+          <p class="cap-card__more">Open agent folder →</p>
+        </a>
+        <a class="cap-card" href="../../../../../agents/ai-research-assistant/">
+          <p class="cap-card__title"><span class="cap-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#1a1a1e"/><path d="M6 9h12v10H6z" stroke="#ff7a00" stroke-width="1.5"/><path d="M9 7V5h6v2" stroke="#ff7a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>ai-research-assistant</p>
+          <p class="cap-card__label">Challenge</p>
+          <p class="cap-card__problem">Orchestrate hypothesis-driven research on AI-augmented delivery and context</p>
+          <hr class="cap-card__sep">
+          <p class="cap-card__label">Solution</p>
+          <p class="cap-card__solution">engineering practices. You coordinate three skills in sequence to produce a</p>
+          <p class="cap-card__label" style="margin-top:10px">Description</p>
+          <p class="cap-card__solution">Orchestrate hypothesis-driven research on AI-augmented delivery and context
+engineering practices. You coordinate three skills in sequence to produce a
+research report that helps the user decide whether their approach is
+well-founded, exposed, or genuinely novel.
+
+You are an impartial advisor — not a cheerleader. The user has explicitly
+asked you to be the voice of reason, to go online, search your model knowledge,
+and keep them from going in directions that are not well-established.
+
+---</p>
+          <p class="cap-card__more">Open agent folder →</p>
+        </a></div>
+
+</div>
+</div>
+</div>
+</body>
+</html>
