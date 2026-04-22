@@ -414,6 +414,81 @@ h2:first-child { margin-top: 0; }
   color: var(--muted);
 }
 
+/* Static markdown mirror pages (catalog/doc/...) */
+.rule-prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 52rem;
+}
+.rule-prose h1,
+.rule-prose h2,
+.rule-prose h3,
+.rule-prose h4 {
+  margin: 1.25em 0 0.5em;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+.rule-prose h1:first-child,
+.rule-prose h2:first-child,
+.rule-prose h3:first-child {
+  margin-top: 0;
+}
+.rule-prose h1 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35em; }
+.rule-prose h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border-muted); padding-bottom: 0.25em; }
+.rule-prose h3 { font-size: 1.1rem; }
+.rule-prose p { margin: 0 0 12px; }
+.rule-prose pre {
+  margin: 12px 0;
+  padding: 12px 14px;
+  overflow: auto;
+  background: #1f1f24;
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+.rule-prose code { font-size: inherit; }
+.rule-prose ul,
+.rule-prose ol {
+  margin: 8px 0 12px 1.25rem;
+  padding: 0;
+}
+.rule-prose li { margin-bottom: 6px; }
+.rule-prose strong { color: var(--text); }
+.rule-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-muted);
+  margin: 1.25em 0;
+}
+.rule-prose .md-table-wrap {
+  overflow-x: auto;
+  margin: 12px 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.rule-prose table.md-table {
+  width: max-content;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.rule-prose table.md-table th,
+.rule-prose table.md-table td {
+  border: 1px solid var(--border-muted);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.rule-prose table.md-table th {
+  background: rgba(255, 122, 0, 0.08);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rule-prose table.md-table td { background: var(--panel); }
+.rule-prose a { color: var(--accent, #ff7a00); text-decoration: underline; }
+.rule-prose a:hover { text-decoration: none; }
+
 </style>
 </head>
 <body>
@@ -469,11 +544,11 @@ h2:first-child { margin-top: 0; }
 
 <hr class="entry-divider">
 
-<h2>Contents</h2>
+<h2 id="entry-contents">Contents</h2>
 <ul class="file-list file-list--root">
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>__pycache__/</strong><span class="file-meta"> → Folder (1 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-skill-catalog/scripts/__pycache__/generate_abd_catalog.cpython-313.pyc" target="_blank" rel="noopener noreferrer"><strong>generate_abd_catalog.cpython-313.pyc</strong></a><span class="file-meta"> →     ֚�i��  �            </span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-skill-catalog/scripts/__pycache__/generate_abd_catalog.cpython-313.pyc" target="_blank" rel="noopener noreferrer"><strong>generate_abd_catalog.cpython-313.pyc</strong></a><span class="file-meta"> → /�i��  �            </span></li>
 </ul></div></details></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-skill-catalog/scripts/generate_abd_catalog.py" target="_blank" rel="noopener noreferrer"><strong>generate_abd_catalog.py</strong></a><span class="file-meta"> → !/usr/bin/env python3</span></li>
 </ul></div></details></li>
@@ -483,15 +558,16 @@ h2:first-child { margin-top: 0; }
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-skill-catalog/templates/intros/catalog-hub-intro.html" target="_blank" rel="noopener noreferrer"><strong>catalog-hub-intro.html</strong></a><span class="file-meta"> → &lt;p&gt;Browse &lt;a href=&quot;skills.html&quot;&gt;skills&lt;/a&gt; and &lt;a href=&quot;agents.html&quot;&gt;agents&lt;/a&gt;.</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-skill-catalog/templates/intros/catalog-skills-intro.html" target="_blank" rel="noopener noreferrer"><strong>catalog-skills-intro.html</strong></a><span class="file-meta"> → &lt;p&gt;Open a card for a full page on that skill.&lt;/p&gt;</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-skill-catalog/templates/catalog-readme-agent.md" target="_blank" rel="noopener noreferrer"><strong>catalog-readme-agent.md</strong></a><span class="file-meta"> → catalogue_summary: &quot;{{CATALOGUE_SUMMARY}}&quot;</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-skill-catalog/templates/catalog-readme-skill.md" target="_blank" rel="noopener noreferrer"><strong>catalog-readme-skill.md</strong></a><span class="file-meta"> → One line for catalogue cards and grids (YAML string).</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/abd-skill-catalog/templates/catalog-readme-agent.html"><strong>catalog-readme-agent.md</strong></a><span class="file-meta"> → catalogue_summary: &quot;{{CATALOGUE_SUMMARY}}&quot;</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/abd-skill-catalog/templates/catalog-readme-skill.html"><strong>catalog-readme-skill.md</strong></a><span class="file-meta"> → One line for catalogue cards and grids (YAML string).</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-skill-catalog/templates/catalog.css" target="_blank" rel="noopener noreferrer"><strong>catalog.css</strong></a><span class="file-meta"> → --orange: #ff7a00;</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-skill-catalog/templates/page-catalog-index.html" target="_blank" rel="noopener noreferrer"><strong>page-catalog-index.html</strong></a><span class="file-meta"> → &lt;!DOCTYPE html&gt;</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-skill-catalog/templates/page-catalog.html" target="_blank" rel="noopener noreferrer"><strong>page-catalog.html</strong></a><span class="file-meta"> → &lt;!DOCTYPE html&gt;</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-skill-catalog/templates/page-entry-detail.html" target="_blank" rel="noopener noreferrer"><strong>page-entry-detail.html</strong></a><span class="file-meta"> → &lt;!DOCTYPE html&gt;</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-skill-catalog/templates/page-markdown-doc.html" target="_blank" rel="noopener noreferrer"><strong>page-markdown-doc.html</strong></a><span class="file-meta"> → &lt;!DOCTYPE html&gt;</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-skill-catalog/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → One line for catalogue cards and grids (YAML string).</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-skill-catalog/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: abd-skill-catalog</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/abd-skill-catalog/README.html"><strong>README.md</strong></a><span class="file-meta"> → One line for catalogue cards and grids (YAML string).</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/abd-skill-catalog/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → name: abd-skill-catalog</span></li>
 </ul>
 
 </div>

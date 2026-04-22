@@ -20,7 +20,7 @@ Use this file when **`team-role`** is set. Combine with **`workspace`** and the 
 
 **You are good at** clarifying acceptance criteria, examples, and behaviors; surfacing gaps; and expressing expectations in testable terms.
 
-**Your goal is to** deepen **exploration** and **spec-by-example** artifacts—using **`abd-acceptance-criteria`** and **`abd-specify-by-example`**, plus the common pipeline (**`story-graph-ops`**, **`execute_using_rules`**) when the deliverable includes or ties to `story-graph.json`.
+**Your goal is to** deepen **exploration** and **spec-by-example** artifacts—using **`abd-acceptance-criteria`** and **`abd-specification-by-example`**, plus the common pipeline (**`story-graph-ops`**, **`execute_using_rules`**) when the deliverable includes or ties to `story-graph.json`.
 
 ---
 
@@ -41,5 +41,5 @@ Use this file when **`team-role`** is set. Combine with **`workspace`** and the 
 | Story mapping | `abd-story-mapping` |
 | Prioritization | TBD / increments in graph — watch for `prioritization` skill |
 | Exploration / AC | `abd-acceptance-criteria` |
-| Spec by example | `abd-specify-by-example` |
+| Spec by example | `abd-specification-by-example` |
 | ATDD / clean code | Add or map when skills land; see `abd-ooad` for design-oriented work |

@@ -308,8 +308,10 @@ def layout_lines(repo_root: Path, package_dir: Path, md_prefix: str) -> list[str
         return ["- (could not read directory)"]
     for p in kids:
         rel = p.relative_to(repo_root).as_posix()
-        link = f"{md_prefix}{rel}"
         if p.is_dir():
+            link = _outline_href_for_rules_folder(package_dir, p)
+            if link is None:
+                link = f"{md_prefix}{rel}"
             try:
                 cnt = len([x for x in p.iterdir() if not x.name.startswith(".")])
             except OSError:
@@ -317,6 +319,8 @@ def layout_lines(repo_root: Path, package_dir: Path, md_prefix: str) -> list[str
             summary = _folder_blurb_from_path(p, cnt)
             lines.append(f"- **[{p.name}/]({link})** — {summary}")
         else:
+            doc_link = _outline_href_for_package_md(repo_root, package_dir, p)
+            link = doc_link if doc_link is not None else f"{md_prefix}{rel}"
             blurb = _file_blurb(p)
             lines.append(f"- [{p.name}]({link}) — {blurb}")
     return lines
@@ -364,6 +368,359 @@ def _repo_href(href_to_repo: str, rel_posix: str) -> str:
         return href_to_repo
     parts = [quote(p, safe="") for p in rel_posix.split("/") if p]
     return href_to_repo + "/".join(parts)
+
+
+def _should_skip_catalog_md(rel_parts: tuple[str, ...]) -> bool:
+    """Skip dot-directories and hidden path segments when mirroring .md into catalog/doc/."""
+    return any(part.startswith(".") for part in rel_parts)
+
+
+def _package_markdown_catalog_href_from_detail_page(
+    repo_root: Path, file_path: Path, package_dir: Path
+) -> str | None:
+    """Any <pkg>/**/*.md → ../doc/<skill|agent>/<pkg>/…/file.html from catalog/skill|agent/<pkg>.html."""
+    if file_path.suffix.lower() != ".md":
+        return None
+    try:
+        rel_under_pkg = file_path.relative_to(package_dir)
+    except ValueError:
+        return None
+    if _should_skip_catalog_md(rel_under_pkg.parts):
+        return None
+    try:
+        rel_pkg = package_dir.relative_to(repo_root)
+    except ValueError:
+        return None
+    if len(rel_pkg.parts) < 2 or rel_pkg.parts[0] not in ("skills", "agents"):
+        return None
+    kind = "skill" if rel_pkg.parts[0] == "skills" else "agent"
+    pkg = rel_pkg.parts[1]
+    rel_html = rel_under_pkg.with_suffix(".html").as_posix()
+    segs = [quote(s, safe="") for s in rel_html.split("/") if s]
+    return f"../doc/{kind}/{quote(pkg, safe='')}/" + "/".join(segs)
+
+
+def _outline_href_for_package_md(
+    repo_root: Path, package_dir: Path, file_path: Path
+) -> str | None:
+    """outline.md lives in catalog/: doc/<skill|agent>/<pkg>/….html for top-level .md only."""
+    if file_path.suffix.lower() != ".md" or file_path.parent != package_dir:
+        return None
+    try:
+        rel_pkg = package_dir.relative_to(repo_root)
+    except ValueError:
+        return None
+    if len(rel_pkg.parts) < 2 or rel_pkg.parts[0] not in ("skills", "agents"):
+        return None
+    kind = "skill" if rel_pkg.parts[0] == "skills" else "agent"
+    pkg = rel_pkg.parts[1]
+    rel_html = file_path.relative_to(package_dir).with_suffix(".html").as_posix()
+    segs = [quote(s, safe="") for s in rel_html.split("/") if s]
+    return f"doc/{kind}/{quote(pkg, safe='')}/" + "/".join(segs)
+
+
+def _outline_href_for_rules_folder(package_dir: Path, rules_dir: Path) -> str | None:
+    """Point rules/ folder entry at the skill or agent detail page #entry-contents."""
+    if rules_dir.name != "rules" or not rules_dir.is_dir():
+        return None
+    root = package_dir.parent.name
+    if root == "skills":
+        return f"skill/{quote(package_dir.name, safe='')}.html#entry-contents"
+    if root == "agents":
+        return f"agent/{quote(package_dir.name, safe='')}.html#entry-contents"
+    return None
+
+
+_TABLE_SEPARATOR_CELL_RE = re.compile(r"^:?-{3,}:?$")
+
+
+def _catalog_href_from_md(href: str) -> str:
+    """Relative *.md links in mirrored docs → *.html for static catalog."""
+    href = href.strip()
+    if not href or href.startswith(("#", "mailto:", "http://", "https://")):
+        return href
+    if href.endswith(".md"):
+        return href[:-3] + ".html"
+    return href
+
+
+def _inline_format(s: str) -> str:
+    """Inline: **bold**, *italic*, [label](href). Escapes plain text; href normalized for sibling .md."""
+    if not s:
+        return ""
+    parts: list[str] = []
+    i = 0
+    n = len(s)
+    while i < n:
+        if s.startswith("**", i):
+            j = s.find("**", i + 2)
+            if j == -1:
+                parts.append(_h(s[i:]))
+                break
+            inner = s[i + 2 : j]
+            parts.append("<strong>" + _inline_format(inner) + "</strong>")
+            i = j + 2
+            continue
+        if s[i] == "[":
+            close_lb = s.find("]", i + 1)
+            if (
+                close_lb != -1
+                and close_lb + 1 < n
+                and s[close_lb + 1] == "("
+            ):
+                close_paren = s.find(")", close_lb + 2)
+                if close_paren != -1:
+                    label = s[i + 1 : close_lb]
+                    href_raw = s[close_lb + 2 : close_paren]
+                    href = _catalog_href_from_md(href_raw)
+                    plain = label.strip()
+                    if plain.endswith(".md") and href == _catalog_href_from_md(plain):
+                        link_inner = _h(plain[:-3])
+                    else:
+                        link_inner = _inline_format(label)
+                    parts.append('<a href="' + _h(href) + '">' + link_inner + "</a>")
+                    i = close_paren + 1
+                    continue
+        if s[i] == "*" and (i + 1 >= n or s[i + 1] != "*"):
+            j = s.find("*", i + 1)
+            if j != -1 and j > i + 1:
+                inner = s[i + 1 : j]
+                parts.append("<em>" + _inline_format(inner) + "</em>")
+                i = j + 1
+                continue
+        parts.append(_h(s[i]))
+        i += 1
+    return "".join(parts)
+
+
+def _is_markdown_table_row(stripped: str) -> bool:
+    return stripped.startswith("|") and stripped.count("|") >= 2
+
+
+def _split_table_row(line: str) -> list[str]:
+    line = line.strip()
+    if line.startswith("|"):
+        line = line[1:]
+    if line.endswith("|"):
+        line = line[:-1]
+    return [c.strip() for c in line.split("|")]
+
+
+def _is_table_separator_row(cells: list[str]) -> bool:
+    if not cells:
+        return False
+    for c in cells:
+        t = c.strip()
+        if not t:
+            continue
+        if not _TABLE_SEPARATOR_CELL_RE.match(t):
+            return False
+    return True
+
+
+def _markdown_table_to_html(table_lines: list[str]) -> str:
+    rows = [_split_table_row(line) for line in table_lines]
+    if not rows:
+        return ""
+    max_cols = max(len(r) for r in rows)
+    rows = [r + [""] * (max_cols - len(r)) for r in rows]
+    parts: list[str] = ['<table class="md-table">']
+    start_body = 0
+    if len(rows) >= 2 and _is_table_separator_row(rows[1]):
+        parts.append("<thead><tr>")
+        for c in rows[0]:
+            parts.append("<th>" + _inline_format(c) + "</th>")
+        parts.append("</tr></thead>")
+        start_body = 2
+    parts.append("<tbody>")
+    for r in rows[start_body:]:
+        parts.append("<tr>")
+        for c in r:
+            parts.append("<td>" + _inline_format(c) + "</td>")
+        parts.append("</tr>")
+    parts.append("</tbody></table>")
+    return '<div class="md-table-wrap">' + "".join(parts) + "</div>"
+
+
+def _markdown_rule_to_html(text: str) -> str:
+    """Markdown → HTML for bundled .md pages: headings, lists, tables, HR, fences, paragraphs, inline marks."""
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+    if FRONTMATTER_RE.match(text):
+        text = FRONTMATTER_RE.sub("", text).strip()
+    lines = text.split("\n")
+    out: list[str] = []
+    in_code = False
+    code_buf: list[str] = []
+    para: list[str] = []
+    in_ul = False
+
+    def close_ul() -> None:
+        nonlocal in_ul
+        if in_ul:
+            out.append("</ul>")
+            in_ul = False
+
+    def flush_para() -> None:
+        nonlocal para
+        if not para:
+            return
+        close_ul()
+        out.append("<p>" + _inline_format(" ".join(para)) + "</p>")
+        para = []
+
+    i = 0
+    while i < len(lines):
+        raw = lines[i]
+        line = raw.rstrip("\n")
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            if in_code:
+                out.append("<pre><code>" + _h("\n".join(code_buf)) + "</code></pre>")
+                code_buf = []
+                in_code = False
+            else:
+                flush_para()
+                close_ul()
+                in_code = True
+            i += 1
+            continue
+        if in_code:
+            code_buf.append(line)
+            i += 1
+            continue
+        if stripped == "":
+            flush_para()
+            close_ul()
+            i += 1
+            continue
+        if re.fullmatch(r"-{3,}|\*{3,}|_{3,}", stripped):
+            flush_para()
+            close_ul()
+            out.append("<hr>")
+            i += 1
+            continue
+        if _is_markdown_table_row(stripped):
+            flush_para()
+            close_ul()
+            tbl: list[str] = []
+            while i < len(lines):
+                st = lines[i].rstrip("\n").strip()
+                if st == "":
+                    break
+                if not _is_markdown_table_row(st):
+                    break
+                tbl.append(st)
+                i += 1
+            out.append(_markdown_table_to_html(tbl))
+            continue
+        if stripped.startswith("#"):
+            flush_para()
+            close_ul()
+            level = len(stripped) - len(stripped.lstrip("#"))
+            title = stripped.lstrip("#").strip()
+            tag = min(max(level, 1), 6)
+            out.append(f"<h{tag}>{_inline_format(title)}</h{tag}>")
+            i += 1
+            continue
+        m = re.match(r"^[-*]\s+(.*)", stripped)
+        if m:
+            flush_para()
+            if not in_ul:
+                out.append("<ul>")
+                in_ul = True
+            out.append("<li>" + _inline_format(m.group(1)) + "</li>")
+            i += 1
+            continue
+        para.append(stripped)
+        i += 1
+    if in_code and code_buf:
+        out.append("<pre><code>" + _h("\n".join(code_buf)) + "</code></pre>")
+    flush_para()
+    close_ul()
+    return "\n".join(out) if out else "<p>(empty)</p>"
+
+
+def write_package_markdown_pages(
+    output_catalog_dir: Path,
+    repo_root: Path,
+    skills: list[SkillEntry],
+    agents: list[AgentEntry],
+    css: str,
+) -> int:
+    """Emit catalog/doc/<skill|agent>/<pkg>/…/*.html for every package .md (mirrors subfolders). Returns page count."""
+    tpl = _load_template("page-markdown-doc.html")
+    brand = CATALOG_BRAND_HTML
+    doc_root = output_catalog_dir / "doc"
+    if doc_root.exists():
+        shutil.rmtree(doc_root)
+    legacy_rule = output_catalog_dir / "rule"
+    if legacy_rule.exists():
+        shutil.rmtree(legacy_rule)
+    doc_root.mkdir(parents=True)
+    count = 0
+
+    def badge_for(rel_under_pkg: Path) -> str:
+        if rel_under_pkg.parts and rel_under_pkg.parts[0] == "rules":
+            return "Rule"
+        return "Markdown"
+
+    def write_pkg_md(pkg_dir: Path, kind: str, display_name: str) -> None:
+        nonlocal count
+        if not pkg_dir.is_dir():
+            return
+        pkg = pkg_dir.name
+        for md in sorted(pkg_dir.rglob("*.md")):
+            if not md.is_file():
+                continue
+            try:
+                rel_under_pkg = md.relative_to(pkg_dir)
+            except ValueError:
+                continue
+            if _should_skip_catalog_md(rel_under_pkg.parts):
+                continue
+            dest = doc_root / kind / pkg / rel_under_pkg.with_suffix(".html")
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            raw = md.read_text(encoding="utf-8", errors="replace")
+            body_html = _markdown_rule_to_html(raw)
+            rel_to_cat = dest.relative_to(output_catalog_dir)
+            nav_prefix = "../" * len(rel_to_cat.parent.parts)
+            back = f"{nav_prefix}{'skill' if kind == 'skill' else 'agent'}/{quote(pkg, safe='')}.html"
+            relpos = rel_under_pkg.as_posix()
+            title = f"ABD catalogue — {display_name} · {relpos}"
+            h1 = relpos
+            tagline = _file_blurb(md, max_len=400)
+            if kind == "skill":
+                nav_hub = _nav_cls("hub", "skills")
+                nav_skills = _nav_cls("skills", "skills")
+                nav_agents = _nav_cls("agents", "skills")
+            else:
+                nav_hub = _nav_cls("hub", "agents")
+                nav_skills = _nav_cls("skills", "agents")
+                nav_agents = _nav_cls("agents", "agents")
+            html = (
+                tpl.replace("{{CSS}}", css)
+                .replace("{{TITLE}}", _h(title))
+                .replace("{{BRAND}}", brand)
+                .replace("{{BACK_HREF}}", back)
+                .replace("{{BACK_LABEL}}", "← " + _h(display_name))
+                .replace("{{BADGE}}", badge_for(rel_under_pkg))
+                .replace("{{H1}}", _h(h1))
+                .replace("{{TAGLINE}}", _h(tagline))
+                .replace("{{NAV_PREFIX}}", nav_prefix)
+                .replace("{{NAV_HUB}}", nav_hub)
+                .replace("{{NAV_SKILLS}}", nav_skills)
+                .replace("{{NAV_AGENTS}}", nav_agents)
+                .replace("{{DOC_BODY}}", body_html)
+            )
+            dest.write_text(html, encoding="utf-8")
+            count += 1
+
+    for s in skills:
+        write_pkg_md(repo_root / "skills" / s.dir_name, "skill", s.name)
+    for a in agents:
+        write_pkg_md(repo_root / "agents" / a.dir_name, "agent", a.name)
+
+    return count
 
 
 def _full_purpose_plain(fm: dict[str, str], body: str) -> str:
@@ -716,15 +1073,26 @@ def _folder_blurb_from_path(folder: Path, child_count: int) -> str:
     return _folder_blurb(name, child_count)
 
 
-def _html_file_row(repo_root: Path, file_path: Path, href_to_repo: str) -> str:
+def _html_file_row(
+    repo_root: Path,
+    file_path: Path,
+    href_to_repo: str,
+    package_dir: Path | None,
+) -> str:
     rel = file_path.relative_to(repo_root).as_posix()
     blurb = _file_blurb(file_path, max_len=260)
     url = _repo_href(href_to_repo, rel)
+    link_attrs = _REPO_LINK_NEW_TAB
+    if package_dir is not None:
+        cat = _package_markdown_catalog_href_from_detail_page(repo_root, file_path, package_dir)
+        if cat:
+            url = cat
+            link_attrs = ""
     return (
         '<li class="file-tree__file"><a class="file-tree__file-link" href="'
         + _h(url)
         + '"'
-        + _REPO_LINK_NEW_TAB
+        + link_attrs
         + "><strong>"
         + _h(file_path.name)
         + "</strong></a><span class=\"file-meta\"> → "
@@ -737,6 +1105,7 @@ def _html_folder_branch(
     repo_root: Path,
     folder: Path,
     href_to_repo: str,
+    package_dir: Path | None,
     *,
     depth: int,
     max_depth: int,
@@ -760,7 +1129,7 @@ def _html_folder_branch(
     inner_parts: list[str] = []
     for p in kids:
         if p.is_file():
-            inner_parts.append(_html_file_row(repo_root, p, href_to_repo))
+            inner_parts.append(_html_file_row(repo_root, p, href_to_repo, package_dir))
         elif p.is_dir():
             if depth + 1 > max_depth:
                 inner_parts.append(
@@ -769,7 +1138,14 @@ def _html_folder_branch(
                     + "/</strong> <span class=\"file-meta\">(deeper nesting omitted)</span></li>"
                 )
             else:
-                sub = _html_folder_branch(repo_root, p, href_to_repo, depth=depth + 1, max_depth=max_depth)
+                sub = _html_folder_branch(
+                    repo_root,
+                    p,
+                    href_to_repo,
+                    package_dir,
+                    depth=depth + 1,
+                    max_depth=max_depth,
+                )
                 inner_parts.append('<li class="file-tree__dir">' + sub + "</li>")
 
     if not inner_parts:
@@ -812,13 +1188,14 @@ def _html_contents_list(repo_root: Path, package_dir: Path, href_to_repo: str) -
                     repo_root,
                     p,
                     href_to_repo,
+                    package_dir,
                     depth=0,
                     max_depth=_FILE_TREE_MAX_DEPTH,
                 )
                 + "</li>"
             )
         else:
-            parts.append(_html_file_row(repo_root, p, href_to_repo))
+            parts.append(_html_file_row(repo_root, p, href_to_repo, package_dir))
     if not parts:
         return '<p class="entry-caption">(no top-level files)</p>'
     return '<ul class="file-list file-list--root">\n' + "\n".join(parts) + "\n</ul>"
@@ -1103,10 +1480,10 @@ def write_html_pages(
     repo_root: Path,
     skills: list[SkillEntry],
     agents: list[AgentEntry],
-) -> tuple[int, int]:
+) -> tuple[int, int, int]:
     """Write index.html (single-page hub + collapsible skills/agents), skills.html, agents.html, detail pages.
 
-    Returns (skill_detail_count, agent_detail_count).
+    Returns (skill_detail_count, agent_detail_count, markdown_doc_page_count).
     """
     up_to_repo = _path_up_to_ancestor(output_catalog_dir, repo_root)
     if not up_to_repo:
@@ -1236,10 +1613,11 @@ def write_html_pages(
         encoding="utf-8",
     )
 
+    n_md_pages = write_package_markdown_pages(output_catalog_dir, repo_root, skills, agents, css)
     n_skill_pages, n_agent_pages = write_entry_detail_pages(
         output_catalog_dir, repo_root, skills, agents, css, detail_tpl
     )
-    return n_skill_pages, n_agent_pages
+    return n_skill_pages, n_agent_pages, n_md_pages
 
 
 def main() -> None:
@@ -1295,10 +1673,11 @@ def main() -> None:
     )
     print(f"  wrote {outline_path}")
 
-    n_sk_detail, n_ag_detail = write_html_pages(output_dir, repo_root, skills, agents)
+    n_sk_detail, n_ag_detail, n_md_pages = write_html_pages(output_dir, repo_root, skills, agents)
     print(f"  wrote {output_dir / 'index.html'}")
     print(f"  wrote {output_dir / 'skills.html'}")
     print(f"  wrote {output_dir / 'agents.html'}")
+    print(f"  wrote {n_md_pages} markdown pages under catalog/doc/")
     print(f"  wrote {n_sk_detail} skill detail pages under catalog/skill/")
     print(f"  wrote {n_ag_detail} agent detail pages under catalog/agent/")
     print(f"  ({len(skills)} skills, {len(agents)} agents)")

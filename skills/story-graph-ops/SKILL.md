@@ -88,14 +88,44 @@ Typical situations:
 Implementation: **`scripts/story_graph_cli.py`**.
 
 ```text
-python scripts/story_graph_cli.py read --file <path/to/story-graph.json> [--pretty]
-python scripts/story_graph_cli.py names --file <path>
+python scripts/story_graph_cli.py read   --file <path/to/story-graph.json> [--pretty]
+python scripts/story_graph_cli.py names  --file <path>
 python scripts/story_graph_cli.py search --file <path> --substring <text>
 python scripts/story_graph_cli.py filter --file <path> --stories "A","B" [--pretty]
-python scripts/story_graph_cli.py write --file <out.json> [--input <in.json>|stdin]
+python scripts/story_graph_cli.py sha    --file <path>
+python scripts/story_graph_cli.py write  --file <out.json> [--input <in.json>|stdin]
+                                          [--expect-sha <hex>] [--no-lock] [--force]
 ```
 
 **Create / delete via CLI:** `write` accepts JSON on stdin or `--input`—you can emit a **full replacement** graph (effectively delete everything not in the new JSON) or a **filtered** subgraph. Finer-grained create/update/delete often uses **`story_map`** types in Python, then **`read`** to validate after saving.
+
+## Parallel runs and concurrent writes
+
+`story-graph.json` is **shared mutable state** across the delivery flow — every stage mutates the same file. The planning skill allows **parallel runs** when outputs are independent (e.g. story definition for one slice while discovery continues for another). The policy and the mechanical safeguards are:
+
+**Policy (planning-level):**
+
+- **Do not edit the same slice in parallel.** Partition by slice / epic / story id up front, in the plan's run scope.
+- When two runs must touch the same subtree, serialize them — run B waits for run A's **CHECKPOINT** to confirm before starting.
+- The delivery lead's **Scope guard** at each exit gate flags when a team member added work outside the current run's scope.
+
+**Mechanical safeguards (CLI-level):** `story_graph_cli.py write` enforces two independent checks so a race does not silently clobber another writer's edit.
+
+1. **Advisory lock.** For the duration of a write, the CLI holds an exclusive lock file at `<path>.lock`. If another process holds a live lock, the write is refused with exit code **4**. Stale locks older than 5 minutes are cleaned up automatically. Bypass with `--no-lock` (not recommended) or `--force` (recovery only).
+
+2. **Optimistic concurrency via `--expect-sha`.** Capture the file's content hash at read time and pass it back on write:
+
+    ```bash
+    SHA=$(python scripts/story_graph_cli.py sha --file story-graph.json)
+    # … build your edit locally …
+    python scripts/story_graph_cli.py write --file story-graph.json --expect-sha $SHA --input new.json
+    ```
+
+    If the file changed between the `sha` call and the `write` call, the write is refused with exit code **3** and an actionable message asking the caller to re-read, merge, and retry. This is the check that catches "Run A wrote between my read and my write" across processes or across sessions.
+
+**Exit codes for `write`:** `0` success · `1` bad input / validation failure · `2` path resolution failure · `3` `--expect-sha` mismatch · `4` active lock held by another writer.
+
+**Agent expectation:** every **`write`** during an active multi-run engagement uses both `--expect-sha` (captured from a prior `sha` or `read`) and the default advisory lock. `--force` is reserved for explicit recovery after a stale lock or an intentionally-clobbered edit, and should be logged as a correction entry (`execute_using_rules`).
 
 ## Relationship to other skills
 

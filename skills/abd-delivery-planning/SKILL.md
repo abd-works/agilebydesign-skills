@@ -275,10 +275,25 @@ Stop for confirmation. If no named strategy fits, explain why and present the cu
 ## Files in this skill
 
 
-| File / path            | Purpose                                                     |
-| ---------------------- | ----------------------------------------------------------- |
-| `SKILL.md` (this file) | Concepts, procedure, risk types, stage table, example plans |
-| `strategies/README.md` | Strategy conventions, catalog, how to select a strategy     |
-| `strategies/*.md`      | One prepackaged strategy per file (excluding `README.md`)   |
+| File / path                            | Purpose                                                                |
+| -------------------------------------- | ---------------------------------------------------------------------- |
+| `SKILL.md` (this file)                 | Concepts, procedure, risk types, stage table, example plans            |
+| `strategies/README.md`                 | Strategy conventions, catalog, how to select a strategy                |
+| `strategies/*.md`                      | One prepackaged strategy per file (excluding `README.md`)              |
+| `rules/*.md`                           | Mechanical rules for plan quality (six rules, bound to one scanner)    |
+| `scanners/plan-shape-scanner.py`       | Single scanner evaluating the six plan-shape rules against the saved plan |
+| `scanners/tests/*.md`                  | Good / bad plan fixtures used to verify the scanner                    |
+
+### Validating a saved plan
+
+After writing or revising `<workspace>/agile-delivery-plan.md` (Step 2 or Step 7 of the delivery lead), run:
+
+```
+python skills/execute_using_rules/scripts/run_scanners.py \
+    --skill-root skills/abd-delivery-planning \
+    --workspace <workspace>
+```
+
+The runner discovers `scanners/plan-shape-scanner.py` from each rule's `scanner: plan-shape` frontmatter (deduplicated to a single invocation) and from flat discovery under `scanners/`. The scanner reads the plan at `<workspace>/agile-delivery-plan.md` and reports violations for any of the six rules; exit code 0 = clean, 1 = at least one violation, 2 = path resolution failure. When no plan exists yet the scanner exits 0 silently.
 
 **Engagement workspace (not in this repo):** `agile-delivery-plan.md` (at workspace root) — canonical **saved** agile delivery plan for the engagement; see **Where to save the plan**.

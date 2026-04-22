@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ABD catalogue — abd-acceptance-criteria · templates/acceptance-criteria.md</title>
+<style>
+:root {
+  --orange: #ff7a00;
+  --bg: #09090b;
+  --surface: #0e0e10;
+  --raised: #161618;
+  --border: #2a2a30;
+  --border-muted: #1a1a1e;
+  --text: #e8e8ed;
+  --muted: #9b9ba8;
+  --radius: 4px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  font-family: system-ui, "Segoe UI", Roboto, Ubuntu, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+}
+a { color: #8ab4ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+strong { font-weight: 700; }
+code {
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.88em;
+  background: #1f1f24;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: #d4d4d4;
+}
+.page-wrap { padding: 16px clamp(8px,3vw,28px); }
+.panel {
+  max-width: min(96vw, 1100px);
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.panel-header {
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  border-left: 4px solid var(--orange);
+  background: var(--raised);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.header-icon {
+  flex-shrink: 0;
+  background: #000;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-muted);
+  box-shadow: inset 0 0 0 1px rgba(255,122,0,0.12);
+}
+.header-text { flex: 1; min-width: 200px; }
+.brand { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.brand strong { color: var(--orange); }
+h1 { margin: 0; font-size: 2rem; font-weight: 700; line-height: 1.15; }
+.tagline { margin: 8px 0 0; font-size: 1.05rem; color: var(--muted); max-width: 52rem; }
+.panel-body { padding: 28px 22px 36px; }
+p { margin: 0 0 14px; }
+h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 32px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+h2:first-child { margin-top: 0; }
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 0 0 18px;
+  padding: 0 0 14px;
+  border-bottom: 1px solid var(--border-muted);
+}
+.nav a {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.nav a.nav__link--current {
+  color: var(--orange);
+  pointer-events: none;
+}
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  margin: 18px 0 0;
+}
+.cap-card {
+  display: block;
+  text-decoration: none;
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  transition: background 0.15s, border-color 0.15s;
+  cursor: pointer;
+}
+.cap-card:hover {
+  background: rgba(255,122,0,0.06);
+  border-color: rgba(255,122,0,0.4);
+  text-decoration: none;
+}
+.cap-card__title {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--orange);
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cap-card__icon { flex-shrink: 0; width: 24px; height: 24px; }
+.cap-card__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.55;
+  margin-bottom: 1px;
+}
+.cap-card__summary { font-size: 0.85rem; color: var(--muted); line-height: 1.45; margin: 0 0 8px; }
+.cap-card__more {
+  font-size: 0.78rem;
+  color: var(--orange);
+  opacity: 0.7;
+  margin: 10px 0 0;
+}
+
+/* Entry detail pages (skill/*.html, agent/*.html) — overview-style */
+.entry-detail-header .back-link {
+  font-size: 0.82rem;
+  color: var(--muted);
+  display: inline-block;
+  margin: 0 0 10px;
+}
+.entry-detail-header .back-link:hover {
+  color: var(--orange);
+}
+.cap-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--orange);
+  background: rgba(255, 122, 0, 0.08);
+  border: 1px solid rgba(255, 122, 0, 0.25);
+  border-radius: 3px;
+  padding: 2px 8px;
+  margin: 0 0 8px;
+}
+.entry-caption {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.entry-prose {
+  white-space: pre-wrap;
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+.entry-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 26px 0;
+}
+.ascii-diagram {
+  background: #111114;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.83em;
+  line-height: 1.55;
+  color: #b8b8c2;
+  margin: 0 0 18px;
+}
+.install-block {
+  margin: 22px 0 0;
+  padding: 16px 18px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--orange);
+}
+.install-block h2 {
+  margin-top: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.install-block .install-hint {
+  font-size: 0.92rem;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.install-snippet {
+  background: #111114;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 0;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.85em;
+  line-height: 1.5;
+  color: #d4d4d4;
+}
+.install-snippet code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.file-list li {
+  margin: 0 0 14px;
+  padding: 10px 12px 10px 14px;
+  border-left: 3px solid var(--border-muted);
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 0 4px 4px 0;
+}
+.file-list .file-meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+  display: block;
+  margin-top: 4px;
+}
+.file-list a {
+  font-weight: 600;
+}
+.file-list--root {
+  margin-top: 4px;
+}
+.file-list--nested {
+  margin: 8px 0 0 0;
+  padding-left: 0;
+  border-left: 2px solid var(--border-muted);
+  margin-left: 2px;
+  padding-left: 10px;
+}
+.file-list--nested li {
+  margin-bottom: 10px;
+  padding: 8px 10px 8px 12px;
+  font-size: 0.95rem;
+}
+.file-list__nested-note {
+  margin: 8px 0 0 0;
+  padding: 6px 0 4px 4px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+/* Expandable folder tree (<details> / <summary>) */
+.file-list > li.file-list__folder {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+}
+.file-list__folder > .file-tree__details {
+  margin: 0 0 12px 0;
+}
+.file-tree__details {
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+.file-tree__summary {
+  cursor: pointer;
+  padding: 10px 12px 10px 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.03);
+}
+.file-tree__summary::-webkit-details-marker {
+  display: none;
+}
+.file-tree__summary::marker {
+  content: "";
+  display: none;
+}
+/* Obvious expand/collapse control (native triangle hidden above). */
+.file-tree__summary::before {
+  content: "+";
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 1px;
+  line-height: 1.45rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 1px solid var(--border-muted);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+  user-select: none;
+}
+.file-tree__details[open] > .file-tree__summary::before {
+  content: "\2212"; /* minus sign */
+}
+.file-tree__summary:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.file-tree__summary:hover::before {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.file-tree__summary .file-meta {
+  display: inline;
+  margin-left: 6px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.file-tree__inner {
+  padding: 8px 10px 12px 14px;
+  border-top: 1px solid var(--border-muted);
+}
+.file-tree__ul {
+  margin-top: 4px;
+}
+.file-tree__dir > .file-tree__details {
+  margin: 0;
+  border-radius: 4px;
+}
+.file-tree__dir--truncated {
+  font-size: 0.95rem;
+}
+.file-tree__file .file-meta {
+  display: block;
+  margin-top: 4px;
+}
+
+/* Single-page hub (index.html): collapsible hub / skills / agents */
+.catalog-section {
+  border: 1px solid var(--border-muted);
+  border-radius: 8px;
+  margin: 0 0 16px;
+  background: rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+.catalog-section > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+}
+.catalog-section > summary::-webkit-details-marker { display: none; }
+.catalog-section > summary::marker { content: ""; }
+.catalog-section > summary::before {
+  content: "+";
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  line-height: 1.45rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 1px solid var(--border-muted);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+.catalog-section[open] > summary::before { content: "\2212"; }
+.catalog-section[open] > summary {
+  border-bottom: 1px solid var(--border-muted);
+}
+.catalog-section .section-body {
+  padding: 18px 16px 22px;
+}
+.catalog-section .section-body > p:first-of-type { margin-top: 0; }
+.catalog-section .cap-grid { margin-top: 8px; }
+.catalog-section .count {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Static markdown mirror pages (catalog/doc/...) */
+.rule-prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 52rem;
+}
+.rule-prose h1,
+.rule-prose h2,
+.rule-prose h3,
+.rule-prose h4 {
+  margin: 1.25em 0 0.5em;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+.rule-prose h1:first-child,
+.rule-prose h2:first-child,
+.rule-prose h3:first-child {
+  margin-top: 0;
+}
+.rule-prose h1 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35em; }
+.rule-prose h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border-muted); padding-bottom: 0.25em; }
+.rule-prose h3 { font-size: 1.1rem; }
+.rule-prose p { margin: 0 0 12px; }
+.rule-prose pre {
+  margin: 12px 0;
+  padding: 12px 14px;
+  overflow: auto;
+  background: #1f1f24;
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+.rule-prose code { font-size: inherit; }
+.rule-prose ul,
+.rule-prose ol {
+  margin: 8px 0 12px 1.25rem;
+  padding: 0;
+}
+.rule-prose li { margin-bottom: 6px; }
+.rule-prose strong { color: var(--text); }
+.rule-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-muted);
+  margin: 1.25em 0;
+}
+.rule-prose .md-table-wrap {
+  overflow-x: auto;
+  margin: 12px 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.rule-prose table.md-table {
+  width: max-content;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.rule-prose table.md-table th,
+.rule-prose table.md-table td {
+  border: 1px solid var(--border-muted);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.rule-prose table.md-table th {
+  background: rgba(255, 122, 0, 0.08);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rule-prose table.md-table td { background: var(--panel); }
+.rule-prose a { color: var(--accent, #ff7a00); text-decoration: underline; }
+.rule-prose a:hover { text-decoration: none; }
+
+</style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="panel" role="main">
+
+<header class="panel-header entry-detail-header">
+  <div class="header-icon">
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:6px;">
+      <rect width="52" height="52" rx="8" fill="#0e0e10"/>
+      <path d="M16 14h20a2 2 0 0 1 2 2v20a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2V16a2 2 0 0 1 2-2z" stroke="#FF7A00" stroke-width="1.5" fill="rgba(255,122,0,0.06)"/>
+      <path d="M20 22h12M20 26h9M20 30h12" stroke="#FF7A00" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="header-text">
+    <p class="brand"><strong>Agile by Design</strong> &middot; catalog</p>
+    <a class="back-link" href="../../../../skill/abd-acceptance-criteria.html">← abd-acceptance-criteria</a>
+    <p class="cap-badge">Markdown</p>
+    <h1>templates/acceptance-criteria.md</h1>
+    <p class="tagline">Acceptance criteria (exploration)</p>
+  </div>
+</header>
+
+<div class="panel-body">
+
+<nav class="nav" aria-label="Catalogue sections">
+  <a href="../../../../index.html" class="nav__link">Hub</a>
+  <a href="../../../../skills.html" class="nav__link nav__link--current">Skills</a>
+  <a href="../../../../agents.html" class="nav__link">Agents</a>
+</nav>
+
+<h2>Content</h2>
+<div class="rule-prose"><h1>Acceptance criteria (exploration)</h1>
+<p>&lt;!-- Template migrated from agile_bots story_bot exploration behavior conventions. --&gt;</p>
+<p>For each <strong>story</strong>, list <strong>acceptance_criteria</strong> as behavioral outcomes using <strong>WHEN / THEN / AND</strong> (and <strong>BUT</strong> for negative outcomes). Reserve <strong>Given</strong> for <strong>scenarios</strong> (BDD), not for AC in `story-graph.json`.</p>
+<p><strong>Source traceability (required when AC are grounded in a corpus):</strong> For <strong>every</strong> numbered acceptance criterion, record <strong>where</strong> that behavior came from—use whatever the source provides: <strong>chapter</strong>, <strong>section</strong> / heading, <strong>page</strong> (or page range), <strong>paragraph</strong> number or quoted lead-in, <strong>slide</strong> number, <strong>line</strong> range, <strong>timestamp</strong>, stable <strong>URL + anchor</strong>, or <strong>chunk / evidence id</strong> (e.g. from a memory pipeline). One criterion may cite <strong>multiple</strong> locations if it synthesizes several passages. If there is <strong>no</strong> written source (facilitator call, whiteboard only), state that explicitly with <strong>date and channel</strong> so the chain is still honest.</p>
+<p>In <strong>Markdown</strong>, wrap <strong>domain-significant</strong> nouns and short phrases in <em>italics</em> — <em>Title Case</em> for multi-word concepts (e.g. <em>Report UI</em>, <em>Wire Transfer</em>). Italicize terms that belong to <em>your</em> problem space, not filler or whole sentences. See the skill rule <strong>Emphasize domain-significant terms</strong>.</p>
+<h2>Story: `Verb–Noun Title`</h2>
+<p><strong>Story type:</strong> user | system | technical</p>
+<h3>Domain terms</h3>
+<p>List the <strong>domain terms</strong> this story’s AC rely on: words or short phrases for key <strong>things</strong>, <strong>state</strong>, <strong>actions</strong>, and <strong>rules or constraints</strong> in <em>your</em> problem space. Use <em>italics</em> for each term (<em>Title Case</em> for multi-word concepts); add a short dash or colon and a plain-language gloss so readers share one vocabulary before they read WHEN/THEN.</p>
+<p><strong>Illustrative pattern:</strong></p>
+<ul>
+<li><em>Operator</em> — human role performing the import</li>
+<li><em>Settlement File</em> — uploaded input; subject of validation</li>
+<li><em>Report UI</em> — surface where import and preview run</li>
+<li><em>Import Job</em> — asynchronous work unit; queued or discarded</li>
+<li><em>Filtered Report Rows</em> — preview content before commit</li>
+<li><em>Export Job Progress</em> — visible status (<em>Running</em>, etc.)</li>
+<li><em>Settlement Records</em> — persisted outcome after confirmation</li>
+<li><em>Schema Validation</em> / <em>Validation Error</em> — rule gate and failure shape</li>
+</ul>
+<p>Keep the list <strong>lean</strong> (only terms that appear in or anchor the AC below). The paired `.txt` file uses the <strong>same words</strong> without markdown.</p>
+<h3>Acceptance criteria</h3>
+<p><strong>Illustrative pattern</strong> (replace names and flows with your domain; keep the <em>italic</em> convention for domain terms). Each item ends with <strong>Evidence</strong> pointing back to the source:</p>
+<p>1. <strong>WHEN</strong> <em>Operator</em> submits <em>Settlement File</em> in <em>Report UI</em> <strong>THEN</strong> <em>Import Job</em> queues and <em>Filtered Report Rows</em> appear in the preview <strong>AND</strong> <em>Export Job Progress</em> shows <em>Running</em> <strong>BUT</strong> <em>Settlement Records</em> are not committed until <em>Operator</em> confirms <strong>Evidence:</strong> <em>Enterprise Reporting Requirements.pdf</em> — Ch. 4 “Settlement import”, pp. 12–13, paragraphs 3–4</p>
+<p><strong>Variant (delta only — atomic rule):</strong></p>
+<p>2. <strong>WHEN</strong> <em>Settlement File</em> fails <em>Schema Validation</em> <strong>THEN</strong> <em>Import Job</em> stops with <em>Validation Error</em> summary <strong>Evidence:</strong> <em>Enterprise Reporting Requirements.pdf</em> — Ch. 4, p. 14, §“Invalid file handling”; <em>API Spec</em> v2, p. 6, Table 2 <em>(Avoid repeating the same WHEN/THEN/AND block across multiple AC — see atomic AC rule.)</em></p>
+<p><strong>Negative / error path:</strong></p>
+<p>3. <strong>WHEN</strong> <em>Operator</em> cancels during preview <strong>THEN</strong> queued <em>Import Job</em> is discarded <strong>BUT</strong> no <em>Settlement Records</em> are written <strong>Evidence:</strong> <em>UX Review notes.docx</em> — Section “Preview cancel”, p. 2, bullet 2</p>
+<p><strong>Optional layout:</strong> If inline <strong>Evidence</strong> lines feel noisy, you may instead add a <strong>Source evidence</strong> table <strong>immediately after</strong> the AC list for that story, with one row per AC # and the same citation detail:</p>
+<div class="md-table-wrap"><table class="md-table"><thead><tr><th>AC #</th><th>Source (document / system)</th><th>Location</th></tr></thead><tbody><tr><td>1</td><td><em>Enterprise Reporting Requirements.pdf</em></td><td>Ch. 4, pp. 12–13, paragraphs 3–4</td></tr><tr><td>2</td><td><em>Enterprise Reporting Requirements.pdf</em>; <em>API Spec</em> v2</td><td>p. 14 §“Invalid file…”; p. 6 Table 2</td></tr><tr><td>3</td><td><em>UX Review notes.docx</em></td><td>§“Preview cancel”, p. 2</td></tr></tbody></table></div>
+<hr>
+<p>&lt;!-- Notation below is for skill/template maintainers. Agents MUST NOT copy this section into generated acceptance-criteria.md files in projects. --&gt;</p>
+<h2>Instructions (template reference only — omit from generated files)</h2>
+<ul>
+<li>Target roughly <strong>4–9</strong> WHEN/THEN-style steps worth of coverage per story (mechanical count uses WHEN + AND lines in combined AC text).</li>
+<li>Use <strong>behavioral</strong> language (user and system outcomes), not implementation (no file formats, APIs, class names) unless framed as `story_type: technical` and kept minimal.</li>
+<li>Prefer <strong>channel-specific</strong> detail where the product has distinct CLI vs Panel vs API surfaces (concrete examples, quoted labels, `cli.` paths).</li>
+<li><strong>Alternate</strong> user and system steps; avoid long runs of the same actor without switching.</li>
+<li>For <strong>multiple system reactions</strong> in sequence, chain with <strong>AND</strong> rather than a new <strong>WHEN</strong> for each micro-step (unless a genuinely new trigger).</li>
+<li><strong>Domain terms:</strong> per story, include <strong>Domain terms</strong> before <strong>Acceptance criteria</strong>; align the list with what appears in the AC. In `.md`, <em>italicize</em> terms in that list and inside AC lines; `.txt` uses the same words with no asterisks.</li>
+<li><strong>Source evidence:</strong> every numbered AC must have traceability (inline <strong>Evidence:</strong> or a per-story table). Prefer the <strong>most specific</strong> pointer the source allows (page + section + paragraph over “chapter 4” alone).</li>
+</ul></div>
+
+</div>
+</div>
+</div>
+</body>
+</html>

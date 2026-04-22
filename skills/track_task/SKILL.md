@@ -103,6 +103,16 @@ When the **abd-delivery-lead** agent tracks work, use **`abd-delivery-lead`** as
 
 **Keep the file aligned** with the current plan: when the plan is confirmed, advanced, or revised, add or adjust lines; mark completed items `- [x]`; do not rely on chat alone for resumable state. **Stage definitions** (entry/exit) stay in `agents/abd-delivery-lead/stages/<stage>.md`.
 
+**Regenerate the checklist from the plan**, don't hand-edit structure:
+
+```bash
+python skills/track_task/scripts/generate_delivery_checklist.py
+python skills/track_task/scripts/generate_delivery_checklist.py --plan <path> --out <path>
+python skills/track_task/scripts/generate_delivery_checklist.py --dry-run
+```
+
+The generator reads `<workspace>/agile-delivery-plan.md` (runs table or `## Run N` sections), emits the orchestration-steps block + per-run stage checkboxes to `…/abd-delivery-lead/progress/delivery-plan-checklist.md`, and **merges** any existing `- [x]` state by label match. Run it every time **Step 2** confirms a new plan and every time **Step 7** revises one — the plan is the source of truth; this file is derived.
+
 ---
 
 ## See also

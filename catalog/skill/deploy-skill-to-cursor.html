@@ -414,6 +414,81 @@ h2:first-child { margin-top: 0; }
   color: var(--muted);
 }
 
+/* Static markdown mirror pages (catalog/doc/...) */
+.rule-prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 52rem;
+}
+.rule-prose h1,
+.rule-prose h2,
+.rule-prose h3,
+.rule-prose h4 {
+  margin: 1.25em 0 0.5em;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+.rule-prose h1:first-child,
+.rule-prose h2:first-child,
+.rule-prose h3:first-child {
+  margin-top: 0;
+}
+.rule-prose h1 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35em; }
+.rule-prose h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border-muted); padding-bottom: 0.25em; }
+.rule-prose h3 { font-size: 1.1rem; }
+.rule-prose p { margin: 0 0 12px; }
+.rule-prose pre {
+  margin: 12px 0;
+  padding: 12px 14px;
+  overflow: auto;
+  background: #1f1f24;
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+.rule-prose code { font-size: inherit; }
+.rule-prose ul,
+.rule-prose ol {
+  margin: 8px 0 12px 1.25rem;
+  padding: 0;
+}
+.rule-prose li { margin-bottom: 6px; }
+.rule-prose strong { color: var(--text); }
+.rule-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-muted);
+  margin: 1.25em 0;
+}
+.rule-prose .md-table-wrap {
+  overflow-x: auto;
+  margin: 12px 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.rule-prose table.md-table {
+  width: max-content;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.rule-prose table.md-table th,
+.rule-prose table.md-table td {
+  border: 1px solid var(--border-muted);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.rule-prose table.md-table th {
+  background: rgba(255, 122, 0, 0.08);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rule-prose table.md-table td { background: var(--panel); }
+.rule-prose a { color: var(--accent, #ff7a00); text-decoration: underline; }
+.rule-prose a:hover { text-decoration: none; }
+
 </style>
 </head>
 <body>
@@ -466,13 +541,13 @@ h2:first-child { margin-top: 0; }
 
 <hr class="entry-divider">
 
-<h2>Contents</h2>
+<h2 id="entry-contents">Contents</h2>
 <ul class="file-list file-list--root">
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/deploy-skill-to-cursor/scripts/Deploy-SkillToCursor.ps1" target="_blank" rel="noopener noreferrer"><strong>Deploy-SkillToCursor.ps1</strong></a><span class="file-meta"> → .SYNOPSIS</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/deploy-skill-to-cursor/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → One line for catalogue cards and grids (YAML string).</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/deploy-skill-to-cursor/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: deploy-skill-to-cursor</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/deploy-skill-to-cursor/README.html"><strong>README.md</strong></a><span class="file-meta"> → One line for catalogue cards and grids (YAML string).</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/deploy-skill-to-cursor/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → name: deploy-skill-to-cursor</span></li>
 </ul>
 
 </div>

@@ -414,6 +414,81 @@ h2:first-child { margin-top: 0; }
   color: var(--muted);
 }
 
+/* Static markdown mirror pages (catalog/doc/...) */
+.rule-prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 52rem;
+}
+.rule-prose h1,
+.rule-prose h2,
+.rule-prose h3,
+.rule-prose h4 {
+  margin: 1.25em 0 0.5em;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+.rule-prose h1:first-child,
+.rule-prose h2:first-child,
+.rule-prose h3:first-child {
+  margin-top: 0;
+}
+.rule-prose h1 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35em; }
+.rule-prose h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border-muted); padding-bottom: 0.25em; }
+.rule-prose h3 { font-size: 1.1rem; }
+.rule-prose p { margin: 0 0 12px; }
+.rule-prose pre {
+  margin: 12px 0;
+  padding: 12px 14px;
+  overflow: auto;
+  background: #1f1f24;
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+.rule-prose code { font-size: inherit; }
+.rule-prose ul,
+.rule-prose ol {
+  margin: 8px 0 12px 1.25rem;
+  padding: 0;
+}
+.rule-prose li { margin-bottom: 6px; }
+.rule-prose strong { color: var(--text); }
+.rule-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-muted);
+  margin: 1.25em 0;
+}
+.rule-prose .md-table-wrap {
+  overflow-x: auto;
+  margin: 12px 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.rule-prose table.md-table {
+  width: max-content;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.rule-prose table.md-table th,
+.rule-prose table.md-table td {
+  border: 1px solid var(--border-muted);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.rule-prose table.md-table th {
+  background: rgba(255, 122, 0, 0.08);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rule-prose table.md-table td { background: var(--panel); }
+.rule-prose a { color: var(--accent, #ff7a00); text-decoration: underline; }
+.rule-prose a:hover { text-decoration: none; }
+
 </style>
 </head>
 <body>
@@ -463,16 +538,16 @@ h2:first-child { margin-top: 0; }
 
 <hr class="entry-divider">
 
-<h2>Contents</h2>
+<h2 id="entry-contents">Contents</h2>
 <ul class="file-list file-list--root">
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>conf/</strong><span class="file-meta"> → Folder (0 items).</span></summary><div class="file-tree__inner"><p class="file-list__nested-note">Empty folder.</p></div></details></li>
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>content/</strong><span class="file-meta"> → Source parts merged into agent instructions or outputs.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/content/checklist.md" target="_blank" rel="noopener noreferrer"><strong>checklist.md</strong></a><span class="file-meta"> → Agent orchestration only. This checklist lives in agents/abd-context-to-memory/content/ with the other agent slices. It is not the abd-skill-builder pattern (generate.py, phase_files, …/progress/ under active_skill_workspace).</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/content/outline.md" target="_blank" rel="noopener noreferrer"><strong>outline.md</strong></a><span class="file-meta"> → How it works (each step is distinct; order matters):</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/content/process.md" target="_blank" rel="noopener noreferrer"><strong>process.md</strong></a><span class="file-meta"> → Follow this page when you work on this agent (pipeline order, artifacts, flags). End-user activation lives in each skill&#x27;s SKILL.md. Stage-specific YAML, env, and retrieval behavior live under skills/&lt;skill-name&gt;/references/ (see the reference map at the end).</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/content/purpose.md" target="_blank" rel="noopener noreferrer"><strong>purpose.md</strong></a><span class="file-meta"> → Orchestrate convert → chunk → embed → search by coordinating this agent&#x27;s skills. Decide when each stage runs, whether to use a strategy pass (review context_chunking_spec.yaml before chunk + embed) or straight-through, and hold cross-stage quality (real …</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/content/role.md" target="_blank" rel="noopener noreferrer"><strong>role.md</strong></a><span class="file-meta"> → You are the orchestrator for the context-to-memory pipeline. You delegate implementation detail to the agent&#x27;s skills (abd-convert-to-markdown, abd-chunk-markdown, abd-embed-vectors, abd-search-memory) and keep dependencies clear: conversion before chunking …</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/content/workspace.md" target="_blank" rel="noopener noreferrer"><strong>workspace.md</strong></a><span class="file-meta"> → The default corpus folder (topic root: where markdown/, memory/, etc. live) is not a separate Open Agent Skill. It is agent policy, implemented by _config.py in this package.</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/content/checklist.html"><strong>checklist.md</strong></a><span class="file-meta"> → Agent orchestration only. This checklist lives in agents/abd-context-to-memory/content/ with the other agent slices. It is not the abd-skill-builder pattern (generate.py, phase_files, …/progress/ under active_skill_workspace).</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/content/outline.html"><strong>outline.md</strong></a><span class="file-meta"> → How it works (each step is distinct; order matters):</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/content/process.html"><strong>process.md</strong></a><span class="file-meta"> → Follow this page when you work on this agent (pipeline order, artifacts, flags). End-user activation lives in each skill&#x27;s SKILL.md. Stage-specific YAML, env, and retrieval behavior live under skills/&lt;skill-name&gt;/references/ (see the reference map at the end).</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/content/purpose.html"><strong>purpose.md</strong></a><span class="file-meta"> → Orchestrate convert → chunk → embed → search by coordinating this agent&#x27;s skills. Decide when each stage runs, whether to use a strategy pass (review context_chunking_spec.yaml before chunk + embed) or straight-through, and hold cross-stage quality (real …</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/content/role.html"><strong>role.md</strong></a><span class="file-meta"> → You are the orchestrator for the context-to-memory pipeline. You delegate implementation detail to the agent&#x27;s skills (abd-convert-to-markdown, abd-chunk-markdown, abd-embed-vectors, abd-search-memory) and keep dependencies clear: conversion before chunking …</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/content/workspace.html"><strong>workspace.md</strong></a><span class="file-meta"> → The default corpus folder (topic root: where markdown/, memory/, etc. live) is not a separate Open Agent Skill. It is agent policy, implemented by _config.py in this package.</span></li>
 </ul></div></details></li>
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/scripts/_config.py" target="_blank" rel="noopener noreferrer"><strong>_config.py</strong></a><span class="file-meta"> → &quot;&quot;&quot;Shared config: ROOT, MEMORY, ASSETS for resolving relative paths.</span></li>
@@ -482,20 +557,20 @@ h2:first-child { margin-top: 0; }
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>skills/</strong><span class="file-meta"> → Nested skills shipped inside an agent package.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>abd-chunk-markdown/</strong><span class="file-meta"> → Split converted Markdown into retrieval-sized chunks with evidence labels, guided by a structure-based chunking spec. Use when the user wants to &quot;chunk documents&quot;, &quot;split for RAG&quot;, &quot;draft a chunking strategy&quot;, or prepare markdown for embedding and semantic …</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>references/</strong><span class="file-meta"> → Folder (2 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-chunk-markdown/references/chunking-spec.md" target="_blank" rel="noopener noreferrer"><strong>chunking-spec.md</strong></a><span class="file-meta"> → Chunking spec (context_chunking_spec.yaml)</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-chunk-markdown/references/output.md" target="_blank" rel="noopener noreferrer"><strong>output.md</strong></a><span class="file-meta"> → Output structure</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/skills/abd-chunk-markdown/references/chunking-spec.html"><strong>chunking-spec.md</strong></a><span class="file-meta"> → Chunking spec (context_chunking_spec.yaml)</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/skills/abd-chunk-markdown/references/output.html"><strong>output.md</strong></a><span class="file-meta"> → Output structure</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-chunk-markdown/scripts/_config.py" target="_blank" rel="noopener noreferrer"><strong>_config.py</strong></a><span class="file-meta"> → &quot;&quot;&quot;Shared config: ROOT, MEMORY, ASSETS for resolving relative paths.</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-chunk-markdown/scripts/chunk_markdown.py" target="_blank" rel="noopener noreferrer"><strong>chunk_markdown.py</strong></a><span class="file-meta"> → Chunk converted markdown into smaller pieces for agent memory.</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-chunk-markdown/scripts/draft_chunking_spec.py" target="_blank" rel="noopener noreferrer"><strong>draft_chunking_spec.py</strong></a><span class="file-meta"> → Structural scan of markdown sources → draft context_chunking_spec.yaml.</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-chunk-markdown/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: abd-chunk-markdown</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/skills/abd-chunk-markdown/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → name: abd-chunk-markdown</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>abd-convert-to-markdown/</strong><span class="file-meta"> → Convert office documents (PDF, PPTX, DOCX, XLSX, etc.) to navigable Markdown with real headings, sections, and tables. Use when the user wants to convert a document or folder of documents to markdown, mentions &quot;convert to markdown&quot;, &quot;extract text&quot;, or needs …</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>references/</strong><span class="file-meta"> → Folder (2 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-convert-to-markdown/references/convert-to-markdown.md" target="_blank" rel="noopener noreferrer"><strong>convert-to-markdown.md</strong></a><span class="file-meta"> → Convert to Markdown (core converter + post-process + quality loop)</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-convert-to-markdown/references/pdf-extraction-advanced.md" target="_blank" rel="noopener noreferrer"><strong>pdf-extraction-advanced.md</strong></a><span class="file-meta"> → PDF extraction: outlines, tags, and heading promotion</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/skills/abd-convert-to-markdown/references/convert-to-markdown.html"><strong>convert-to-markdown.md</strong></a><span class="file-meta"> → Convert to Markdown (core converter + post-process + quality loop)</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/skills/abd-convert-to-markdown/references/pdf-extraction-advanced.html"><strong>pdf-extraction-advanced.md</strong></a><span class="file-meta"> → PDF extraction: outlines, tags, and heading promotion</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-convert-to-markdown/scripts/_config.py" target="_blank" rel="noopener noreferrer"><strong>_config.py</strong></a><span class="file-meta"> → &quot;&quot;&quot;Shared config: ROOT, MEMORY, ASSETS for resolving relative paths.</span></li>
@@ -507,32 +582,32 @@ h2:first-child { margin-top: 0; }
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-convert-to-markdown/scripts/pdf_outline_extract.py" target="_blank" rel="noopener noreferrer"><strong>pdf_outline_extract.py</strong></a><span class="file-meta"> → PDF → markdown by outline + anchored text (PyMuPDF).</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-convert-to-markdown/scripts/pdf_outline_headings.py" target="_blank" rel="noopener noreferrer"><strong>pdf_outline_headings.py</strong></a><span class="file-meta"> → Optional: map PDF bookmark/outline (TOC) entries to markdown ## lines.</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-convert-to-markdown/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: abd-convert-to-markdown</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/skills/abd-convert-to-markdown/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → name: abd-convert-to-markdown</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>abd-embed-vectors/</strong><span class="file-meta"> → Embed text chunks into a local FAISS vector index for semantic search. Use when the user wants to &quot;embed chunks&quot;, &quot;build a vector index&quot;, &quot;create embeddings&quot;, or prepare chunked content for RAG retrieval.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>references/</strong><span class="file-meta"> → Folder (1 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-embed-vectors/references/config.md" target="_blank" rel="noopener noreferrer"><strong>config.md</strong></a><span class="file-meta"> → Configuration</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/skills/abd-embed-vectors/references/config.html"><strong>config.md</strong></a><span class="file-meta"> → Configuration</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-embed-vectors/scripts/_config.py" target="_blank" rel="noopener noreferrer"><strong>_config.py</strong></a><span class="file-meta"> → &quot;&quot;&quot;Shared config: ROOT, MEMORY, ASSETS for resolving relative paths.</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-embed-vectors/scripts/embed_and_index.py" target="_blank" rel="noopener noreferrer"><strong>embed_and_index.py</strong></a><span class="file-meta"> → Embed chunked markdown into a local FAISS vector store.</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-embed-vectors/scripts/index_chunks.py" target="_blank" rel="noopener noreferrer"><strong>index_chunks.py</strong></a><span class="file-meta"> → !/usr/bin/env python3</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-embed-vectors/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: abd-embed-vectors</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/skills/abd-embed-vectors/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → name: abd-embed-vectors</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>abd-search-memory/</strong><span class="file-meta"> → Semantic search over a local FAISS vector index built from document chunks. Use when the user says &quot;use memory&quot;, &quot;search memory&quot;, &quot;what does memory say&quot;, &quot;from our content&quot;, &quot;what do we have on [topic]&quot;, or asks about content that has been ingested into agent …</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>references/</strong><span class="file-meta"> → Folder (1 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-search-memory/references/rag-retrieval.md" target="_blank" rel="noopener noreferrer"><strong>rag-retrieval.md</strong></a><span class="file-meta"> → RAG Semantic Retrieval</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/skills/abd-search-memory/references/rag-retrieval.html"><strong>rag-retrieval.md</strong></a><span class="file-meta"> → RAG Semantic Retrieval</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-search-memory/scripts/_config.py" target="_blank" rel="noopener noreferrer"><strong>_config.py</strong></a><span class="file-meta"> → &quot;&quot;&quot;Shared config: ROOT, MEMORY, ASSETS for resolving relative paths.</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-search-memory/scripts/search_memory.py" target="_blank" rel="noopener noreferrer"><strong>search_memory.py</strong></a><span class="file-meta"> → Search memory using semantic (vector) retrieval.</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skills/abd-search-memory/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: abd-search-memory</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/skills/abd-search-memory/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → name: abd-search-memory</span></li>
 </ul></div></details></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/AGENTS.md" target="_blank" rel="noopener noreferrer"><strong>AGENTS.md</strong></a><span class="file-meta"> → AGENTS — abd-context-to-memory</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → catalogue_summary: &quot;Orchestrate convert → chunk → embed → search by coordinating this agent&#x27;s skills. Decide when each stage runs, whether to use a strategy pass (review context_chunking_spec.yaml before chunk + embed) or straight-through, and hold …</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/AGENTS.html"><strong>AGENTS.md</strong></a><span class="file-meta"> → AGENTS — abd-context-to-memory</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-context-to-memory/README.html"><strong>README.md</strong></a><span class="file-meta"> → catalogue_summary: &quot;Orchestrate convert → chunk → embed → search by coordinating this agent&#x27;s skills. Decide when each stage runs, whether to use a strategy pass (review context_chunking_spec.yaml before chunk + embed) or straight-through, and hold …</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/requirements-export.txt" target="_blank" rel="noopener noreferrer"><strong>requirements-export.txt</strong></a><span class="file-meta"> → Export: markdown → Excel, Word, PDF</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/requirements-rag.txt" target="_blank" rel="noopener noreferrer"><strong>requirements-rag.txt</strong></a><span class="file-meta"> → RAG (vector search) dependencies for ace-context-to-memory</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-context-to-memory/skill-config.json" target="_blank" rel="noopener noreferrer"><strong>skill-config.json</strong></a><span class="file-meta"> → &quot;name&quot;: &quot;abd-context-to-memory&quot;,</span></li>

@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ABD catalogue — ABD Delivery Lead · AGENT.md</title>
+<style>
+:root {
+  --orange: #ff7a00;
+  --bg: #09090b;
+  --surface: #0e0e10;
+  --raised: #161618;
+  --border: #2a2a30;
+  --border-muted: #1a1a1e;
+  --text: #e8e8ed;
+  --muted: #9b9ba8;
+  --radius: 4px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  font-family: system-ui, "Segoe UI", Roboto, Ubuntu, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+}
+a { color: #8ab4ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+strong { font-weight: 700; }
+code {
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.88em;
+  background: #1f1f24;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: #d4d4d4;
+}
+.page-wrap { padding: 16px clamp(8px,3vw,28px); }
+.panel {
+  max-width: min(96vw, 1100px);
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.panel-header {
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  border-left: 4px solid var(--orange);
+  background: var(--raised);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.header-icon {
+  flex-shrink: 0;
+  background: #000;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-muted);
+  box-shadow: inset 0 0 0 1px rgba(255,122,0,0.12);
+}
+.header-text { flex: 1; min-width: 200px; }
+.brand { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.brand strong { color: var(--orange); }
+h1 { margin: 0; font-size: 2rem; font-weight: 700; line-height: 1.15; }
+.tagline { margin: 8px 0 0; font-size: 1.05rem; color: var(--muted); max-width: 52rem; }
+.panel-body { padding: 28px 22px 36px; }
+p { margin: 0 0 14px; }
+h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 32px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+h2:first-child { margin-top: 0; }
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 0 0 18px;
+  padding: 0 0 14px;
+  border-bottom: 1px solid var(--border-muted);
+}
+.nav a {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.nav a.nav__link--current {
+  color: var(--orange);
+  pointer-events: none;
+}
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  margin: 18px 0 0;
+}
+.cap-card {
+  display: block;
+  text-decoration: none;
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  transition: background 0.15s, border-color 0.15s;
+  cursor: pointer;
+}
+.cap-card:hover {
+  background: rgba(255,122,0,0.06);
+  border-color: rgba(255,122,0,0.4);
+  text-decoration: none;
+}
+.cap-card__title {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--orange);
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cap-card__icon { flex-shrink: 0; width: 24px; height: 24px; }
+.cap-card__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.55;
+  margin-bottom: 1px;
+}
+.cap-card__summary { font-size: 0.85rem; color: var(--muted); line-height: 1.45; margin: 0 0 8px; }
+.cap-card__more {
+  font-size: 0.78rem;
+  color: var(--orange);
+  opacity: 0.7;
+  margin: 10px 0 0;
+}
+
+/* Entry detail pages (skill/*.html, agent/*.html) — overview-style */
+.entry-detail-header .back-link {
+  font-size: 0.82rem;
+  color: var(--muted);
+  display: inline-block;
+  margin: 0 0 10px;
+}
+.entry-detail-header .back-link:hover {
+  color: var(--orange);
+}
+.cap-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--orange);
+  background: rgba(255, 122, 0, 0.08);
+  border: 1px solid rgba(255, 122, 0, 0.25);
+  border-radius: 3px;
+  padding: 2px 8px;
+  margin: 0 0 8px;
+}
+.entry-caption {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.entry-prose {
+  white-space: pre-wrap;
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+.entry-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 26px 0;
+}
+.ascii-diagram {
+  background: #111114;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.83em;
+  line-height: 1.55;
+  color: #b8b8c2;
+  margin: 0 0 18px;
+}
+.install-block {
+  margin: 22px 0 0;
+  padding: 16px 18px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--orange);
+}
+.install-block h2 {
+  margin-top: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.install-block .install-hint {
+  font-size: 0.92rem;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.install-snippet {
+  background: #111114;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 0;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.85em;
+  line-height: 1.5;
+  color: #d4d4d4;
+}
+.install-snippet code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.file-list li {
+  margin: 0 0 14px;
+  padding: 10px 12px 10px 14px;
+  border-left: 3px solid var(--border-muted);
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 0 4px 4px 0;
+}
+.file-list .file-meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+  display: block;
+  margin-top: 4px;
+}
+.file-list a {
+  font-weight: 600;
+}
+.file-list--root {
+  margin-top: 4px;
+}
+.file-list--nested {
+  margin: 8px 0 0 0;
+  padding-left: 0;
+  border-left: 2px solid var(--border-muted);
+  margin-left: 2px;
+  padding-left: 10px;
+}
+.file-list--nested li {
+  margin-bottom: 10px;
+  padding: 8px 10px 8px 12px;
+  font-size: 0.95rem;
+}
+.file-list__nested-note {
+  margin: 8px 0 0 0;
+  padding: 6px 0 4px 4px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+/* Expandable folder tree (<details> / <summary>) */
+.file-list > li.file-list__folder {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+}
+.file-list__folder > .file-tree__details {
+  margin: 0 0 12px 0;
+}
+.file-tree__details {
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+.file-tree__summary {
+  cursor: pointer;
+  padding: 10px 12px 10px 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.03);
+}
+.file-tree__summary::-webkit-details-marker {
+  display: none;
+}
+.file-tree__summary::marker {
+  content: "";
+  display: none;
+}
+/* Obvious expand/collapse control (native triangle hidden above). */
+.file-tree__summary::before {
+  content: "+";
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 1px;
+  line-height: 1.45rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 1px solid var(--border-muted);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+  user-select: none;
+}
+.file-tree__details[open] > .file-tree__summary::before {
+  content: "\2212"; /* minus sign */
+}
+.file-tree__summary:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.file-tree__summary:hover::before {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.file-tree__summary .file-meta {
+  display: inline;
+  margin-left: 6px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.file-tree__inner {
+  padding: 8px 10px 12px 14px;
+  border-top: 1px solid var(--border-muted);
+}
+.file-tree__ul {
+  margin-top: 4px;
+}
+.file-tree__dir > .file-tree__details {
+  margin: 0;
+  border-radius: 4px;
+}
+.file-tree__dir--truncated {
+  font-size: 0.95rem;
+}
+.file-tree__file .file-meta {
+  display: block;
+  margin-top: 4px;
+}
+
+/* Single-page hub (index.html): collapsible hub / skills / agents */
+.catalog-section {
+  border: 1px solid var(--border-muted);
+  border-radius: 8px;
+  margin: 0 0 16px;
+  background: rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+.catalog-section > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+}
+.catalog-section > summary::-webkit-details-marker { display: none; }
+.catalog-section > summary::marker { content: ""; }
+.catalog-section > summary::before {
+  content: "+";
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  line-height: 1.45rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 1px solid var(--border-muted);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+.catalog-section[open] > summary::before { content: "\2212"; }
+.catalog-section[open] > summary {
+  border-bottom: 1px solid var(--border-muted);
+}
+.catalog-section .section-body {
+  padding: 18px 16px 22px;
+}
+.catalog-section .section-body > p:first-of-type { margin-top: 0; }
+.catalog-section .cap-grid { margin-top: 8px; }
+.catalog-section .count {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Static markdown mirror pages (catalog/doc/...) */
+.rule-prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 52rem;
+}
+.rule-prose h1,
+.rule-prose h2,
+.rule-prose h3,
+.rule-prose h4 {
+  margin: 1.25em 0 0.5em;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+.rule-prose h1:first-child,
+.rule-prose h2:first-child,
+.rule-prose h3:first-child {
+  margin-top: 0;
+}
+.rule-prose h1 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35em; }
+.rule-prose h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border-muted); padding-bottom: 0.25em; }
+.rule-prose h3 { font-size: 1.1rem; }
+.rule-prose p { margin: 0 0 12px; }
+.rule-prose pre {
+  margin: 12px 0;
+  padding: 12px 14px;
+  overflow: auto;
+  background: #1f1f24;
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+.rule-prose code { font-size: inherit; }
+.rule-prose ul,
+.rule-prose ol {
+  margin: 8px 0 12px 1.25rem;
+  padding: 0;
+}
+.rule-prose li { margin-bottom: 6px; }
+.rule-prose strong { color: var(--text); }
+.rule-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-muted);
+  margin: 1.25em 0;
+}
+.rule-prose .md-table-wrap {
+  overflow-x: auto;
+  margin: 12px 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.rule-prose table.md-table {
+  width: max-content;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.rule-prose table.md-table th,
+.rule-prose table.md-table td {
+  border: 1px solid var(--border-muted);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.rule-prose table.md-table th {
+  background: rgba(255, 122, 0, 0.08);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rule-prose table.md-table td { background: var(--panel); }
+.rule-prose a { color: var(--accent, #ff7a00); text-decoration: underline; }
+.rule-prose a:hover { text-decoration: none; }
+
+</style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="panel" role="main">
+
+<header class="panel-header entry-detail-header">
+  <div class="header-icon">
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:6px;">
+      <rect width="52" height="52" rx="8" fill="#0e0e10"/>
+      <path d="M16 14h20a2 2 0 0 1 2 2v20a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2V16a2 2 0 0 1 2-2z" stroke="#FF7A00" stroke-width="1.5" fill="rgba(255,122,0,0.06)"/>
+      <path d="M20 22h12M20 26h9M20 30h12" stroke="#FF7A00" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="header-text">
+    <p class="brand"><strong>Agile by Design</strong> &middot; catalog</p>
+    <a class="back-link" href="../../../agent/abd-delivery-lead.html">← ABD Delivery Lead</a>
+    <p class="cap-badge">Markdown</p>
+    <h1>AGENT.md</h1>
+    <p class="tagline">ABD Delivery Lead</p>
+  </div>
+</header>
+
+<div class="panel-body">
+
+<nav class="nav" aria-label="Catalogue sections">
+  <a href="../../../index.html" class="nav__link">Hub</a>
+  <a href="../../../skills.html" class="nav__link">Skills</a>
+  <a href="../../../agents.html" class="nav__link nav__link--current">Agents</a>
+</nav>
+
+<h2>Content</h2>
+<div class="rule-prose"><h1>ABD Delivery Lead</h1>
+<p>You are a delivery lead agent orchestrating an Agile by Design (ABD) delivery flow.</p>
+<p>You own the <strong>orchestration</strong> lifecycle: workspace, planning checkpoints (when to stop and confirm), sequencing runs and stages, bootstrapping `abd-team-member` agents, handoff gates, and cross-stage quality. You do <strong>not</strong> produce deliverables yourself — you delegate to team members with the right role, workspace, and practice skills.</p>
+<p><strong>Planning detail lives in the skill, not in this file.</strong> For every planning decision — what a plan and run are, how to assess context, risk types, strategies, example plans, and how to design runs — read <strong>`abd-delivery-planning`</strong> (`skills/abd-delivery-planning/SKILL.md` and the <strong>`strategies/`</strong> folder — start with <strong>`strategies/README.md`</strong>, then the strategy file(s) that match context). Follow that skill when you build, present, or revise the plan.</p>
+<h2>Bootstrap inputs (required from outside)</h2>
+<p>Every session MUST be given the following. If missing, ask once and stop until confirmed.</p>
+<ul>
+<li><strong>`workspace`</strong> — Absolute or repo-relative root where engagement artifacts live. Must contain (or will contain) `story-graph.json` or `docs/story/story-graph.json`. All team-member `--workspace` flags resolve from here.</li>
+</ul>
+<p><strong>Authoritative agile delivery plan (disk):</strong> `&lt;workspace&gt;/agile-delivery-plan.md` (workspace root). On <strong>Step 2</strong> (and when resuming), <strong>read this file if it exists</strong> before building or revising the plan—treat it as the current plan unless the user overrides. When the plan is <strong>confirmed</strong> or <strong>revised</strong> (including after <strong>Step 7</strong>), ensure this file is <strong>updated</strong> per <strong>`abd-delivery-planning`</strong> (<strong>Where to save the plan</strong>). Checkbox progress stays in <strong>`abd-delivery-lead/progress/delivery-plan-checklist.md`</strong> (<strong>`track_task`</strong>); keep plan and checklist aligned.</p>
+<p>Optional:</p>
+<ul>
+<li><strong>`context`</strong> — Brief, documents, links, API references, prior material describing what is being delivered. The more context, the better the plan.</li>
+<li><strong>`start-stage`</strong> — Stage to resume from if not starting fresh (default: `discovery`).</li>
+<li><strong>`end-stage`</strong> — Stage to stop after (default: `engineering`; set earlier for partial runs).</li>
+</ul>
+<p>Example kick-off:</p>
+<pre><code>workspace: C:\dev\my-engagement
+context: Build an onboarding flow integrating Acme SSO API and legacy billing system
+start-stage: discovery</code></pre>
+<hr>
+<h2>Your skills</h2>
+<p>Read each skill&#x27;s `SKILL.md` for instructions.</p>
+<ul>
+<li><strong>`abd-delivery-planning`</strong> — Build and revise the agile delivery plan (context assessment, risks, strategies, runs, checkpoints). <strong>Read this before Step 2 in every engagement.</strong></li>
+<li>`workspace_skill` — Set and resolve the engagement workspace root.</li>
+<li><strong>`execute_using_rules`</strong> (`skills/execute_using_rules/SKILL.md`) — <strong>Corrections.</strong> When you identify wrong or missing deliverables, gate failures, or new constraints, log them in <strong>`docs/corrections-log.md`</strong> using the skill’s <strong>correction process</strong> (same contract as <strong>`abd-team-member`</strong>): identify → log with DO / DO NOT and <strong>Example (wrong)</strong> → direct rework; do not substitute informal chat for a log entry when a fix must stick for downstream work.</li>
+<li><strong>`track_task`</strong> (`skills/track_task/SKILL.md`) — Mandatory. Follow the skill for workspace resolution, checkbox rules, and <strong>each-turn</strong> updates. Use the skill’s <strong>`abd-delivery-lead` (agent checklist)</strong> section for where to write the file and what lines to include (orchestration + full plan: runs, stages, checkpoints).</li>
+</ul>
+<p>You do <strong>not</strong> use practice skills (`abd-story-mapping`, `abd-thin-slicing`, etc.) directly. Team members do. You read their outputs, validate handoffs, and run cross-stage checks.</p>
+<p><strong>Stage definitions</strong> (`stages/*.md` in this agent folder) are the source of truth for entry conditions, exit gates, and team roles per stage.</p>
+<hr>
+<h2>Orchestration workflow</h2>
+<p><strong>Announce each step as you begin it.</strong> Do not compress steps silently.</p>
+<h3>Step 1 — Establish workspace</h3>
+<p>Read `workspace_skill` SKILL.md. Set or confirm the engagement workspace. Verify the workspace exists and note what artifacts are already present (prior story graph, specs, code, corrections logs, etc.). <strong>Create</strong> the delivery-lead checklist per <strong>`track_task`</strong> (path under <strong>`abd-delivery-lead` (agent checklist)</strong>); check off workspace / resume position as appropriate.</p>
+<p>Report to the user:</p>
+<ul>
+<li>Workspace path</li>
+<li>Existing artifacts found (or &quot;empty workspace&quot;)</li>
+<li>Context summary (if provided)</li>
+</ul>
+<h3>Step 2 — Build the plan</h3>
+<p>Read <strong>`abd-delivery-planning`</strong> (`skills/abd-delivery-planning/SKILL.md` and <strong>`strategies/`</strong> — enumerate `<em>.md` except `README.md`, match </em><em>When to use</em><em> to context per §2b of the skill). </em><em>If</em><em> `agile-delivery-plan.md` exists at the workspace root, </em><em>read it first</em><em> and use it as the baseline to </em><em>continue</em><em> or </em><em>revise</em><em> unless the user replaces context. Treat its </em><em>context inventory</em><em> (provided vs missing) and per-run </em><em>rationales</em><em> (concrete outcomes, not risk-only summaries) as authoritative—</em><em>surface gaps</em><em> from the inventory to the user instead of assuming missing context. Follow the skill’s procedure: context analysis, risk classification, strategy selection, run design, then present the plan at the </em><em>CHECKPOINT</em><em> defined there. </em><em>Before</em><em> that CHECKPOINT, </em><em>populate the checklist</em><em> per </em><em>`track_task`</em><em> with the full plan (runs, stages, orchestration milestones, checkpoints). </em><em>Write or update</em><em> `agile-delivery-plan.md` with the full narrative plan (per the skill’s </em><em>Present the plan</em><em> / </em><em>Where to save</em><em> sections). </em><em>Do not</em>* default to &quot;run all six stages.&quot; The plan is your primary contribution as orchestrator; the skill owns the mechanics of how to think about plans and runs.</p>
+<h3>Step 3 — Open a stage (within the current run)</h3>
+<p>For the current stage in the current run:</p>
+<p>1. Read `stages/&lt;stage&gt;.md` for the full stage definition. 2. Verify entry conditions are met (upstream artifacts exist and are valid). 3. If entry conditions fail, report what is missing and either loop back to the prior stage or ask the user how to proceed. 4. <strong>Scope the stage</strong> — the team member only works on the stories/slices/epics defined by the current run&#x27;s scope, not the entire graph.</p>
+<h3>Step 4 — Bootstrap team member</h3>
+<p>Instantiate an `abd-team-member` agent with:</p>
+<pre><code>team-role: &lt;role from stage definition&gt;
+workspace: &lt;engagement workspace&gt;</code></pre>
+<p>Provide stage context including:</p>
+<ul>
+<li>What upstream artifacts are available.</li>
+<li>The <strong>run scope</strong>: exactly which stories, slices, or areas to work on.</li>
+<li>Constraints or decisions from prior stages and prior runs.</li>
+<li><strong>Corrections from prior runs</strong>: point the team member at `docs/corrections-log.md`. The team member MUST read corrections before producing artifacts.</li>
+<li>Checkpoint granularity for this run (e.g. &quot;checkpoint after each story&quot; vs &quot;checkpoint after the full slice&quot;).</li>
+</ul>
+<p>The team member follows `abd-team-member/AGENT.md`. You monitor checkpoints and intervene only if:</p>
+<ul>
+<li>The team member asks for upstream clarification you can answer.</li>
+<li>Cross-stage consistency issues surface (e.g. story graph structure conflicts).</li>
+<li>The user directs you to redirect work.</li>
+<li>The team member&#x27;s output contradicts a prior correction.</li>
+</ul>
+<h3>Step 5 — Validate stage exit</h3>
+<p>When the team member signals &quot;Stage complete&quot;:</p>
+<p>1. Read the stage&#x27;s <strong>exit gate</strong> criteria from `stages/&lt;stage&gt;.md`. 2. Verify each gate criterion against the workspace artifacts. 3. Run cross-stage consistency checks (see below). 4. <strong>Corrections review</strong>: check that no prior correction was violated in this stage&#x27;s output.</p>
+<p><strong>CHECKPOINT.</strong> Present the exit-gate results to the user. If gates pass, propose advancing to the next stage. If gates fail, identify what needs rework and which team member should fix it — and <strong>log each required fix</strong> in <strong>`docs/corrections-log.md`</strong> per <strong>`execute_using_rules`</strong> correction process (same approach as team members: structured log entry, not chat-only). After the user responds at this checkpoint, <strong>update the checklist</strong> per <strong>`track_task`</strong> for this stage’s exit and checkpoint lines.</p>
+<h3>Step 6 — Handoff to next stage</h3>
+<p>Check off the completed stage in the checklist (<strong>`track_task`</strong>). Pass forward:</p>
+<ul>
+<li>What was produced (artifact paths, story-graph state).</li>
+<li>Decisions or constraints that affect downstream work.</li>
+<li>Open questions the user or next team member should address.</li>
+<li><strong>Corrections relevant to downstream work</strong> (e.g. domain terms corrected during exploration that story definition must respect).</li>
+</ul>
+<p>Return to <strong>Step 3</strong> for the next stage in the current run.</p>
+<h3>Step 7 — Run complete, revise plan</h3>
+<p>When the current run&#x27;s final stage exit gate passes:</p>
+<p>1. Summarize the run: stages completed, scope covered, artifacts produced, key decisions made. 2. Review the corrections log: what was corrected during this run, any patterns. 3. <strong>Revise the plan</strong> per `abd-delivery-planning` (update remaining runs, scope, checkpoints, or strategy if the situation changed). <strong>Update</strong> `agile-delivery-plan.md` (workspace root) and <strong>the checklist</strong> per <strong>`track_task`</strong> to match the revised plan. 4. <strong>CHECKPOINT.</strong> Present the run summary and the revised plan for remaining runs.</p>
+<p>If more runs remain, confirm the next run (per the planning skill), then <strong>Step 3</strong>. If a different strategy fits better, state the shift and revise remaining runs.</p>
+<h3>Step 8 — Plan complete</h3>
+<p>When all runs are done (or the user stops):</p>
+<p>1. Summarize the full delivery: runs completed, artifacts, decisions, corrections logged. 2. Flag open items, risks, or suggestions for iteration. 3. <strong>Save new strategy</strong> — if the plan used a custom strategy, propose adding a new <strong>`.md`</strong> under `skills/abd-delivery-planning/strategies/` (see planning skill and <strong>`strategies/README.md`</strong>). 4. <strong>CHECKPOINT</strong> for user sign-off. Mark the checklist <strong>complete</strong> (or <strong>stopped</strong>) per <strong>`track_task`</strong>.</p>
+<hr>
+<h2>Checkpoint protocol</h2>
+<p>Every step that says <strong>CHECKPOINT</strong> follows this protocol exactly:</p>
+<p>1. <strong>Present</strong> the current state and flag unknowns. 2. <strong>Stop</strong> and wait for the user to respond. 3. <strong>On user response:</strong></p>
+<ul>
+<li><strong>Confirms</strong> — proceed to the next step.</li>
+<li><strong>Corrects</strong> — log the correction in `docs/corrections-log.md` per the `execute_using_rules` correction process, adjust the plan or outputs accordingly, then re-present.</li>
+<li><strong>Asks a question</strong> — answer, then re-present the checkpoint.</li>
+</ul>
+<p><strong>Orchestrator-identified issues (not only user corrections).</strong> When <strong>you</strong> find exit-gate failures, cross-stage inconsistencies, or violations of prior corrections, treat them like any other mistake: <strong>append</strong> `docs/corrections-log.md` per <strong>`execute_using_rules`</strong> (identify → log DO / DO NOT + <strong>Example (wrong)</strong>; complete the entry when rework is verified). Point the responsible team member at the log before they rework. Chat-only handoffs are not enough when the constraint must carry forward.</p>
+<h3>Corrections carry forward</h3>
+<p>When continuing from any checkpoint — resuming a run, starting a new run, or handing off to a team member:</p>
+<p>1. <strong>Read `docs/corrections-log.md`</strong> if it exists. 2. <strong>Surface relevant corrections</strong> to the active team member or in the run plan. Corrections are constraints that MUST be respected. 3. <strong>Flag repeat violations.</strong> Output that contradicts a logged correction is a gate failure.</p>
+<hr>
+<h2>Cross-stage validation</h2>
+<p>As orchestrator you enforce consistency that no single team member can see:</p>
+<ul>
+<li><strong>Graph integrity</strong> — `story-graph.json` remains structurally valid. Run `story_graph_cli.py read --file &lt;workspace&gt;/story-graph.json` after any stage that modifies the graph.</li>
+<li><strong>Traceability</strong> — Stories referenced in AC exist in the graph. Story definitions map to AC. Tests map to scenarios or AC.</li>
+<li><strong>Naming alignment</strong> — Verb–noun story names, actor names, and domain terms stay consistent across stages.</li>
+<li><strong>Scope guard</strong> — If a team member adds work outside the current run&#x27;s agreed scope, flag it at the exit gate.</li>
+<li><strong>Cross-run coherence</strong> — Later runs do not invalidate earlier runs&#x27; artifacts without explicit handling.</li>
+</ul>
+<hr>
+<h2>Behavior rules</h2>
+<ul>
+<li><strong>You orchestrate, you do not produce.</strong> Never write story maps, AC, scenarios, tests, or code directly. Delegate to a team member.</li>
+<li><strong>Track in the workspace.</strong> Follow <strong>`track_task`</strong>; never rely on chat alone for “what’s next” across sessions.</li>
+<li><strong>Plan before executing.</strong> Use `abd-delivery-planning`; do not assume a linear six-stage waterfall.</li>
+<li><strong>Prefer short feedback loops.</strong> One stage at a time within a run; re-plan between runs when needed.</li>
+<li><strong>Start granular, relax as confidence builds</strong> (per the planning skill).</li>
+<li><strong>Iterate</strong> — if downstream work reveals upstream gaps, loop back.</li>
+<li><strong>Be transparent</strong> — which run, which stage, what scope remains, what is next.</li>
+<li><strong>Respect the user&#x27;s authority</strong> — they may skip stages, reorder work, or override gates. Acknowledge and continue.</li>
+<li><strong>Learn from corrections</strong> — read the log before every run and handoff; when you add findings, use <strong>`execute_using_rules`</strong> like team members do.</li>
+</ul>
+<hr>
+<h2>Relationship to `abd-team-member`</h2>
+<p>You instantiate `abd-team-member` agents. Their contract is in `abd-team-member/AGENT.md`. You provide `team-role`, `workspace`, the current run&#x27;s scope and checkpoint policy, and relevant corrections. They produce artifacts; you validate handoffs and manage the flow.</p></div>
+
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ABD catalogue — ABD Delivery Lead · docs/prompt.md</title>
+<style>
+:root {
+  --orange: #ff7a00;
+  --bg: #09090b;
+  --surface: #0e0e10;
+  --raised: #161618;
+  --border: #2a2a30;
+  --border-muted: #1a1a1e;
+  --text: #e8e8ed;
+  --muted: #9b9ba8;
+  --radius: 4px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  font-family: system-ui, "Segoe UI", Roboto, Ubuntu, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+}
+a { color: #8ab4ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+strong { font-weight: 700; }
+code {
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.88em;
+  background: #1f1f24;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: #d4d4d4;
+}
+.page-wrap { padding: 16px clamp(8px,3vw,28px); }
+.panel {
+  max-width: min(96vw, 1100px);
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.panel-header {
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  border-left: 4px solid var(--orange);
+  background: var(--raised);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.header-icon {
+  flex-shrink: 0;
+  background: #000;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-muted);
+  box-shadow: inset 0 0 0 1px rgba(255,122,0,0.12);
+}
+.header-text { flex: 1; min-width: 200px; }
+.brand { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.brand strong { color: var(--orange); }
+h1 { margin: 0; font-size: 2rem; font-weight: 700; line-height: 1.15; }
+.tagline { margin: 8px 0 0; font-size: 1.05rem; color: var(--muted); max-width: 52rem; }
+.panel-body { padding: 28px 22px 36px; }
+p { margin: 0 0 14px; }
+h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 32px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+h2:first-child { margin-top: 0; }
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 0 0 18px;
+  padding: 0 0 14px;
+  border-bottom: 1px solid var(--border-muted);
+}
+.nav a {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.nav a.nav__link--current {
+  color: var(--orange);
+  pointer-events: none;
+}
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  margin: 18px 0 0;
+}
+.cap-card {
+  display: block;
+  text-decoration: none;
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  transition: background 0.15s, border-color 0.15s;
+  cursor: pointer;
+}
+.cap-card:hover {
+  background: rgba(255,122,0,0.06);
+  border-color: rgba(255,122,0,0.4);
+  text-decoration: none;
+}
+.cap-card__title {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--orange);
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cap-card__icon { flex-shrink: 0; width: 24px; height: 24px; }
+.cap-card__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.55;
+  margin-bottom: 1px;
+}
+.cap-card__summary { font-size: 0.85rem; color: var(--muted); line-height: 1.45; margin: 0 0 8px; }
+.cap-card__more {
+  font-size: 0.78rem;
+  color: var(--orange);
+  opacity: 0.7;
+  margin: 10px 0 0;
+}
+
+/* Entry detail pages (skill/*.html, agent/*.html) — overview-style */
+.entry-detail-header .back-link {
+  font-size: 0.82rem;
+  color: var(--muted);
+  display: inline-block;
+  margin: 0 0 10px;
+}
+.entry-detail-header .back-link:hover {
+  color: var(--orange);
+}
+.cap-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--orange);
+  background: rgba(255, 122, 0, 0.08);
+  border: 1px solid rgba(255, 122, 0, 0.25);
+  border-radius: 3px;
+  padding: 2px 8px;
+  margin: 0 0 8px;
+}
+.entry-caption {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.entry-prose {
+  white-space: pre-wrap;
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+.entry-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 26px 0;
+}
+.ascii-diagram {
+  background: #111114;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.83em;
+  line-height: 1.55;
+  color: #b8b8c2;
+  margin: 0 0 18px;
+}
+.install-block {
+  margin: 22px 0 0;
+  padding: 16px 18px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--orange);
+}
+.install-block h2 {
+  margin-top: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.install-block .install-hint {
+  font-size: 0.92rem;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.install-snippet {
+  background: #111114;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 0;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.85em;
+  line-height: 1.5;
+  color: #d4d4d4;
+}
+.install-snippet code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.file-list li {
+  margin: 0 0 14px;
+  padding: 10px 12px 10px 14px;
+  border-left: 3px solid var(--border-muted);
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 0 4px 4px 0;
+}
+.file-list .file-meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+  display: block;
+  margin-top: 4px;
+}
+.file-list a {
+  font-weight: 600;
+}
+.file-list--root {
+  margin-top: 4px;
+}
+.file-list--nested {
+  margin: 8px 0 0 0;
+  padding-left: 0;
+  border-left: 2px solid var(--border-muted);
+  margin-left: 2px;
+  padding-left: 10px;
+}
+.file-list--nested li {
+  margin-bottom: 10px;
+  padding: 8px 10px 8px 12px;
+  font-size: 0.95rem;
+}
+.file-list__nested-note {
+  margin: 8px 0 0 0;
+  padding: 6px 0 4px 4px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+/* Expandable folder tree (<details> / <summary>) */
+.file-list > li.file-list__folder {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+}
+.file-list__folder > .file-tree__details {
+  margin: 0 0 12px 0;
+}
+.file-tree__details {
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+.file-tree__summary {
+  cursor: pointer;
+  padding: 10px 12px 10px 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.03);
+}
+.file-tree__summary::-webkit-details-marker {
+  display: none;
+}
+.file-tree__summary::marker {
+  content: "";
+  display: none;
+}
+/* Obvious expand/collapse control (native triangle hidden above). */
+.file-tree__summary::before {
+  content: "+";
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 1px;
+  line-height: 1.45rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 1px solid var(--border-muted);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+  user-select: none;
+}
+.file-tree__details[open] > .file-tree__summary::before {
+  content: "\2212"; /* minus sign */
+}
+.file-tree__summary:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.file-tree__summary:hover::before {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.file-tree__summary .file-meta {
+  display: inline;
+  margin-left: 6px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.file-tree__inner {
+  padding: 8px 10px 12px 14px;
+  border-top: 1px solid var(--border-muted);
+}
+.file-tree__ul {
+  margin-top: 4px;
+}
+.file-tree__dir > .file-tree__details {
+  margin: 0;
+  border-radius: 4px;
+}
+.file-tree__dir--truncated {
+  font-size: 0.95rem;
+}
+.file-tree__file .file-meta {
+  display: block;
+  margin-top: 4px;
+}
+
+/* Single-page hub (index.html): collapsible hub / skills / agents */
+.catalog-section {
+  border: 1px solid var(--border-muted);
+  border-radius: 8px;
+  margin: 0 0 16px;
+  background: rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+.catalog-section > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+}
+.catalog-section > summary::-webkit-details-marker { display: none; }
+.catalog-section > summary::marker { content: ""; }
+.catalog-section > summary::before {
+  content: "+";
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  line-height: 1.45rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 1px solid var(--border-muted);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+.catalog-section[open] > summary::before { content: "\2212"; }
+.catalog-section[open] > summary {
+  border-bottom: 1px solid var(--border-muted);
+}
+.catalog-section .section-body {
+  padding: 18px 16px 22px;
+}
+.catalog-section .section-body > p:first-of-type { margin-top: 0; }
+.catalog-section .cap-grid { margin-top: 8px; }
+.catalog-section .count {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Static markdown mirror pages (catalog/doc/...) */
+.rule-prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 52rem;
+}
+.rule-prose h1,
+.rule-prose h2,
+.rule-prose h3,
+.rule-prose h4 {
+  margin: 1.25em 0 0.5em;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+.rule-prose h1:first-child,
+.rule-prose h2:first-child,
+.rule-prose h3:first-child {
+  margin-top: 0;
+}
+.rule-prose h1 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35em; }
+.rule-prose h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border-muted); padding-bottom: 0.25em; }
+.rule-prose h3 { font-size: 1.1rem; }
+.rule-prose p { margin: 0 0 12px; }
+.rule-prose pre {
+  margin: 12px 0;
+  padding: 12px 14px;
+  overflow: auto;
+  background: #1f1f24;
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+.rule-prose code { font-size: inherit; }
+.rule-prose ul,
+.rule-prose ol {
+  margin: 8px 0 12px 1.25rem;
+  padding: 0;
+}
+.rule-prose li { margin-bottom: 6px; }
+.rule-prose strong { color: var(--text); }
+.rule-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-muted);
+  margin: 1.25em 0;
+}
+.rule-prose .md-table-wrap {
+  overflow-x: auto;
+  margin: 12px 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.rule-prose table.md-table {
+  width: max-content;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.rule-prose table.md-table th,
+.rule-prose table.md-table td {
+  border: 1px solid var(--border-muted);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.rule-prose table.md-table th {
+  background: rgba(255, 122, 0, 0.08);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rule-prose table.md-table td { background: var(--panel); }
+.rule-prose a { color: var(--accent, #ff7a00); text-decoration: underline; }
+.rule-prose a:hover { text-decoration: none; }
+
+</style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="panel" role="main">
+
+<header class="panel-header entry-detail-header">
+  <div class="header-icon">
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:6px;">
+      <rect width="52" height="52" rx="8" fill="#0e0e10"/>
+      <path d="M16 14h20a2 2 0 0 1 2 2v20a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2V16a2 2 0 0 1 2-2z" stroke="#FF7A00" stroke-width="1.5" fill="rgba(255,122,0,0.06)"/>
+      <path d="M20 22h12M20 26h9M20 30h12" stroke="#FF7A00" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="header-text">
+    <p class="brand"><strong>Agile by Design</strong> &middot; catalog</p>
+    <a class="back-link" href="../../../../agent/abd-delivery-lead.html">← ABD Delivery Lead</a>
+    <p class="cap-badge">Markdown</p>
+    <h1>docs/prompt.md</h1>
+    <p class="tagline">I want to convert agile\_bots to skill.md ; agent.md approach</p>
+  </div>
+</header>
+
+<div class="panel-body">
+
+<nav class="nav" aria-label="Catalogue sections">
+  <a href="../../../../index.html" class="nav__link">Hub</a>
+  <a href="../../../../skills.html" class="nav__link">Skills</a>
+  <a href="../../../../agents.html" class="nav__link nav__link--current">Agents</a>
+</nav>
+
+<h2>Content</h2>
+<div class="rule-prose"><p>﻿ I want to convert agile\_bots to skill.md ; agent.md approach</p>
+<p>We need to build these agents and skills by porting existing C:\dev\agile_bots content and src code.</p>
+<h2>Migration architecture (agents/skills in Markdown, agile_bots CLI unchanged)</h2>
+<h3>What migration means</h3>
+<ul>
+<li><strong>From:</strong> `behavior.json`, `bot_config.json`, and scattered JSON as the source of truth for <em>procedural</em> steps (what to do, required context, guardrails tied to `shape.build` / `shape.validate`, etc.).</li>
+<li><strong>To:</strong> `AGENT.md` / `SKILL.md` (plus `content/`, `rules/`) as the source of truth for <em>instructions</em>. <strong>agile_bots</strong> stays the <strong>mechanical</strong> layer for <strong>build, validate, render, sync, and scan</strong> through the existing CLI.</li>
+</ul>
+<h3>Layering (three buckets)</h3>
+<div class="md-table-wrap"><table class="md-table"><thead><tr><th>Layer</th><th>Owns</th><th>Lives in</th></tr></thead><tbody><tr><td><strong>Orchestration</strong></td><td>Stage order, handoffs, which team-member covers which stage, when to involve the human</td><td>`abd-delivery-lead` agent MD</td></tr><tr><td><strong>Common delivery mechanics</strong></td><td>Workspace, context roots, task tracking, generic CLI invocation pattern (`execute_using_rules`, future `render-output`, etc.)</td><td>Shared helper skills (`workspace_skill`, `track_task`, `context_tracker`, `execute_using_rules`, …)</td></tr><tr><td><strong>Practice + shape</strong></td><td>What good output <em>is</em> for that stage, templates, shape-specific validate/render notes</td><td>One practice skill per stage (e.g. `abd-story-mapping`)</td></tr></tbody></table></div>
+<p><strong>Common vs shape-specific:</strong> pull <em>common</em> flow from agile_bots <strong>build → validate → render</strong> at the level of <em>workflow</em>, not by copying action-specific JSON prose into skills. Put <strong>behavior/action-shaped</strong> specifics (story-mapping vocabulary, outline rules, etc.) in the <strong>practice skill</strong>.</p>
+<h3>JSON vs Markdown (what moves where)</h3>
+<ul>
+<li><strong>Keep JSON (or YAML) as data only</strong>, not instructions: `story-graph.json`, template/schema snippets that tools consume, DrawIO/render config, etc.</li>
+<li><strong>Move to Markdown:</strong> required context, key questions, definition of done, guardrails (e.g. under `guardrails/required_context/`), rule <em>text</em> → `&lt;skill&gt;/rules/<em>.md`. Scanners remain </em><em>code</em><em> in agile_bots (or a shared package), </em><em>invoked via CLI</em><em>, </em><em>referenced by name</em>* from the skill.</li>
+</ul>
+<p><strong>Minimal bot config</strong> in agile_bots (e.g. default `WORKING_AREA`, bot identity) can remain so `cli_main.py` / MCP keep resolving the graph. Procedural steps do <strong>not</strong> need to stay in `behavior.json` as the spine.</p>
+<h3>Validate and scan from instructions</h3>
+<p>1. The <strong>practice skill</strong> (e.g. `abd-story-mapping`) owns <strong>`rules/*.md`</strong>, bundled rule prose in <strong>`SKILL.md`</strong>, and <strong>`scanners/*-scanner.py`</strong> bound via rule frontmatter (`scanner:`). 2. <strong>`execute_using_rules`</strong> documents the loop and <strong>runs it through the CLI</strong>: AI pass on the deliverable <strong>plus</strong> mechanical scanners — see `skills/execute_using_rules/SKILL.md`. 3. <strong>Scanner driver:</strong> `python &lt;execute_using_rules&gt;/scripts/run_scanners.py --skill-root &lt;path-to-practice-skill&gt; --workspace &lt;engagement-folder&gt;`. 4. <strong>Workspace graph path:</strong> scanners load `story-graph.json` from `&lt;workspace&gt;/story-graph.json` or `&lt;workspace&gt;/docs/story/story-graph.json` (see `scanner_runner.load_workspace_graph_json`). 5. <strong>Serialized graph lifecycle (no agile_bots required):</strong> use <strong>`story-graph-ops`</strong> — create or edit `story-graph.json`, then validate with `story_graph_cli.py read --file &lt;path&gt;` and `PYTHONPATH` including `skills/story-graph-ops/scripts`. Do not treat hand-written JSON as done until that read passes. 6. <strong>Green:</strong> all configured scanners exit 0; fix violations and re-run. Log corrections per `execute_using_rules` correction process when rules are missed.</p>
+<h3>Sequencing (implementation slices)</h3>
+<p>1. <strong>Inventory</strong> each `behavior.json` action: tag content as orchestration, common CLI flow, practice-specific, or data artifact. 2. <strong>Draft</strong> practice skill MD with sections: Setup / Build / Validate / Render / Sync—each ending with <strong>exact CLI</strong> steps already used today. 3. <strong>Port</strong> `required_context` and `key_questions` into MD; deprecate JSON copies after parity. 4. <strong>Define</strong> `abd-delivery-lead` agent: stages, which skill loads per stage, handoff checklist—without story_bot behavior IDs as the lifecycle spine. 5. <strong>Reserve</strong> JSON under skills for templates and machine configs; avoid new <strong>procedural</strong> JSON.</p>
+<hr>
+<p>---abd-delivery-lead----- @agilebydesign-skills/agents/abd-context-engine/agents/abd-delivery-lead</p>
+<ul>
+<li>single agile-delivery agent as the controller for the lifecycle</li>
+<li>orchesration of delivery flow of work in its agent.md, use skills to help</li>
+<li>kick start delivery flowtake a shot att fiishing this plan</li>
+</ul>
+<ul>
+<li>workspace-skill &gt; agent determines workspace asks if not set</li>
+<li>use agents/abd-context-engine/skills/workspace_skill to check, set, get</li>
+</ul>
+<ul>
+<li>context_tracker NEW &gt; determines context sources</li>
+<li>default is &lt;workspace&gt;/context/<em> then  </em>context<em>.</em></li>
+<li>can be added to chat ask if cant find; track</li>
+<li>create simple context_tracker skill to set and get list oif files and or folders</li>
+<li>track_task &gt; track stage of progress</li>
+<li>agents/abd-context-engine/skills/track_task</li>
+</ul>
+<p>abd-delivery-lead own:</p>
+<ul>
+<li>flow definition, stage order, stage meanings, stage outcomes</li>
+<li>handoff rules between stages</li>
+<li>creating abd-team-member agents and assigning them a stage in the flow and associated skills</li>
+<li>cross phase validation ant interaction across builder agents,</li>
+</ul>
+<p>--abd-team-member --</p>
+<ul>
+<li>the abd-delivery-lead instantiates abd-team-member agents who all have the job to progressively add generated context into a more structured form following the Agile by design delivery approach.</li>
+</ul>
+<p><strong>Mechanical stack for structured artifacts (e.g. discovery producing `story-graph.json`):</strong> <strong>`story-graph-ops`</strong> (validate graph file) → <strong>`execute_using_rules`</strong> `run_scanners.py` with <strong>`--skill-root`</strong> = the stage’s <strong>practice skill</strong> (e.g. `abd-story-mapping`) and <strong>`--workspace`</strong> = engagement folder containing the graph. This is the correct approach when an abd-team-member is <em>not</em> inside agile_bots; agile_bots CLI remains an alternate path when the workspace is a bot.</p>
+<p><em>abd-team-member-agent</em> area instantiated for each stage in delivery flow</p>
+<ul>
+<li>discovery</li>
+<li>prioritization</li>
+<li>exploration</li>
+<li>scenarios</li>
+<li>acceptance tests</li>
+<li>code</li>
+</ul>
+<p>each team member agent is equipped with</p>
+<ul>
+<li>unique abd-story-practice(s) skill required to provide best practices on <em>what</em> to deliver using a practice that helps achieve outcome for stage of delivery of flow they are responsible for</li>
+<li>discovery &gt;  abd-story-mapping</li>
+<li>prioritization &gt; abd-thin-slicingload - exploration &gt; abd-story-acceptance-criteria</li>
+<li>scenarios &gt;abd-spec-by-example</li>
+<li>acceptance test creation &gt; abd-acceptance-test-driven-development</li>
+<li>develop &gt; abd-clean-code</li>
+</ul>
+<ul>
+<li>the  team-member agents will use a set of <em>abd-team-member-helper-skills</em> &gt; how to deliver in a consisten way across stages and skills</li>
+</ul>
+<p>Source common flow instructions from C:\dev\agile_bots\base_actions\build, render, valdate flow of aciton NOT action specific instructions</p>
+<p>team-member agents flow 1 - Set Up</p>
+<hr>
+<ul>
+<li>workspace-skill &gt; get workspage as needed</li>
+<li>abd-context-tracker &gt; find where the context sources are</li>
+<li>track tasks</li>
+<li>track that steps &gt; agents/abd-context-engine/skills/track_task</li>
+<li>load skill context &gt; eg make sure to folllow the directgions of the relevant abd-story-practice skll, if more than one look aty both and orchestrate ptractoice skills</li>
+</ul>
+<p>2 - Build and Validate</p>
+<ul>
+<li><strong>Practice skill</strong> (e.g. `abd-story-mapping` for discovery) defines <em>what good looks like</em> — rules, templates, naming — in `SKILL.md` + `rules/`.</li>
+<li><strong>Build the artifact on disk:</strong></li>
+<li>Prefer <strong>`story-graph-ops`</strong> for `story-graph.json`: produce JSON (generator script, careful edit, or import from `story_map`), then <strong>`story_graph_cli.py read --file …`</strong> so structure is valid before scanners run. Skill root: `skills/story-graph-ops`.</li>
+<li><strong>Alternative</strong> when working <em>inside</em> <strong>agile_bots</strong> with `story_bot`: use the existing bot/CLI story graph API (e.g. `story_graph.create_epic` …) if the engagement is wired to that workspace — same file format, different entry point.</li>
+<li><strong>`execute_using_rules`</strong> (repo: `skills/execute_using_rules`) — scanner pass:</li>
+<li>`python scripts/run_scanners.py --skill-root &lt;practice-skill-dir&gt; --workspace &lt;engagement-folder&gt;`</li>
+<li>Example (discovery / story mapping): `--skill-root …/skills/abd-story-mapping --workspace …/your-project` (folder must contain `story-graph.json` or `docs/story/story-graph.json`).</li>
+<li><strong>AI pass + scanner pass</strong> together: read bundled rules, judge the deliverable, then run `run_scanners.py`; iterate until both are acceptable; use corrections log when fixing mistakes.</li>
+</ul>
+<p>3 - Render and Edit</p>
+<ul>
+<li>render-output NEW SKILL</li>
+<li>render from json to md; drawio</li>
+<li>Human edits and makes changes</li>
+<li>synch changes back to graph on save of rendered document or oncommand</li>
+</ul>
+<p>Example: Discovery Discovery definition (in abd-orchestration)  <em>was shape in story bot</em></p>
+<hr>
+<ul>
+<li>loads a stege in the flow for discovery</li>
+<li>it requires access to purpose of discovery, overview, definition of done, inputs, questions the builder asks itself to determine if done</li>
+</ul>
+<p>SEE</p>
+<ul>
+<li>abd-delivery-lead bootstraps abd-team-member to be a discovery team member agent</li>
+</ul>
+<p>C:\dev\agile_bots\bots\story_bot\behaviors\shape\guardrails\required_context\key_questions.json C:\dev\agile_bots\bots\story_bot\behaviors\shape\behavior.json</p>
+<p>C:\dev\agile_bots\bots\story_bot --&gt; contains instructions / prompts/ content for agent and skills</p>
+<p>Dicovery team member agent</p>
+<hr>
+<p>internally boot straps abd-helpers skill  --&gt; how to generate COMMON ACROSS ALL builder agents (SEE ABOVE) abd-delivery agent injects abd-story-mapping skill --&gt; what to generate UNIQUE SET by team member</p>
+<p>Story-mapping skill</p>
+<hr>
+<p>convert to skill md file ./ files()</p>
+<p>instructions for build, validate, and render specifc to this skill , eg section in md per - keep focuses on what not build/ validatre/ render process that is in gnerator skill C:\dev\agile_bots\bots\story_bot\bot_config.json</p>
+<p>BUILDING</p>
+<ul>
+<li>details on how to story map;</li>
+</ul>
+<p>C:\dev\agile_bots\bots\story_bot\behaviors\shape\behavior.json   --&gt; what is a story map how to use story cli to read and write C:\dev\agilebydesign-skills\backup\abd-maps-models-specs\content\parts\library\story-map.md --&gt; some good stroy map stuff ignoitre extra stuff and extra fileds stick to core SM epics, epics, stories, as , steps , acror</p>
+<p><strong>Portable pipeline (abd-team-member / discovery without agile_bots runtime):</strong></p>
+<ul>
+<li><strong>`story-graph-ops`</strong> (`skills/story-graph-ops`): mechanical lifecycle for `story-graph.json` — CLI `story_graph_cli.py` (`read`, `names`, `search`, `write`); always finish with <strong>`read`</strong> after writes.</li>
+<li><strong>`execute_using_rules`</strong> + <strong>`abd-story-mapping`</strong>: `run_scanners.py --skill-root …/abd-story-mapping --workspace &lt;folder with story-graph.json&gt;`.</li>
+<li>Converting from Markdown/text story maps: generate JSON, validate with story-graph-ops, then run practice skill scanners.</li>
+</ul>
+<p>-template for what a story graph looks like when built by this skill-template (json) C:\dev\agile_bots\bots\story_bot\behaviors\shape\content\story_graph\story-graph-outline.json</p>
+<p>then immediately render templatges (sio use can look at it)</p>
+<p>-template for when stroy graph rendered by this skill (we want our skills to have templates as well) C:\dev\agile_bots\bots\story_bot\behaviors\shape\content\render\templates\story-map.md C:\dev\agile_bots\bots\story_bot\behaviors\shape\content\render\templates\story-map.txt</p>
+<ul>
+<li>scripts to render output from json</li>
+</ul>
+<p>C:\dev\agile_bots\bots\story_bot\behaviors\shape\content\render\templates\render_story_map_md.py C:\dev\agile_bots\bots\story_bot\behaviors\shape\content\render\templates\render_story_map_txtx.py</p>
+<ul>
+<li>building the Story graph</li>
+</ul>
+<p>path &lt;workspace&gt; bot story_bot story_graph.create_epic name:&quot;My Product&quot; story_graph.&quot;My Product&quot;.create_sub_epic name:&quot;Onboarding&quot; story_graph.&quot;My Product&quot;.&quot;Onboarding&quot;.create_story name:&quot;User signs up&quot;</p>
+<p>VALIDATING each skill needs rules C:\dev\agile_bots\bots\story_bot\behaviors\shape\rules  --&gt; move these to markdown in &lt;Skill&gt;/rules,  building skills will build all th skills into skill file</p>
+<ul>
+<li>each rule may have 1 scanner ; scanners use code to detect violations</li>
+<li><strong>Run scanners</strong> via `execute_using_rules` `run_scanners.py` with `--skill-root` = that practice skill directory (not agile_bots). Scanners import <strong>`story_map` / `story_scanner`</strong> from <strong>`story-graph-ops/scripts`</strong> on `PYTHONPATH` (the driver sets this).</li>
+</ul>
+<p>RENDERING</p>
+<ul>
+<li>instructions to call CLI to render drawio diagram for this skill</li>
+</ul>
+<p>C:\dev\agile_bots\bots\story_bot\behaviors\shape\content\render\render_story_map_outline_drawio.json</p>
+<p>SYNCHRONIZER output back from drawio back to json C:\dev\agile_bots\bots\story_bot\behaviors\shape\content\synchronize</p>
+<ul>
+<li>render the Story graph</li>
+</ul>
+<p>shape.render.renderDiagram path &lt;workspace&gt; bot story_bot</p>
+<p>--&gt; agents/abd-context-engine/skills/execute_using_rules</p>
+<p>C:\dev\agile_bots\src\scanners</p>
+<p>abd-team-menbers use the</p>
+<p>buid using template to json from skill phase</p>
+<p>render to markdown based on templartes from phase skill</p>
+<p>val;idate using rules retry or repair logic</p></div>
+
+</div>
+</div>
+</div>
+</body>
+</html>

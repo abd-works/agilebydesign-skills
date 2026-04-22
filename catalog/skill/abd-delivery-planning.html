@@ -414,6 +414,81 @@ h2:first-child { margin-top: 0; }
   color: var(--muted);
 }
 
+/* Static markdown mirror pages (catalog/doc/...) */
+.rule-prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 52rem;
+}
+.rule-prose h1,
+.rule-prose h2,
+.rule-prose h3,
+.rule-prose h4 {
+  margin: 1.25em 0 0.5em;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+.rule-prose h1:first-child,
+.rule-prose h2:first-child,
+.rule-prose h3:first-child {
+  margin-top: 0;
+}
+.rule-prose h1 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35em; }
+.rule-prose h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border-muted); padding-bottom: 0.25em; }
+.rule-prose h3 { font-size: 1.1rem; }
+.rule-prose p { margin: 0 0 12px; }
+.rule-prose pre {
+  margin: 12px 0;
+  padding: 12px 14px;
+  overflow: auto;
+  background: #1f1f24;
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+.rule-prose code { font-size: inherit; }
+.rule-prose ul,
+.rule-prose ol {
+  margin: 8px 0 12px 1.25rem;
+  padding: 0;
+}
+.rule-prose li { margin-bottom: 6px; }
+.rule-prose strong { color: var(--text); }
+.rule-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-muted);
+  margin: 1.25em 0;
+}
+.rule-prose .md-table-wrap {
+  overflow-x: auto;
+  margin: 12px 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.rule-prose table.md-table {
+  width: max-content;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.rule-prose table.md-table th,
+.rule-prose table.md-table td {
+  border: 1px solid var(--border-muted);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.rule-prose table.md-table th {
+  background: rgba(255, 122, 0, 0.08);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rule-prose table.md-table td { background: var(--panel); }
+.rule-prose a { color: var(--accent, #ff7a00); text-decoration: underline; }
+.rule-prose a:hover { text-decoration: none; }
+
 </style>
 </head>
 <body>
@@ -470,21 +545,21 @@ h2:first-child { margin-top: 0; }
 
 <hr class="entry-divider">
 
-<h2>Contents</h2>
+<h2 id="entry-contents">Contents</h2>
 <ul class="file-list file-list--root">
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>strategies/</strong><span class="file-meta"> → Folder (9 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-delivery-planning/strategies/bug-fix.md" target="_blank" rel="noopener noreferrer"><strong>bug-fix.md</strong></a><span class="file-meta"> → Strategy: Bug Fix</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-delivery-planning/strategies/legacy-migration.md" target="_blank" rel="noopener noreferrer"><strong>legacy-migration.md</strong></a><span class="file-meta"> → Strategy: Legacy Migration</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-delivery-planning/strategies/new-initiative-business-user-experience-risk.md" target="_blank" rel="noopener noreferrer"><strong>new-initiative-business-user-experience-risk.md</strong></a><span class="file-meta"> → Strategy: New Initiative — Business / User Experience Risk</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-delivery-planning/strategies/new-initiative-no-documented-architecture.md" target="_blank" rel="noopener noreferrer"><strong>new-initiative-no-documented-architecture.md</strong></a><span class="file-meta"> → Strategy: New Initiative — No Documented Architecture</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-delivery-planning/strategies/new-initiative-proprietary-technology-risk.md" target="_blank" rel="noopener noreferrer"><strong>new-initiative-proprietary-technology-risk.md</strong></a><span class="file-meta"> → Strategy: New Initiative — Proprietary Technology Risk</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-delivery-planning/strategies/new-thin-slice.md" target="_blank" rel="noopener noreferrer"><strong>new-thin-slice.md</strong></a><span class="file-meta"> → Strategy: New Thin Slice</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-delivery-planning/strategies/new-user-story.md" target="_blank" rel="noopener noreferrer"><strong>new-user-story.md</strong></a><span class="file-meta"> → Strategy: New User Story</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-delivery-planning/strategies/regulatory-compliance-heavy.md" target="_blank" rel="noopener noreferrer"><strong>regulatory-compliance-heavy.md</strong></a><span class="file-meta"> → Strategy: Regulatory / Compliance-Heavy</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-delivery-planning/strategies/spike-proof-of-concept.md" target="_blank" rel="noopener noreferrer"><strong>spike-proof-of-concept.md</strong></a><span class="file-meta"> → Strategy: Spike / Proof of Concept</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/abd-delivery-planning/strategies/bug-fix.html"><strong>bug-fix.md</strong></a><span class="file-meta"> → Strategy: Bug Fix</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/abd-delivery-planning/strategies/legacy-migration.html"><strong>legacy-migration.md</strong></a><span class="file-meta"> → Strategy: Legacy Migration</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/abd-delivery-planning/strategies/new-initiative-business-user-experience-risk.html"><strong>new-initiative-business-user-experience-risk.md</strong></a><span class="file-meta"> → Strategy: New Initiative — Business / User Experience Risk</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/abd-delivery-planning/strategies/new-initiative-no-documented-architecture.html"><strong>new-initiative-no-documented-architecture.md</strong></a><span class="file-meta"> → Strategy: New Initiative — No Documented Architecture</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/abd-delivery-planning/strategies/new-initiative-proprietary-technology-risk.html"><strong>new-initiative-proprietary-technology-risk.md</strong></a><span class="file-meta"> → Strategy: New Initiative — Proprietary Technology Risk</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/abd-delivery-planning/strategies/new-thin-slice.html"><strong>new-thin-slice.md</strong></a><span class="file-meta"> → Strategy: New Thin Slice</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/abd-delivery-planning/strategies/new-user-story.html"><strong>new-user-story.md</strong></a><span class="file-meta"> → Strategy: New User Story</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/abd-delivery-planning/strategies/regulatory-compliance-heavy.html"><strong>regulatory-compliance-heavy.md</strong></a><span class="file-meta"> → Strategy: Regulatory / Compliance-Heavy</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/abd-delivery-planning/strategies/spike-proof-of-concept.html"><strong>spike-proof-of-concept.md</strong></a><span class="file-meta"> → Strategy: Spike / Proof of Concept</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-delivery-planning/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → One line for catalogue cards and grids (YAML string).</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/abd-delivery-planning/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: abd-delivery-planning</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/abd-delivery-planning/README.html"><strong>README.md</strong></a><span class="file-meta"> → One line for catalogue cards and grids (YAML string).</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/abd-delivery-planning/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → name: abd-delivery-planning</span></li>
 </ul>
 
 </div>

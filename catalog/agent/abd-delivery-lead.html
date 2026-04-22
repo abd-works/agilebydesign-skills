@@ -414,6 +414,81 @@ h2:first-child { margin-top: 0; }
   color: var(--muted);
 }
 
+/* Static markdown mirror pages (catalog/doc/...) */
+.rule-prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 52rem;
+}
+.rule-prose h1,
+.rule-prose h2,
+.rule-prose h3,
+.rule-prose h4 {
+  margin: 1.25em 0 0.5em;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+.rule-prose h1:first-child,
+.rule-prose h2:first-child,
+.rule-prose h3:first-child {
+  margin-top: 0;
+}
+.rule-prose h1 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35em; }
+.rule-prose h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border-muted); padding-bottom: 0.25em; }
+.rule-prose h3 { font-size: 1.1rem; }
+.rule-prose p { margin: 0 0 12px; }
+.rule-prose pre {
+  margin: 12px 0;
+  padding: 12px 14px;
+  overflow: auto;
+  background: #1f1f24;
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+.rule-prose code { font-size: inherit; }
+.rule-prose ul,
+.rule-prose ol {
+  margin: 8px 0 12px 1.25rem;
+  padding: 0;
+}
+.rule-prose li { margin-bottom: 6px; }
+.rule-prose strong { color: var(--text); }
+.rule-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-muted);
+  margin: 1.25em 0;
+}
+.rule-prose .md-table-wrap {
+  overflow-x: auto;
+  margin: 12px 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.rule-prose table.md-table {
+  width: max-content;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.rule-prose table.md-table th,
+.rule-prose table.md-table td {
+  border: 1px solid var(--border-muted);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.rule-prose table.md-table th {
+  background: rgba(255, 122, 0, 0.08);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rule-prose table.md-table td { background: var(--panel); }
+.rule-prose a { color: var(--accent, #ff7a00); text-decoration: underline; }
+.rule-prose a:hover { text-decoration: none; }
+
 </style>
 </head>
 <body>
@@ -482,24 +557,24 @@ h2:first-child { margin-top: 0; }
 
 <hr class="entry-divider">
 
-<h2>Contents</h2>
+<h2 id="entry-contents">Contents</h2>
 <ul class="file-list file-list--root">
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>docs/</strong><span class="file-meta"> → Human-oriented documentation for the package.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-delivery-lead/docs/plan.md" target="_blank" rel="noopener noreferrer"><strong>plan.md</strong></a><span class="file-meta"> → @agilebydesign-skills/agents/abd-context-engine/skills/abd-story-mappingin vhere</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-delivery-lead/docs/prompt.md" target="_blank" rel="noopener noreferrer"><strong>prompt.md</strong></a><span class="file-meta"> → I want to convert agile\_bots to skill.md ; agent.md approach</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-delivery-lead/docs/plan.html"><strong>plan.md</strong></a><span class="file-meta"> → @agilebydesign-skills/agents/abd-context-engine/skills/abd-story-mappingin vhere</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-delivery-lead/docs/prompt.html"><strong>prompt.md</strong></a><span class="file-meta"> → I want to convert agile\_bots to skill.md ; agent.md approach</span></li>
 </ul></div></details></li>
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span></summary><div class="file-tree__inner"><p class="file-list__nested-note">Empty folder.</p></div></details></li>
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>stages/</strong><span class="file-meta"> → Folder (6 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-delivery-lead/stages/acceptance-tests.md" target="_blank" rel="noopener noreferrer"><strong>acceptance-tests.md</strong></a><span class="file-meta"> → Acceptance Tests</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-delivery-lead/stages/discovery.md" target="_blank" rel="noopener noreferrer"><strong>discovery.md</strong></a><span class="file-meta"> → Discovery</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-delivery-lead/stages/engineering.md" target="_blank" rel="noopener noreferrer"><strong>engineering.md</strong></a><span class="file-meta"> → Engineering</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-delivery-lead/stages/exploration.md" target="_blank" rel="noopener noreferrer"><strong>exploration.md</strong></a><span class="file-meta"> → Exploration</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-delivery-lead/stages/prioritization.md" target="_blank" rel="noopener noreferrer"><strong>prioritization.md</strong></a><span class="file-meta"> → Prioritization</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-delivery-lead/stages/scenarios.md" target="_blank" rel="noopener noreferrer"><strong>scenarios.md</strong></a><span class="file-meta"> → Story Definition</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-delivery-lead/stages/acceptance-tests.html"><strong>acceptance-tests.md</strong></a><span class="file-meta"> → Acceptance Tests</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-delivery-lead/stages/discovery.html"><strong>discovery.md</strong></a><span class="file-meta"> → Discovery</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-delivery-lead/stages/engineering.html"><strong>engineering.md</strong></a><span class="file-meta"> → Engineering</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-delivery-lead/stages/exploration.html"><strong>exploration.md</strong></a><span class="file-meta"> → Exploration</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-delivery-lead/stages/prioritization.html"><strong>prioritization.md</strong></a><span class="file-meta"> → Prioritization</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-delivery-lead/stages/scenarios.html"><strong>scenarios.md</strong></a><span class="file-meta"> → Story Definition</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-delivery-lead/AGENT.md" target="_blank" rel="noopener noreferrer"><strong>AGENT.md</strong></a><span class="file-meta"> → ABD Delivery Lead</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-delivery-lead/AGENT.html"><strong>AGENT.md</strong></a><span class="file-meta"> → ABD Delivery Lead</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-delivery-lead/Deploy-ToCursor.ps1" target="_blank" rel="noopener noreferrer"><strong>Deploy-ToCursor.ps1</strong></a><span class="file-meta"> → .SYNOPSIS</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-delivery-lead/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → catalogue_summary: &gt;-</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-delivery-lead/README.html"><strong>README.md</strong></a><span class="file-meta"> → catalogue_summary: &gt;-</span></li>
 </ul>
 
 </div>

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ABD catalogue — ABD Delivery Lead · stages/discovery.md</title>
+<style>
+:root {
+  --orange: #ff7a00;
+  --bg: #09090b;
+  --surface: #0e0e10;
+  --raised: #161618;
+  --border: #2a2a30;
+  --border-muted: #1a1a1e;
+  --text: #e8e8ed;
+  --muted: #9b9ba8;
+  --radius: 4px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  font-family: system-ui, "Segoe UI", Roboto, Ubuntu, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+}
+a { color: #8ab4ff; text-decoration: none; }
+a:hover { text-decoration: underline; }
+strong { font-weight: 700; }
+code {
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.88em;
+  background: #1f1f24;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: #d4d4d4;
+}
+.page-wrap { padding: 16px clamp(8px,3vw,28px); }
+.panel {
+  max-width: min(96vw, 1100px);
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.panel-header {
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  border-left: 4px solid var(--orange);
+  background: var(--raised);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.header-icon {
+  flex-shrink: 0;
+  background: #000;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-muted);
+  box-shadow: inset 0 0 0 1px rgba(255,122,0,0.12);
+}
+.header-text { flex: 1; min-width: 200px; }
+.brand { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.brand strong { color: var(--orange); }
+h1 { margin: 0; font-size: 2rem; font-weight: 700; line-height: 1.15; }
+.tagline { margin: 8px 0 0; font-size: 1.05rem; color: var(--muted); max-width: 52rem; }
+.panel-body { padding: 28px 22px 36px; }
+p { margin: 0 0 14px; }
+h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 32px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+h2:first-child { margin-top: 0; }
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 0 0 18px;
+  padding: 0 0 14px;
+  border-bottom: 1px solid var(--border-muted);
+}
+.nav a {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.nav a.nav__link--current {
+  color: var(--orange);
+  pointer-events: none;
+}
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  margin: 18px 0 0;
+}
+.cap-card {
+  display: block;
+  text-decoration: none;
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  transition: background 0.15s, border-color 0.15s;
+  cursor: pointer;
+}
+.cap-card:hover {
+  background: rgba(255,122,0,0.06);
+  border-color: rgba(255,122,0,0.4);
+  text-decoration: none;
+}
+.cap-card__title {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--orange);
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cap-card__icon { flex-shrink: 0; width: 24px; height: 24px; }
+.cap-card__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.55;
+  margin-bottom: 1px;
+}
+.cap-card__summary { font-size: 0.85rem; color: var(--muted); line-height: 1.45; margin: 0 0 8px; }
+.cap-card__more {
+  font-size: 0.78rem;
+  color: var(--orange);
+  opacity: 0.7;
+  margin: 10px 0 0;
+}
+
+/* Entry detail pages (skill/*.html, agent/*.html) — overview-style */
+.entry-detail-header .back-link {
+  font-size: 0.82rem;
+  color: var(--muted);
+  display: inline-block;
+  margin: 0 0 10px;
+}
+.entry-detail-header .back-link:hover {
+  color: var(--orange);
+}
+.cap-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--orange);
+  background: rgba(255, 122, 0, 0.08);
+  border: 1px solid rgba(255, 122, 0, 0.25);
+  border-radius: 3px;
+  padding: 2px 8px;
+  margin: 0 0 8px;
+}
+.entry-caption {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.entry-prose {
+  white-space: pre-wrap;
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+.entry-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 26px 0;
+}
+.ascii-diagram {
+  background: #111114;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.83em;
+  line-height: 1.55;
+  color: #b8b8c2;
+  margin: 0 0 18px;
+}
+.install-block {
+  margin: 22px 0 0;
+  padding: 16px 18px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--orange);
+}
+.install-block h2 {
+  margin-top: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.install-block .install-hint {
+  font-size: 0.92rem;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.install-snippet {
+  background: #111114;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 0;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.85em;
+  line-height: 1.5;
+  color: #d4d4d4;
+}
+.install-snippet code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.file-list li {
+  margin: 0 0 14px;
+  padding: 10px 12px 10px 14px;
+  border-left: 3px solid var(--border-muted);
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 0 4px 4px 0;
+}
+.file-list .file-meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+  display: block;
+  margin-top: 4px;
+}
+.file-list a {
+  font-weight: 600;
+}
+.file-list--root {
+  margin-top: 4px;
+}
+.file-list--nested {
+  margin: 8px 0 0 0;
+  padding-left: 0;
+  border-left: 2px solid var(--border-muted);
+  margin-left: 2px;
+  padding-left: 10px;
+}
+.file-list--nested li {
+  margin-bottom: 10px;
+  padding: 8px 10px 8px 12px;
+  font-size: 0.95rem;
+}
+.file-list__nested-note {
+  margin: 8px 0 0 0;
+  padding: 6px 0 4px 4px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+/* Expandable folder tree (<details> / <summary>) */
+.file-list > li.file-list__folder {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+}
+.file-list__folder > .file-tree__details {
+  margin: 0 0 12px 0;
+}
+.file-tree__details {
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+.file-tree__summary {
+  cursor: pointer;
+  padding: 10px 12px 10px 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.03);
+}
+.file-tree__summary::-webkit-details-marker {
+  display: none;
+}
+.file-tree__summary::marker {
+  content: "";
+  display: none;
+}
+/* Obvious expand/collapse control (native triangle hidden above). */
+.file-tree__summary::before {
+  content: "+";
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 1px;
+  line-height: 1.45rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 1px solid var(--border-muted);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+  user-select: none;
+}
+.file-tree__details[open] > .file-tree__summary::before {
+  content: "\2212"; /* minus sign */
+}
+.file-tree__summary:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.file-tree__summary:hover::before {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.file-tree__summary .file-meta {
+  display: inline;
+  margin-left: 6px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.file-tree__inner {
+  padding: 8px 10px 12px 14px;
+  border-top: 1px solid var(--border-muted);
+}
+.file-tree__ul {
+  margin-top: 4px;
+}
+.file-tree__dir > .file-tree__details {
+  margin: 0;
+  border-radius: 4px;
+}
+.file-tree__dir--truncated {
+  font-size: 0.95rem;
+}
+.file-tree__file .file-meta {
+  display: block;
+  margin-top: 4px;
+}
+
+/* Single-page hub (index.html): collapsible hub / skills / agents */
+.catalog-section {
+  border: 1px solid var(--border-muted);
+  border-radius: 8px;
+  margin: 0 0 16px;
+  background: rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+.catalog-section > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+}
+.catalog-section > summary::-webkit-details-marker { display: none; }
+.catalog-section > summary::marker { content: ""; }
+.catalog-section > summary::before {
+  content: "+";
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  line-height: 1.45rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 1px solid var(--border-muted);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+.catalog-section[open] > summary::before { content: "\2212"; }
+.catalog-section[open] > summary {
+  border-bottom: 1px solid var(--border-muted);
+}
+.catalog-section .section-body {
+  padding: 18px 16px 22px;
+}
+.catalog-section .section-body > p:first-of-type { margin-top: 0; }
+.catalog-section .cap-grid { margin-top: 8px; }
+.catalog-section .count {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Static markdown mirror pages (catalog/doc/...) */
+.rule-prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 52rem;
+}
+.rule-prose h1,
+.rule-prose h2,
+.rule-prose h3,
+.rule-prose h4 {
+  margin: 1.25em 0 0.5em;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+.rule-prose h1:first-child,
+.rule-prose h2:first-child,
+.rule-prose h3:first-child {
+  margin-top: 0;
+}
+.rule-prose h1 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35em; }
+.rule-prose h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border-muted); padding-bottom: 0.25em; }
+.rule-prose h3 { font-size: 1.1rem; }
+.rule-prose p { margin: 0 0 12px; }
+.rule-prose pre {
+  margin: 12px 0;
+  padding: 12px 14px;
+  overflow: auto;
+  background: #1f1f24;
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+.rule-prose code { font-size: inherit; }
+.rule-prose ul,
+.rule-prose ol {
+  margin: 8px 0 12px 1.25rem;
+  padding: 0;
+}
+.rule-prose li { margin-bottom: 6px; }
+.rule-prose strong { color: var(--text); }
+.rule-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-muted);
+  margin: 1.25em 0;
+}
+.rule-prose .md-table-wrap {
+  overflow-x: auto;
+  margin: 12px 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.rule-prose table.md-table {
+  width: max-content;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.rule-prose table.md-table th,
+.rule-prose table.md-table td {
+  border: 1px solid var(--border-muted);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.rule-prose table.md-table th {
+  background: rgba(255, 122, 0, 0.08);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rule-prose table.md-table td { background: var(--panel); }
+.rule-prose a { color: var(--accent, #ff7a00); text-decoration: underline; }
+.rule-prose a:hover { text-decoration: none; }
+
+</style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="panel" role="main">
+
+<header class="panel-header entry-detail-header">
+  <div class="header-icon">
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:6px;">
+      <rect width="52" height="52" rx="8" fill="#0e0e10"/>
+      <path d="M16 14h20a2 2 0 0 1 2 2v20a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2V16a2 2 0 0 1 2-2z" stroke="#FF7A00" stroke-width="1.5" fill="rgba(255,122,0,0.06)"/>
+      <path d="M20 22h12M20 26h9M20 30h12" stroke="#FF7A00" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="header-text">
+    <p class="brand"><strong>Agile by Design</strong> &middot; catalog</p>
+    <a class="back-link" href="../../../../agent/abd-delivery-lead.html">← ABD Delivery Lead</a>
+    <p class="cap-badge">Markdown</p>
+    <h1>stages/discovery.md</h1>
+    <p class="tagline">Discovery</p>
+  </div>
+</header>
+
+<div class="panel-body">
+
+<nav class="nav" aria-label="Catalogue sections">
+  <a href="../../../../index.html" class="nav__link">Hub</a>
+  <a href="../../../../skills.html" class="nav__link">Skills</a>
+  <a href="../../../../agents.html" class="nav__link nav__link--current">Agents</a>
+</nav>
+
+<h2>Content</h2>
+<div class="rule-prose"><h1>Discovery</h1>
+<h2>Purpose</h2>
+<p>Transform raw context — business goals, stakeholder conversations, documents — into a structured story map that represents the product as a hierarchy of actors, epics, features, and stories.</p>
+<p>A story map is a collaborative method for breaking work down. It provides a structure to guide collaborative thought in order to achieve shared understanding. The map is a lightweight, two-dimensional arrangement of stories: a sequential narrative from left to right, and a prioritization from top to bottom. It establishes approximately 80% of scope initially, with room for incremental growth, and creates the backlog the team will deliver against.</p>
+<p>Discovery focuses on <strong>what you are working on</strong>, not <strong>the way you work</strong> — it is important to understand the distinction. The output is a highly visible representation of end-to-end product scope and a site for conversation that is accessible and useful for setting context.</p>
+<h2>Why this stage matters</h2>
+<ul>
+<li><strong>Alignment:</strong> Creates shared understanding among the team building the product and stakeholders affected by the product.</li>
+<li><strong>Decomposition:</strong> Systematically breaks a project into smaller units of business value that support iterative delivery.</li>
+<li><strong>Scope visibility:</strong> A cross-functional team (SMEs, analysts, developers, testers, delivery lead) acquires various viewpoints early, reducing costly surprises downstream.</li>
+<li><strong>Backlog creation:</strong> The map directly produces an ordered backlog — not a flat list, but a structured representation of user journeys.</li>
+</ul>
+<h2>Team role</h2>
+<p><strong>Product Owner</strong></p>
+<h2>Practice skill</h2>
+<p>`abd-story-mapping` — Patton-style story mapping: epics, sub-epics, stories, verb–noun naming, actors via `story_type`.</p>
+<h2>Entry conditions</h2>
+<ul>
+<li>Workspace is set and accessible.</li>
+<li>At least one context source exists: scope brief, business document, stakeholder notes, or prior material under `&lt;workspace&gt;/context/` or attached to the session.</li>
+</ul>
+<h2>Expected outputs</h2>
+<ul>
+<li>`story-graph.json` (or `docs/story/story-graph.json`) with at least one epic, its sub-epics, and leaf stories.</li>
+<li>Rendered story map artifacts in `templates/` (`story-map.md` and `story-map.txt`) with the same tree coverage.</li>
+</ul>
+<h2>Key questions (is this stage done?)</h2>
+<p>1. Can someone new to the project read the map left-to-right and understand the end-to-end user journey? 2. Does the map cover the actors who will interact with the product, not just one perspective? 3. Are epics named as verb–noun activities (what users do), not noun-only labels? 4. Is there enough story depth that the team could estimate at the epic level? 5. Has the team walked through the map together and confirmed it represents their shared understanding? 6. Are there any known user journeys or business goals from the scope that are not yet represented?</p>
+<h2>Conditions of success</h2>
+<ul>
+<li>The map reads as a <strong>narrative</strong>: a stakeholder can walk through it left to right and see the product&#x27;s flow.</li>
+<li>Every epic has at least one sub-epic; every sub-epic has at least one story — no orphan branches.</li>
+<li>Stories use verb–noun naming and are assigned to an actor.</li>
+<li>Domain vocabulary is captured and consistent across the map — actors, concepts, and terms that will carry through all downstream stages.</li>
+<li>The map is a site for conversation, not a final document — it is understood that it will grow incrementally.</li>
+</ul>
+<h2>Exit gate</h2>
+<p>1. `story-graph.json` passes structural validation: `story_graph_cli.py read --file &lt;path&gt;` exits 0. 2. Practice skill scanners pass: `run_scanners.py --skill-root &lt;abd-story-mapping&gt; --workspace &lt;workspace&gt;` exits 0. 3. Every epic has at least one sub-epic; every sub-epic has at least one story. 4. Stories use verb–noun naming and are assigned to an actor. 5. Rendered templates (`story-map.md`, `story-map.txt`) exist and reflect the graph. 6. The user has confirmed the map at a team-member checkpoint.</p>
+<h2>Handoff to next stage</h2>
+<p>Pass forward:</p>
+<ul>
+<li>Path to `story-graph.json`.</li>
+<li>Rendered map files.</li>
+<li>Any open questions or areas flagged for deeper exploration.</li>
+<li>Actor and domain vocabulary established during mapping.</li>
+</ul></div>
+
+</div>
+</div>
+</div>
+</body>
+</html>

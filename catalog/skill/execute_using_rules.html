@@ -414,6 +414,81 @@ h2:first-child { margin-top: 0; }
   color: var(--muted);
 }
 
+/* Static markdown mirror pages (catalog/doc/...) */
+.rule-prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 52rem;
+}
+.rule-prose h1,
+.rule-prose h2,
+.rule-prose h3,
+.rule-prose h4 {
+  margin: 1.25em 0 0.5em;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+.rule-prose h1:first-child,
+.rule-prose h2:first-child,
+.rule-prose h3:first-child {
+  margin-top: 0;
+}
+.rule-prose h1 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35em; }
+.rule-prose h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border-muted); padding-bottom: 0.25em; }
+.rule-prose h3 { font-size: 1.1rem; }
+.rule-prose p { margin: 0 0 12px; }
+.rule-prose pre {
+  margin: 12px 0;
+  padding: 12px 14px;
+  overflow: auto;
+  background: #1f1f24;
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+.rule-prose code { font-size: inherit; }
+.rule-prose ul,
+.rule-prose ol {
+  margin: 8px 0 12px 1.25rem;
+  padding: 0;
+}
+.rule-prose li { margin-bottom: 6px; }
+.rule-prose strong { color: var(--text); }
+.rule-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-muted);
+  margin: 1.25em 0;
+}
+.rule-prose .md-table-wrap {
+  overflow-x: auto;
+  margin: 12px 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.rule-prose table.md-table {
+  width: max-content;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.rule-prose table.md-table th,
+.rule-prose table.md-table td {
+  border: 1px solid var(--border-muted);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.rule-prose table.md-table th {
+  background: rgba(255, 122, 0, 0.08);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rule-prose table.md-table td { background: var(--panel); }
+.rule-prose a { color: var(--accent, #ff7a00); text-decoration: underline; }
+.rule-prose a:hover { text-decoration: none; }
+
 </style>
 </head>
 <body>
@@ -466,7 +541,7 @@ h2:first-child { margin-top: 0; }
 
 <hr class="entry-divider">
 
-<h2>Contents</h2>
+<h2 id="entry-contents">Contents</h2>
 <ul class="file-list file-list--root">
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>__pycache__/</strong><span class="file-meta"> → Folder (3 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
@@ -496,7 +571,7 @@ h2:first-child { margin-top: 0; }
 </ul></div></details></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/execute_using_rules/scripts/scanner_bases/__init__.py" target="_blank" rel="noopener noreferrer"><strong>__init__.py</strong></a><span class="file-meta"> → Generic scanner infrastructure: abstract Scanner, violations, rules protocol, scan context.</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/execute_using_rules/scripts/scanner_bases/eval_paths.py" target="_blank" rel="noopener noreferrer"><strong>eval_paths.py</strong></a><span class="file-meta"> → from pathlib import Path</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/execute_using_rules/scripts/scanner_bases/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → scanner_bases — shared scanner infrastructure</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/execute_using_rules/scripts/scanner_bases/README.html"><strong>README.md</strong></a><span class="file-meta"> → scanner_bases — shared scanner infrastructure</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/execute_using_rules/scripts/scanner_bases/scanner.py" target="_blank" rel="noopener noreferrer"><strong>scanner.py</strong></a><span class="file-meta"> → from abc import ABC, abstractmethod</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/execute_using_rules/scripts/scanner_bases/simple_rule.py" target="_blank" rel="noopener noreferrer"><strong>simple_rule.py</strong></a><span class="file-meta"> → &quot;&quot;&quot;Minimal rule object for scanner_bases without a host bot actions.rules dependency.&quot;&quot;&quot;</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/execute_using_rules/scripts/scanner_bases/violation.py" target="_blank" rel="noopener noreferrer"><strong>violation.py</strong></a><span class="file-meta"> → from typing import Optional, Dict, Any, TYPE_CHECKING</span></li>
@@ -510,8 +585,8 @@ h2:first-child { margin-top: 0; }
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/execute_using_rules/scripts/scanner_test_helper.py" target="_blank" rel="noopener noreferrer"><strong>scanner_test_helper.py</strong></a><span class="file-meta"> → &quot;&quot;&quot;Test helpers for running scanners with the same PYTHONPATH as run_scanners.py.</span></li>
 </ul></div></details></li>
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>templates/</strong><span class="file-meta"> → Authoring templates and structural skeletons.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/execute_using_rules/templates/corrections-log.md" target="_blank" rel="noopener noreferrer"><strong>corrections-log.md</strong></a><span class="file-meta"> → Corrections log — structure</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/execute_using_rules/templates/quality-steps-checklist.md" target="_blank" rel="noopener noreferrer"><strong>quality-steps-checklist.md</strong></a><span class="file-meta"> → Quality steps — checklist</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/execute_using_rules/templates/corrections-log.html"><strong>corrections-log.md</strong></a><span class="file-meta"> → Corrections log — structure</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/execute_using_rules/templates/quality-steps-checklist.html"><strong>quality-steps-checklist.md</strong></a><span class="file-meta"> → Quality steps — checklist</span></li>
 </ul></div></details></li>
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>tests/</strong><span class="file-meta"> → Folder (4 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>__pycache__/</strong><span class="file-meta"> → Folder (3 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
@@ -523,8 +598,8 @@ h2:first-child { margin-top: 0; }
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/execute_using_rules/tests/test_run_scanners_smoke.py" target="_blank" rel="noopener noreferrer"><strong>test_run_scanners_smoke.py</strong></a><span class="file-meta"> → &quot;&quot;&quot;Smoke: run_scanners.py exits 0 when a skill has no scanners.&quot;&quot;&quot;</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/execute_using_rules/tests/test_scanner_test_helper.py" target="_blank" rel="noopener noreferrer"><strong>test_scanner_test_helper.py</strong></a><span class="file-meta"> → &quot;&quot;&quot;Tests for :mod:scanner_test_helper alignment with run_scanners.py.&quot;&quot;&quot;</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/execute_using_rules/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → One line for catalogue cards and grids (YAML string).</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../skills/execute_using_rules/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: execute-rules</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/execute_using_rules/README.html"><strong>README.md</strong></a><span class="file-meta"> → One line for catalogue cards and grids (YAML string).</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/skill/execute_using_rules/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → name: execute-rules</span></li>
 </ul>
 
 </div>

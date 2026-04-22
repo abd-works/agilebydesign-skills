@@ -23,6 +23,7 @@
 | Field | Content |
 | --- | --- |
 | **Rule** | Rule id or `rules/<file>.md` name |
+| **Affects** | Scope where this correction applies, as a short mapping: `stage:`, `story:`, `rule:`, optional `slice:`, `run:`, `role:`. At least one value is required. Use `stage: *` / `story: *` for global. This is what the delivery lead filters on before surfacing entries to a team member. |
 | **DO / DO NOT** | The rule as it should be stated |
 | **Example (wrong)** | What the output actually did |
 | **Example (correct)** | What it should have done — fill **only after** the right output is confirmed |
@@ -30,6 +31,13 @@
 | **Likely source** | One of: `prompt gap` · `rule not read` · `edge case` · `automation gap` |
 
 **Duplicate violations:** If the **same guidance** was violated again, add another **Example (wrong)** under the **same entry** instead of opening a new entry.
+
+**Scope (`Affects`) — how it's used:**
+
+- The **delivery lead** reads the log before every run and handoff. It surfaces to the active **team member** only entries whose **Affects** intersects the current stage, current run scope (slice / story), or the role being bootstrapped.
+- **Team members** must still read the file, but the lead is responsible for flagging the entries it expects to apply. Missing `Affects` means the lead cannot filter — leave it empty only when the correction truly is cross-cutting, and then set `stage: *` / `story: *` explicitly.
+- **Stages** values map 1:1 to `agents/abd-delivery-lead/stages/<stage>.md`: `discovery`, `prioritization`, `exploration`, `scenarios`, `acceptance-tests`, `engineering`.
+- **Roles** values: `product-owner`, `analyst`, `engineer`.
 
 ---
 
@@ -49,6 +57,13 @@ Skill / phase: <what was being reviewed>
 
 - **Status:** open | confirmed
 - **Rule:** `rules/<stem>.md` or rule id
+- **Affects:**
+  - stage: <one of discovery | prioritization | exploration | scenarios | acceptance-tests | engineering | `*`>
+  - story: <story id or verb-noun name, or `*`>
+  - slice: <slice/increment name, optional>
+  - run: <run label from agile-delivery-plan.md, optional>
+  - role: <product-owner | analyst | engineer, optional>
+  - rule: <rule id if narrower than Rule above, optional>
 - **DO / DO NOT:** <plain statement>
 - **Example (wrong):**
   <what the model or artifact did>
@@ -73,6 +88,13 @@ Skill / phase: <what was being reviewed>
 
 - **Status:** open
 - **Rule:**
+- **Affects:**
+  - stage:
+  - story:
+  - slice:
+  - run:
+  - role:
+  - rule:
 - **DO / DO NOT:**
 - **Example (wrong):**
 - **Example (correct):**

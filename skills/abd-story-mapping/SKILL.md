@@ -219,18 +219,6 @@ Do not over-elaborate areas the team will not build soon. Go deep where uncertai
 ## Example
 
 ```
-Epic: Track Fleet Vehicles
-  └── Sub-Epic: Assign Driver To Vehicle
-        ├── Story: Open Vehicle Roster           [user]
-        ├── Story: Select Available Driver       [user]
-        └── Story: Confirm Assignment              [user]
-```
-
-One epic, one flow (sub-epic), and a few verb–noun stories with actors only in `story_type`.
-
-## The shape of a good story map
-
-```
 Epic: Manage Customer Orders
   └── Sub-Epic: Place New Order
         ├── Story: Browse Product Catalog         [user]
@@ -266,8 +254,6 @@ Checklist:
 - **Hierarchy** — epics → sub-epics → stories; **verb–noun** names; actors only in `story_type`, not in titles.
 - **Story size** — one observable behavior per story; flows grouped in sub-epics.
 - **Intent** — outcomes and behaviors, not implementation tasks, tickets, or internal structure spelled out as “stories.”
-
-When you use mechanical checks, run them via **execute_rules** in this repo (**`skills/execute_using_rules/SKILL.md`**). Revise until the three perspectives above can agree on what the map means.
 
 ---
 

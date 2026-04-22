@@ -414,6 +414,81 @@ h2:first-child { margin-top: 0; }
   color: var(--muted);
 }
 
+/* Static markdown mirror pages (catalog/doc/...) */
+.rule-prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 52rem;
+}
+.rule-prose h1,
+.rule-prose h2,
+.rule-prose h3,
+.rule-prose h4 {
+  margin: 1.25em 0 0.5em;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+.rule-prose h1:first-child,
+.rule-prose h2:first-child,
+.rule-prose h3:first-child {
+  margin-top: 0;
+}
+.rule-prose h1 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35em; }
+.rule-prose h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border-muted); padding-bottom: 0.25em; }
+.rule-prose h3 { font-size: 1.1rem; }
+.rule-prose p { margin: 0 0 12px; }
+.rule-prose pre {
+  margin: 12px 0;
+  padding: 12px 14px;
+  overflow: auto;
+  background: #1f1f24;
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+.rule-prose code { font-size: inherit; }
+.rule-prose ul,
+.rule-prose ol {
+  margin: 8px 0 12px 1.25rem;
+  padding: 0;
+}
+.rule-prose li { margin-bottom: 6px; }
+.rule-prose strong { color: var(--text); }
+.rule-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-muted);
+  margin: 1.25em 0;
+}
+.rule-prose .md-table-wrap {
+  overflow-x: auto;
+  margin: 12px 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.rule-prose table.md-table {
+  width: max-content;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.rule-prose table.md-table th,
+.rule-prose table.md-table td {
+  border: 1px solid var(--border-muted);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.rule-prose table.md-table th {
+  background: rgba(255, 122, 0, 0.08);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rule-prose table.md-table td { background: var(--panel); }
+.rule-prose a { color: var(--accent, #ff7a00); text-decoration: underline; }
+.rule-prose a:hover { text-decoration: none; }
+
 </style>
 </head>
 <body>
@@ -462,50 +537,50 @@ h2:first-child { margin-top: 0; }
 
 <hr class="entry-divider">
 
-<h2>Contents</h2>
+<h2 id="entry-contents">Contents</h2>
 <ul class="file-list file-list--root">
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>content/</strong><span class="file-meta"> → Source parts merged into agent instructions or outputs.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>built/</strong><span class="file-meta"> → Folder (2 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/built/AGENTS.md" target="_blank" rel="noopener noreferrer"><strong>AGENTS.md</strong></a><span class="file-meta"> → AGENTS — abd-skill-builder</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/built/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → content/built/ — static_built outputs</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/built/AGENTS.html"><strong>AGENTS.md</strong></a><span class="file-meta"> → AGENTS — abd-skill-builder</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/built/README.html"><strong>README.md</strong></a><span class="file-meta"> → content/built/ — static_built outputs</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>parts/</strong><span class="file-meta"> → Folder (3 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>library/</strong><span class="file-meta"> → Folder (1 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>base/</strong><span class="file-meta"> → Folder (6 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/library/base/critical-quality-steps.md" target="_blank" rel="noopener noreferrer"><strong>critical-quality-steps.md</strong></a><span class="file-meta"> → Leaf execute_rules skill (commands, templates, quality workflow as Steps 1–4): skills/execute_rules/SKILL.md. This file is the library slice merged into AGENTS.md / phases — phrased in layers for content/parts/ and build.py.</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/library/base/delivery-modes.md" target="_blank" rel="noopener noreferrer"><strong>delivery-modes.md</strong></a><span class="file-meta"> → Agent delivery modes (static build vs runtime injection)</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/library/base/process-phases.md" target="_blank" rel="noopener noreferrer"><strong>process-phases.md</strong></a><span class="file-meta"> → Agent stages and phases (skills per phase)</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/library/base/rules-and-scanners.md" target="_blank" rel="noopener noreferrer"><strong>rules-and-scanners.md</strong></a><span class="file-meta"> → Rules and scanners</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/library/base/skill-structure-and-concepts.md" target="_blank" rel="noopener noreferrer"><strong>skill-structure-and-concepts.md</strong></a><span class="file-meta"> → Skill structure and concepts</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/library/base/workspace-config.md" target="_blank" rel="noopener noreferrer"><strong>workspace-config.md</strong></a><span class="file-meta"> → Workspace and config</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/library/base/critical-quality-steps.html"><strong>critical-quality-steps.md</strong></a><span class="file-meta"> → Leaf execute_rules skill (commands, templates, quality workflow as Steps 1–4): skills/execute_rules/SKILL.md. This file is the library slice merged into AGENTS.md / phases — phrased in layers for content/parts/ and build.py.</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/library/base/delivery-modes.html"><strong>delivery-modes.md</strong></a><span class="file-meta"> → Agent delivery modes (static build vs runtime injection)</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/library/base/process-phases.html"><strong>process-phases.md</strong></a><span class="file-meta"> → Agent stages and phases (skills per phase)</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/library/base/rules-and-scanners.html"><strong>rules-and-scanners.md</strong></a><span class="file-meta"> → Rules and scanners</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/library/base/skill-structure-and-concepts.html"><strong>skill-structure-and-concepts.md</strong></a><span class="file-meta"> → Skill structure and concepts</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/library/base/workspace-config.html"><strong>workspace-config.md</strong></a><span class="file-meta"> → Workspace and config</span></li>
 </ul></div></details></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>phases/</strong><span class="file-meta"> → Folder (7 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>built/</strong><span class="file-meta"> → Folder (7 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/phases/built/fill-scaffold-parts.md" target="_blank" rel="noopener noreferrer"><strong>fill-scaffold-parts.md</strong></a><span class="file-meta"> → You are the skill author for this repository: you interpret the skill’s intent, keep SKILL.md as the narrow discovery surface and put orchestration in AGENTS.md (built from parts), edit sources under content/parts/ and rules/ (never hand-patch AGENTS.md or …</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/phases/built/migrate.md" target="_blank" rel="noopener noreferrer"><strong>migrate.md</strong></a><span class="file-meta"> → You are the skill author for this repository: you interpret the skill’s intent, keep SKILL.md as the narrow discovery surface and put orchestration in AGENTS.md (built from parts), edit sources under content/parts/ and rules/ (never hand-patch AGENTS.md or …</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/phases/built/plan-migrate.md" target="_blank" rel="noopener noreferrer"><strong>plan-migrate.md</strong></a><span class="file-meta"> → You are the skill author for this repository: you interpret the skill’s intent, keep SKILL.md as the narrow discovery surface and put orchestration in AGENTS.md (built from parts), edit sources under content/parts/ and rules/ (never hand-patch AGENTS.md or …</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/phases/built/plan-script-build.md" target="_blank" rel="noopener noreferrer"><strong>plan-script-build.md</strong></a><span class="file-meta"> → You are the skill author for this repository: you interpret the skill’s intent, keep SKILL.md as the narrow discovery surface and put orchestration in AGENTS.md (built from parts), edit sources under content/parts/ and rules/ (never hand-patch AGENTS.md or …</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/phases/built/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → parts/phases/built/ — derived per-phase prompts</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/phases/built/scaffold.md" target="_blank" rel="noopener noreferrer"><strong>scaffold.md</strong></a><span class="file-meta"> → You are the skill author for this repository: you interpret the skill’s intent, keep SKILL.md as the narrow discovery surface and put orchestration in AGENTS.md (built from parts), edit sources under content/parts/ and rules/ (never hand-patch AGENTS.md or …</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/phases/built/workspace-and-config.md" target="_blank" rel="noopener noreferrer"><strong>workspace-and-config.md</strong></a><span class="file-meta"> → You are the skill author for this repository: you interpret the skill’s intent, keep SKILL.md as the narrow discovery surface and put orchestration in AGENTS.md (built from parts), edit sources under content/parts/ and rules/ (never hand-patch AGENTS.md or …</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/phases/built/fill-scaffold-parts.html"><strong>fill-scaffold-parts.md</strong></a><span class="file-meta"> → You are the skill author for this repository: you interpret the skill’s intent, keep SKILL.md as the narrow discovery surface and put orchestration in AGENTS.md (built from parts), edit sources under content/parts/ and rules/ (never hand-patch AGENTS.md or …</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/phases/built/migrate.html"><strong>migrate.md</strong></a><span class="file-meta"> → You are the skill author for this repository: you interpret the skill’s intent, keep SKILL.md as the narrow discovery surface and put orchestration in AGENTS.md (built from parts), edit sources under content/parts/ and rules/ (never hand-patch AGENTS.md or …</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/phases/built/plan-migrate.html"><strong>plan-migrate.md</strong></a><span class="file-meta"> → You are the skill author for this repository: you interpret the skill’s intent, keep SKILL.md as the narrow discovery surface and put orchestration in AGENTS.md (built from parts), edit sources under content/parts/ and rules/ (never hand-patch AGENTS.md or …</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/phases/built/plan-script-build.html"><strong>plan-script-build.md</strong></a><span class="file-meta"> → You are the skill author for this repository: you interpret the skill’s intent, keep SKILL.md as the narrow discovery surface and put orchestration in AGENTS.md (built from parts), edit sources under content/parts/ and rules/ (never hand-patch AGENTS.md or …</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/phases/built/README.html"><strong>README.md</strong></a><span class="file-meta"> → parts/phases/built/ — derived per-phase prompts</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/phases/built/scaffold.html"><strong>scaffold.md</strong></a><span class="file-meta"> → You are the skill author for this repository: you interpret the skill’s intent, keep SKILL.md as the narrow discovery surface and put orchestration in AGENTS.md (built from parts), edit sources under content/parts/ and rules/ (never hand-patch AGENTS.md or …</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/phases/built/workspace-and-config.html"><strong>workspace-and-config.md</strong></a><span class="file-meta"> → You are the skill author for this repository: you interpret the skill’s intent, keep SKILL.md as the narrow discovery surface and put orchestration in AGENTS.md (built from parts), edit sources under content/parts/ and rules/ (never hand-patch AGENTS.md or …</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/phases/fill-scaffold-parts.md" target="_blank" rel="noopener noreferrer"><strong>fill-scaffold-parts.md</strong></a><span class="file-meta"> → Phase — Fill scaffold (library and rules)</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/phases/migrate.md" target="_blank" rel="noopener noreferrer"><strong>migrate.md</strong></a><span class="file-meta"> → Phase — Migrate existing skill (execute)</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/phases/plan-migrate.md" target="_blank" rel="noopener noreferrer"><strong>plan-migrate.md</strong></a><span class="file-meta"> → Phase — Plan skill migration</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/phases/plan-script-build.md" target="_blank" rel="noopener noreferrer"><strong>plan-script-build.md</strong></a><span class="file-meta"> → Phase — Plan Script Build</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/phases/scaffold.md" target="_blank" rel="noopener noreferrer"><strong>scaffold.md</strong></a><span class="file-meta"> → Phase: Scaffold</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/phases/workspace-and-config.md" target="_blank" rel="noopener noreferrer"><strong>workspace-and-config.md</strong></a><span class="file-meta"> → Workspace and config</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/phases/fill-scaffold-parts.html"><strong>fill-scaffold-parts.md</strong></a><span class="file-meta"> → Phase — Fill scaffold (library and rules)</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/phases/migrate.html"><strong>migrate.md</strong></a><span class="file-meta"> → Phase — Migrate existing skill (execute)</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/phases/plan-migrate.html"><strong>plan-migrate.md</strong></a><span class="file-meta"> → Phase — Plan skill migration</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/phases/plan-script-build.html"><strong>plan-script-build.md</strong></a><span class="file-meta"> → Phase — Plan Script Build</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/phases/scaffold.html"><strong>scaffold.md</strong></a><span class="file-meta"> → Phase: Scaffold</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/phases/workspace-and-config.html"><strong>workspace-and-config.md</strong></a><span class="file-meta"> → Workspace and config</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/parts/process.md" target="_blank" rel="noopener noreferrer"><strong>process.md</strong></a><span class="file-meta"> → Process — abd-skill-builder</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/parts/process.html"><strong>process.md</strong></a><span class="file-meta"> → Process — abd-skill-builder</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/agent-skill-model.md" target="_blank" rel="noopener noreferrer"><strong>agent-skill-model.md</strong></a><span class="file-meta"> → Agent vs skill (Open Agent Skills)</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/builder-architecture.md" target="_blank" rel="noopener noreferrer"><strong>builder-architecture.md</strong></a><span class="file-meta"> → Builder architecture — agent, skills, capabilities (source of truth)</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/outline.md" target="_blank" rel="noopener noreferrer"><strong>outline.md</strong></a><span class="file-meta"> → Introduction</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/principles.md" target="_blank" rel="noopener noreferrer"><strong>principles.md</strong></a><span class="file-meta"> → These principles state how the abd-skill-builder pattern is meant to be operated.</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/purpose.md" target="_blank" rel="noopener noreferrer"><strong>purpose.md</strong></a><span class="file-meta"> → Provide portable repository standards aligned with Open Agent Skills: a focused SKILL.md for discovery, a merged AGENTS.md for multi-step workflow, plus documentation of build and validation (merge, build.py, scanners, CI), and a scaffold CLI so new skills …</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → content/ — per-skill narrative</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/content/role.md" target="_blank" rel="noopener noreferrer"><strong>role.md</strong></a><span class="file-meta"> → You are the skill author for this repository: you interpret the skill’s intent, keep SKILL.md as the narrow discovery surface and put orchestration in AGENTS.md (built from parts), edit sources under content/parts/ and rules/ (never hand-patch AGENTS.md or …</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/agent-skill-model.html"><strong>agent-skill-model.md</strong></a><span class="file-meta"> → Agent vs skill (Open Agent Skills)</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/builder-architecture.html"><strong>builder-architecture.md</strong></a><span class="file-meta"> → Builder architecture — agent, skills, capabilities (source of truth)</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/outline.html"><strong>outline.md</strong></a><span class="file-meta"> → Introduction</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/principles.html"><strong>principles.md</strong></a><span class="file-meta"> → These principles state how the abd-skill-builder pattern is meant to be operated.</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/purpose.html"><strong>purpose.md</strong></a><span class="file-meta"> → Provide portable repository standards aligned with Open Agent Skills: a focused SKILL.md for discovery, a merged AGENTS.md for multi-step workflow, plus documentation of build and validation (merge, build.py, scanners, CI), and a scaffold CLI so new skills …</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/README.html"><strong>README.md</strong></a><span class="file-meta"> → content/ — per-skill narrative</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/content/role.html"><strong>role.md</strong></a><span class="file-meta"> → You are the skill author for this repository: you interpret the skill’s intent, keep SKILL.md as the narrow discovery surface and put orchestration in AGENTS.md (built from parts), edit sources under content/parts/ and rules/ (never hand-patch AGENTS.md or …</span></li>
 </ul></div></details></li>
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>docs/</strong><span class="file-meta"> → Human-oriented documentation for the package.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>overview/</strong><span class="file-meta"> → Folder (10 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
@@ -529,7 +604,7 @@ h2:first-child { margin-top: 0; }
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/docs/overview/capability-workspace.html" target="_blank" rel="noopener noreferrer"><strong>capability-workspace.html</strong></a><span class="file-meta"> → &lt;!DOCTYPE html&gt;</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/docs/overview/outline.html" target="_blank" rel="noopener noreferrer"><strong>outline.html</strong></a><span class="file-meta"> → &lt;!DOCTYPE html&gt;</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/docs/process-outline.md" target="_blank" rel="noopener noreferrer"><strong>process-outline.md</strong></a><span class="file-meta"> → Process outline — capabilities and problems</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/docs/process-outline.html"><strong>process-outline.md</strong></a><span class="file-meta"> → Process outline — capabilities and problems</span></li>
 </ul></div></details></li>
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>base/</strong><span class="file-meta"> → Folder (12 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
@@ -547,7 +622,7 @@ h2:first-child { margin-top: 0; }
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/scripts/base/generate.py" target="_blank" rel="noopener noreferrer"><strong>generate.py</strong></a><span class="file-meta"> → !/usr/bin/env python3</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/scripts/base/instructions.py" target="_blank" rel="noopener noreferrer"><strong>instructions.py</strong></a><span class="file-meta"> → Instructions — assemble prompt text for a phase or operation slug.</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/scripts/base/markers.py" target="_blank" rel="noopener noreferrer"><strong>markers.py</strong></a><span class="file-meta"> → markers — two kinds of HTML-comment markers used in skill content files.</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/scripts/base/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → scripts/base/ — skill package tooling (assignment)</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/scripts/base/README.html"><strong>README.md</strong></a><span class="file-meta"> → scripts/base/ — skill package tooling (assignment)</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/scripts/base/rules.py" target="_blank" rel="noopener noreferrer"><strong>rules.py</strong></a><span class="file-meta"> → rules — load rules/*.md + scanners.json; frontmatter helpers; phase stem resolution.</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/scripts/base/set_workspace.py" target="_blank" rel="noopener noreferrer"><strong>set_workspace.py</strong></a><span class="file-meta"> → !/usr/bin/env python3</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/scripts/base/skill.py" target="_blank" rel="noopener noreferrer"><strong>skill.py</strong></a><span class="file-meta"> → skill — Skill runtime: load skill-config.json → workspace, resolve workspace, assemble prompts.</span></li>
@@ -558,26 +633,26 @@ h2:first-child { margin-top: 0; }
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>skills/</strong><span class="file-meta"> → Nested skills shipped inside an agent package.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>build_agent/</strong><span class="file-meta"> → Scaffold a multi-skill agent — thin AGENTS.md merge from content/*.md, leaf skills under skills/. For orchestrators, not single skill packages.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>content/</strong><span class="file-meta"> → Source parts merged into agent instructions or outputs.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_agent/content/layout.md" target="_blank" rel="noopener noreferrer"><strong>layout.md</strong></a><span class="file-meta"> → Multi-skill agent layout</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_agent/content/layout.html"><strong>layout.md</strong></a><span class="file-meta"> → Multi-skill agent layout</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_agent/scripts/new_agent.py" target="_blank" rel="noopener noreferrer"><strong>new_agent.py</strong></a><span class="file-meta"> → !/usr/bin/env python3</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_agent/scripts/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → build_agent scripts</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_agent/scripts/README.html"><strong>README.md</strong></a><span class="file-meta"> → build_agent scripts</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>templates/</strong><span class="file-meta"> → Authoring templates and structural skeletons.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_agent/templates/build.py" target="_blank" rel="noopener noreferrer"><strong>build.py</strong></a><span class="file-meta"> → !/usr/bin/env python3</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_agent/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: build-agent</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_agent/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → name: build-agent</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>build_skill/</strong><span class="file-meta"> → Create a new skill package from the builder template (build_skill.py) and merge AGENTS.md via scripts/base/build.py.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>content/</strong><span class="file-meta"> → Source parts merged into agent instructions or outputs.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/content/scripts-map.md" target="_blank" rel="noopener noreferrer"><strong>scripts-map.md</strong></a><span class="file-meta"> → Scripts map — build skill</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/content/scripts-map.html"><strong>scripts-map.md</strong></a><span class="file-meta"> → Scripts map — build skill</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/scripts/build_pipeline_plan.py" target="_blank" rel="noopener noreferrer"><strong>build_pipeline_plan.py</strong></a><span class="file-meta"> → !/usr/bin/env python3</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/scripts/build_skill.py" target="_blank" rel="noopener noreferrer"><strong>build_skill.py</strong></a><span class="file-meta"> → !/usr/bin/env python3</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/scripts/check_skill_layout.py" target="_blank" rel="noopener noreferrer"><strong>check_skill_layout.py</strong></a><span class="file-meta"> → !/usr/bin/env python3</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/scripts/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → build_skill script</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/scripts/README.html"><strong>README.md</strong></a><span class="file-meta"> → build_skill script</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/scripts/set_workspace.py" target="_blank" rel="noopener noreferrer"><strong>set_workspace.py</strong></a><span class="file-meta"> → !/usr/bin/env python3</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/scripts/skill_base_runner.py" target="_blank" rel="noopener noreferrer"><strong>skill_base_runner.py</strong></a><span class="file-meta"> → &quot;&quot;&quot;Parse --skill-root and subprocess a script from the target skill&#x27;s scripts/base/ (build_skill wrappers).&quot;&quot;&quot;</span></li>
 </ul></div></details></li>
@@ -585,33 +660,33 @@ h2:first-child { margin-top: 0; }
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>skill-scaffold/</strong><span class="file-meta"> → &lt;!-- Authoring: keep discovery + instructions in this file until ~1–2 screens of dense procedure; then split to references/ or library shards and link here. See library/base/skill-structure-and-concepts.md → &quot;SKILL.md — default one file&quot;. --&gt;</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>content/</strong><span class="file-meta"> → Source parts merged into agent instructions or outputs.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>built/</strong><span class="file-meta"> → Folder (1 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/built/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → Pre-generated phase slices assembled by python scripts/base/build.py (static delivery mode only).</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/built/README.html"><strong>README.md</strong></a><span class="file-meta"> → Pre-generated phase slices assembled by python scripts/base/build.py (static delivery mode only).</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>parts/</strong><span class="file-meta"> → Folder (3 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>library/</strong><span class="file-meta"> → Folder (1 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/parts/library/library-topic-template.md" target="_blank" rel="noopener noreferrer"><strong>library-topic-template.md</strong></a><span class="file-meta"> → Library — {{topic}}</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/parts/library/library-topic-template.html"><strong>library-topic-template.md</strong></a><span class="file-meta"> → Library — {{topic}}</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>phases/</strong><span class="file-meta"> → Folder (4 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>built/</strong><span class="file-meta"> → Folder (1 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/parts/phases/built/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → content/parts/phases/built/ — derived per-phase prompts</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/parts/phases/built/README.html"><strong>README.md</strong></a><span class="file-meta"> → content/parts/phases/built/ — derived per-phase prompts</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/parts/phases/code-phase-template.md" target="_blank" rel="noopener noreferrer"><strong>code-phase-template.md</strong></a><span class="file-meta"> → Phase — {{code_phase_name}}</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/parts/phases/phase-template.md" target="_blank" rel="noopener noreferrer"><strong>phase-template.md</strong></a><span class="file-meta"> → Phase — {{phase_name}}</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/parts/phases/workspace-and-config.md" target="_blank" rel="noopener noreferrer"><strong>workspace-and-config.md</strong></a><span class="file-meta"> → Phase — Workspace and config</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/parts/phases/code-phase-template.html"><strong>code-phase-template.md</strong></a><span class="file-meta"> → Phase — {{code_phase_name}}</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/parts/phases/phase-template.html"><strong>phase-template.md</strong></a><span class="file-meta"> → Phase — {{phase_name}}</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/parts/phases/workspace-and-config.html"><strong>workspace-and-config.md</strong></a><span class="file-meta"> → Phase — Workspace and config</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/parts/process.md" target="_blank" rel="noopener noreferrer"><strong>process.md</strong></a><span class="file-meta"> → Process — {{skill_name}}</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/parts/process.html"><strong>process.md</strong></a><span class="file-meta"> → Process — {{skill_name}}</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/outline.md" target="_blank" rel="noopener noreferrer"><strong>outline.md</strong></a><span class="file-meta"> → This skill ({{skill_name}}) exists to {{skill_purpose}} Replace this paragraph with a tight statement of the problem space, audience, and outcome.</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/principles.md" target="_blank" rel="noopener noreferrer"><strong>principles.md</strong></a><span class="file-meta"> → These principles state how {{skill_name}} is meant to be operated: defaults the agent and authors follow across phases. Align them with purpose.md and outline.md.</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/purpose.md" target="_blank" rel="noopener noreferrer"><strong>purpose.md</strong></a><span class="file-meta"> → {{skill_purpose}}</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → content/ — per-skill narrative (purpose, outline, role, principles)</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/role.md" target="_blank" rel="noopener noreferrer"><strong>role.md</strong></a><span class="file-meta"> → When this skill runs, you act as: (replace with one short paragraph) — your responsibilities, tone, constraints, and what you optimize for (e.g. correctness, traceability, speed).</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/outline.html"><strong>outline.md</strong></a><span class="file-meta"> → This skill ({{skill_name}}) exists to {{skill_purpose}} Replace this paragraph with a tight statement of the problem space, audience, and outcome.</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/principles.html"><strong>principles.md</strong></a><span class="file-meta"> → These principles state how {{skill_name}} is meant to be operated: defaults the agent and authors follow across phases. Align them with purpose.md and outline.md.</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/purpose.html"><strong>purpose.md</strong></a><span class="file-meta"> → {{skill_purpose}}</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/README.html"><strong>README.md</strong></a><span class="file-meta"> → content/ — per-skill narrative (purpose, outline, role, principles)</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/content/role.html"><strong>role.md</strong></a><span class="file-meta"> → When this skill runs, you act as: (replace with one short paragraph) — your responsibilities, tone, constraints, and what you optimize for (e.g. correctness, traceability, speed).</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>docs/</strong><span class="file-meta"> → Human-oriented documentation for the package.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/docs/capability-registry.md" target="_blank" rel="noopener noreferrer"><strong>capability-registry.md</strong></a><span class="file-meta"> → Capability Registry — [Skill Name]</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/docs/capability-registry.html"><strong>capability-registry.md</strong></a><span class="file-meta"> → Capability Registry — [Skill Name]</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>rules/</strong><span class="file-meta"> → Practice rules (DO/DON&#x27;T) and constraints used with scanners.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/rules/%7B%7Brule_id%7D%7D.md" target="_blank" rel="noopener noreferrer"><strong>{{rule_id}}.md</strong></a><span class="file-meta"> → id: &quot;{{rule_id}}&quot;</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/rules/%7B%7Brule_id%7D%7D.html"><strong>{{rule_id}}.md</strong></a><span class="file-meta"> → id: &quot;{{rule_id}}&quot;</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>scanners/</strong><span class="file-meta"> → Folder (2 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>__pycache__/</strong><span class="file-meta"> → Folder (1 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
@@ -621,7 +696,7 @@ h2:first-child { margin-top: 0; }
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>{{skill_name}}/</strong><span class="file-meta"> → Folder (1 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/scripts/%7B%7Bskill_name%7D%7D/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → scripts/{{skill_name}}/</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/scripts/%7B%7Bskill_name%7D%7D/README.html"><strong>README.md</strong></a><span class="file-meta"> → scripts/{{skill_name}}/</span></li>
 </ul></div></details></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>templates/</strong><span class="file-meta"> → Authoring templates and structural skeletons.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
@@ -629,16 +704,16 @@ h2:first-child { margin-top: 0; }
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>test/</strong><span class="file-meta"> → Automated tests for the agent or skill package.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>fixture/</strong><span class="file-meta"> → Folder (1 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/test/fixture/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → test/fixture/</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/test/fixture/README.html"><strong>README.md</strong></a><span class="file-meta"> → test/fixture/</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/test/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → Automated verification for this skill.</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/test/README.html"><strong>README.md</strong></a><span class="file-meta"> → Automated verification for this skill.</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → Open Agent Skill</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/README.html"><strong>README.md</strong></a><span class="file-meta"> → Open Agent Skill</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/skill-config.json" target="_blank" rel="noopener noreferrer"><strong>skill-config.json</strong></a><span class="file-meta"> → &quot;name&quot;: &quot;{{skill_name}}&quot;,</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/templates/skill-scaffold/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → SKILL.md — {{skill_name}}</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/templates/skill-scaffold/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → SKILL.md — {{skill_name}}</span></li>
 </ul></div></details></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skills/build_skill/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: build-skill</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/skills/build_skill/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → name: build-skill</span></li>
 </ul></div></details></li>
 </ul></div></details></li>
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>test/</strong><span class="file-meta"> → Automated tests for the agent or skill package.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
@@ -650,19 +725,19 @@ h2:first-child { margin-top: 0; }
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>content/</strong><span class="file-meta"> → Source parts merged into agent instructions or outputs.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>parts/</strong><span class="file-meta"> → Folder (2 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>phases/</strong><span class="file-meta"> → Folder (4 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/toy-polite-dialogue/content/parts/phases/close.md" target="_blank" rel="noopener noreferrer"><strong>close.md</strong></a><span class="file-meta"> → Phase — Close</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/toy-polite-dialogue/content/parts/phases/converse.md" target="_blank" rel="noopener noreferrer"><strong>converse.md</strong></a><span class="file-meta"> → Phase — Converse</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/toy-polite-dialogue/content/parts/phases/greet.md" target="_blank" rel="noopener noreferrer"><strong>greet.md</strong></a><span class="file-meta"> → Phase — Greet</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/toy-polite-dialogue/content/parts/phases/introduce.md" target="_blank" rel="noopener noreferrer"><strong>introduce.md</strong></a><span class="file-meta"> → Phase — Introduce</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/test/fixture/toy-polite-dialogue/content/parts/phases/close.html"><strong>close.md</strong></a><span class="file-meta"> → Phase — Close</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/test/fixture/toy-polite-dialogue/content/parts/phases/converse.html"><strong>converse.md</strong></a><span class="file-meta"> → Phase — Converse</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/test/fixture/toy-polite-dialogue/content/parts/phases/greet.html"><strong>greet.md</strong></a><span class="file-meta"> → Phase — Greet</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/test/fixture/toy-polite-dialogue/content/parts/phases/introduce.html"><strong>introduce.md</strong></a><span class="file-meta"> → Phase — Introduce</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/toy-polite-dialogue/content/parts/process.md" target="_blank" rel="noopener noreferrer"><strong>process.md</strong></a><span class="file-meta"> → Process — polite dialogue (toy)</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/test/fixture/toy-polite-dialogue/content/parts/process.html"><strong>process.md</strong></a><span class="file-meta"> → Process — polite dialogue (toy)</span></li>
 </ul></div></details></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>rules/</strong><span class="file-meta"> → Practice rules (DO/DON&#x27;T) and constraints used with scanners.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/toy-polite-dialogue/rules/assume-good-faith.md" target="_blank" rel="noopener noreferrer"><strong>assume-good-faith.md</strong></a><span class="file-meta"> → id: assume_good_faith</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/toy-polite-dialogue/rules/close-graceful.md" target="_blank" rel="noopener noreferrer"><strong>close-graceful.md</strong></a><span class="file-meta"> → id: close_graceful</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/toy-polite-dialogue/rules/greet-warm-brief.md" target="_blank" rel="noopener noreferrer"><strong>greet-warm-brief.md</strong></a><span class="file-meta"> → id: greet_warm</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/toy-polite-dialogue/rules/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → Rules ↔ scanners (toy skill)</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/test/fixture/toy-polite-dialogue/rules/assume-good-faith.html"><strong>assume-good-faith.md</strong></a><span class="file-meta"> → id: assume_good_faith</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/test/fixture/toy-polite-dialogue/rules/close-graceful.html"><strong>close-graceful.md</strong></a><span class="file-meta"> → id: close_graceful</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/test/fixture/toy-polite-dialogue/rules/greet-warm-brief.html"><strong>greet-warm-brief.md</strong></a><span class="file-meta"> → id: greet_warm</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/test/fixture/toy-polite-dialogue/rules/README.html"><strong>README.md</strong></a><span class="file-meta"> → Rules ↔ scanners (toy skill)</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/toy-polite-dialogue/rules/scanners.json" target="_blank" rel="noopener noreferrer"><strong>scanners.json</strong></a><span class="file-meta"> → &quot;version&quot;: 1,</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
@@ -672,13 +747,13 @@ h2:first-child { margin-top: 0; }
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/toy-polite-dialogue/scripts/scanner_greet_warm.py" target="_blank" rel="noopener noreferrer"><strong>scanner_greet_warm.py</strong></a><span class="file-meta"> → !/usr/bin/env python3</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/toy-polite-dialogue/scripts/scanner_politeness.py" target="_blank" rel="noopener noreferrer"><strong>scanner_politeness.py</strong></a><span class="file-meta"> → !/usr/bin/env python3</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/toy-polite-dialogue/AGENTS.md" target="_blank" rel="noopener noreferrer"><strong>AGENTS.md</strong></a><span class="file-meta"> → AGENTS — toy-polite-dialogue</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/test/fixture/toy-polite-dialogue/AGENTS.html"><strong>AGENTS.md</strong></a><span class="file-meta"> → AGENTS — toy-polite-dialogue</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/toy-polite-dialogue/skill-config.json" target="_blank" rel="noopener noreferrer"><strong>skill-config.json</strong></a><span class="file-meta"> → &quot;name&quot;: &quot;toy-polite-dialogue&quot;,</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/toy-polite-dialogue/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: toy-polite-dialogue</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/test/fixture/toy-polite-dialogue/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → name: toy-polite-dialogue</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/fixture/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → toy-polite-dialogue</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/test/fixture/README.html"><strong>README.md</strong></a><span class="file-meta"> → toy-polite-dialogue</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → Tests (abd-skill-builder)</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/test/README.html"><strong>README.md</strong></a><span class="file-meta"> → Tests (abd-skill-builder)</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/test_build_smoke.py" target="_blank" rel="noopener noreferrer"><strong>test_build_smoke.py</strong></a><span class="file-meta"> → &quot;&quot;&quot;Smoke tests: build.py emits root + content/built AGENTS in sync.&quot;&quot;&quot;</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/test_resolve_library.py" target="_blank" rel="noopener noreferrer"><strong>test_resolve_library.py</strong></a><span class="file-meta"> → &quot;&quot;&quot;Library path resolution: library direct → content/ → required (legacy) → base.&quot;&quot;&quot;</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/test_rules_support.py" target="_blank" rel="noopener noreferrer"><strong>test_rules_support.py</strong></a><span class="file-meta"> → &quot;&quot;&quot;Unit tests for rules_support (phase rule stems + frontmatter strip).&quot;&quot;&quot;</span></li>
@@ -686,11 +761,11 @@ h2:first-child { margin-top: 0; }
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/test_subsections.py" target="_blank" rel="noopener noreferrer"><strong>test_subsections.py</strong></a><span class="file-meta"> → &quot;&quot;&quot;Unit tests for subsections.extract_section.&quot;&quot;&quot;</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/test/test_workspace_checklists.py" target="_blank" rel="noopener noreferrer"><strong>test_workspace_checklists.py</strong></a><span class="file-meta"> → &quot;&quot;&quot;Tests for scripts/base/workspace_checklists.py.&quot;&quot;&quot;</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/AGENTS.md" target="_blank" rel="noopener noreferrer"><strong>AGENTS.md</strong></a><span class="file-meta"> → AGENTS — abd-skill-builder</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → catalogue_summary: &quot;Provide portable repository standards aligned with Open Agent Skills: a focused SKILL.md for discovery, a merged AGENTS.md for multi-step workflow, plus documentation of build and validation (merge, build.py, scanners, CI), and a scaffold …</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/AGENTS.html"><strong>AGENTS.md</strong></a><span class="file-meta"> → AGENTS — abd-skill-builder</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/README.html"><strong>README.md</strong></a><span class="file-meta"> → catalogue_summary: &quot;Provide portable repository standards aligned with Open Agent Skills: a focused SKILL.md for discovery, a merged AGENTS.md for multi-step workflow, plus documentation of build and validation (merge, build.py, scanners, CI), and a scaffold …</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/requirements-dev.txt" target="_blank" rel="noopener noreferrer"><strong>requirements-dev.txt</strong></a><span class="file-meta"> → Dev-only: pytest for smoke tests (see test/README.md)</span></li>
 <li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/skill-config.json" target="_blank" rel="noopener noreferrer"><strong>skill-config.json</strong></a><span class="file-meta"> → &quot;name&quot;: &quot;abd-skill-builder&quot;,</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/abd-skill-builder/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: abd-skill-builder</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/abd-skill-builder/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → name: abd-skill-builder</span></li>
 </ul>
 
 </div>

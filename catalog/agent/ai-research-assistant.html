@@ -414,6 +414,81 @@ h2:first-child { margin-top: 0; }
   color: var(--muted);
 }
 
+/* Static markdown mirror pages (catalog/doc/...) */
+.rule-prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 52rem;
+}
+.rule-prose h1,
+.rule-prose h2,
+.rule-prose h3,
+.rule-prose h4 {
+  margin: 1.25em 0 0.5em;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+.rule-prose h1:first-child,
+.rule-prose h2:first-child,
+.rule-prose h3:first-child {
+  margin-top: 0;
+}
+.rule-prose h1 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35em; }
+.rule-prose h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border-muted); padding-bottom: 0.25em; }
+.rule-prose h3 { font-size: 1.1rem; }
+.rule-prose p { margin: 0 0 12px; }
+.rule-prose pre {
+  margin: 12px 0;
+  padding: 12px 14px;
+  overflow: auto;
+  background: #1f1f24;
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+.rule-prose code { font-size: inherit; }
+.rule-prose ul,
+.rule-prose ol {
+  margin: 8px 0 12px 1.25rem;
+  padding: 0;
+}
+.rule-prose li { margin-bottom: 6px; }
+.rule-prose strong { color: var(--text); }
+.rule-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-muted);
+  margin: 1.25em 0;
+}
+.rule-prose .md-table-wrap {
+  overflow-x: auto;
+  margin: 12px 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.rule-prose table.md-table {
+  width: max-content;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.rule-prose table.md-table th,
+.rule-prose table.md-table td {
+  border: 1px solid var(--border-muted);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.rule-prose table.md-table th {
+  background: rgba(255, 122, 0, 0.08);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rule-prose table.md-table td { background: var(--panel); }
+.rule-prose a { color: var(--accent, #ff7a00); text-decoration: underline; }
+.rule-prose a:hover { text-decoration: none; }
+
 </style>
 </head>
 <body>
@@ -468,24 +543,24 @@ and keep them from going in directions that are not well-established.</p>
 
 <hr class="entry-divider">
 
-<h2>Contents</h2>
+<h2 id="entry-contents">Contents</h2>
 <ul class="file-list file-list--root">
 <li class="file-list__folder"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>skills/</strong><span class="file-meta"> → Nested skills shipped inside an agent package.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>research-compare-approach/</strong><span class="file-meta"> → Critically compare the user&#x27;s approach against researched alternatives. Identifies strengths, weaknesses, trade-offs, and legitimate white space. Reads the user&#x27;s codebase ONLY to understand what they built — never as a source of best practice. Use when the …</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>templates/</strong><span class="file-meta"> → Authoring templates and structural skeletons.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/ai-research-assistant/skills/research-compare-approach/templates/research-report.md" target="_blank" rel="noopener noreferrer"><strong>research-report.md</strong></a><span class="file-meta"> → Research Report: [Hypothesis title]</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/ai-research-assistant/skills/research-compare-approach/templates/research-report.html"><strong>research-report.md</strong></a><span class="file-meta"> → Research Report: [Hypothesis title]</span></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/ai-research-assistant/skills/research-compare-approach/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: research-compare-approach</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/ai-research-assistant/skills/research-compare-approach/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → name: research-compare-approach</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>research-problem-validation/</strong><span class="file-meta"> → Research whether a stated problem is real and worth solving. Searches online and model knowledge for who is talking about the problem, who says it is NOT a problem, competing problems in the same space, and the maturity of discourse. Use when validating a …</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/ai-research-assistant/skills/research-problem-validation/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: research-problem-validation</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/ai-research-assistant/skills/research-problem-validation/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → name: research-problem-validation</span></li>
 </ul></div></details></li>
 <li class="file-tree__dir"><details class="file-tree__details" open><summary class="file-tree__summary"><strong>research-solution-landscape/</strong><span class="file-meta"> → Map the landscape of competing solutions for a validated problem. Searches online and model knowledge for categories of approaches, key tools and frameworks, trade-offs, and which segments each solution targets. Use when the user wants to know how others are …</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/ai-research-assistant/skills/research-solution-landscape/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: research-solution-landscape</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/ai-research-assistant/skills/research-solution-landscape/SKILL.html"><strong>SKILL.md</strong></a><span class="file-meta"> → name: research-solution-landscape</span></li>
 </ul></div></details></li>
 </ul></div></details></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/ai-research-assistant/AGENTS.md" target="_blank" rel="noopener noreferrer"><strong>AGENTS.md</strong></a><span class="file-meta"> → AGENTS — ai-research-assistant</span></li>
-<li class="file-tree__file"><a class="file-tree__file-link" href="../../agents/ai-research-assistant/README.md" target="_blank" rel="noopener noreferrer"><strong>README.md</strong></a><span class="file-meta"> → catalogue_summary: &quot;Orchestrate hypothesis-driven research on AI-augmented delivery and context engineering practices. You coordinate three skills in sequence to produce a research report that helps the user decide whether their approach is well-founded …</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/ai-research-assistant/AGENTS.html"><strong>AGENTS.md</strong></a><span class="file-meta"> → AGENTS — ai-research-assistant</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../doc/agent/ai-research-assistant/README.html"><strong>README.md</strong></a><span class="file-meta"> → catalogue_summary: &quot;Orchestrate hypothesis-driven research on AI-augmented delivery and context engineering practices. You coordinate three skills in sequence to produce a research report that helps the user decide whether their approach is well-founded …</span></li>
 </ul>
 
 </div>
