@@ -352,9 +352,7 @@ def _npx_skills_install_block(skill_package_name: str) -> str:
         '<section class="install-block" aria-labelledby="install-npx-heading">\n'
         '  <h2 id="install-npx-heading">Install with npx</h2>\n'
         '  <p class="install-hint">Install this package from GitHub into your project or global agent '
-        'skills directory (see <a href="https://skills.sh/">skills.sh</a> / Open Agent Skills). '
-        "The <code>@</code> suffix must match the skill name shown by "
-        f'<code>npx skills add https://github.com/{NPX_SKILLS_REPO_SLUG} -l</code>.</p>\n'
+        'skills directory (see <a href="https://skills.sh/">skills.sh</a> / Open Agent Skills).</p>\n'
         '  <pre class="install-snippet"><code>'
         + _h(cmd)
         + "</code></pre>\n"
