@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "skills": {
+    "brand-designer": {
+      "source": "daffy0208/ai-dev-standards",
+      "sourceType": "github",
+      "computedHash": "4848bb14290d7bc7b9264cab5fca3c42453a32f88a03bdb1cc4b5357117490e1"
+    },
+    "webconsulting-branding": {
+      "source": "dirnbauer/webconsulting-skills",
+      "sourceType": "github",
+      "computedHash": "c50ad667430fc58fba00bddd00f0d495bf7cb10d42d54befe81600d105dc925f"
+    }
+  }
+}

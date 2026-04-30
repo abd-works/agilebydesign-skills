@@ -1,6 +1,5 @@
 ---
-description: Commit message standards for agilebydesign-skills
-globs: ["**/*"]
+description: 
 alwaysApply: true
 ---
 
@@ -21,7 +20,7 @@ Describe **what the skill or agent can now do** — not what files changed.
 ### Types
 
 | Type | Use when |
-|------|----------|
+|---|----|
 | `feat` | A skill or agent gains new capability |
 | `fix` | Broken behavior in a skill or agent is corrected |
 | `rule` | A rule is added, changed, or removed |
