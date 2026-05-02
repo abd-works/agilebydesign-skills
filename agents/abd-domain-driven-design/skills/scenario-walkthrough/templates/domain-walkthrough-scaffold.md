@@ -1,6 +1,6 @@
 # Domain walkthrough - {{project}}
 
-Source CRC: `abd-ooad/crc.md`
+Source CRC: `abd-domain-driven-design/crc.md`
 
 ---
 

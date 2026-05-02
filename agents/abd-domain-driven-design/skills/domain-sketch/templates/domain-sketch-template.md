@@ -1,120 +1,321 @@
 <!--
-  Structural skeleton only: placeholders and separator shapes for object-sketch.md.
-  Section order and in-concept layout are normative here; SKILL.md holds rules and relationships.
+  domain-sketch template — shows the growing module file shape AFTER domain-sketch enrichment.
 
-  Copy to: <workspace>/abd-ooad/object-sketch.md
+  The file already exists at state: key-abstractions.
+  This skill enriches it in place. Key changes this phase makes:
 
-  Workflow: optional extracted-domain-logic.md (extract-domain-logic); key-abstractions.md
-  when present; refine into concept blocks (Domain-logic + ### Concept / ### Subtype *is a type of* Base).
-  Do not maintain a parallel "Key abstractions (carry-forward)" section that
-  duplicates the whole key-abstractions.md module - that file stays canonical for
-  identification narrative.
+    1. Adds #### Domain Sketch under each ### term — verb-led behavior bullets and
+       an optional role sentence describing what the term is for and who it works with
+    2. Adds or extends #### Decisions made at the ## KA level and/or ### term level
+    3. Deduplicates #### References across terms within the same ## KA
+       (remove a ref from a ### term if the identical ref already appears in another
+       ### term under the same ## KA; keep it on the first term that needs it)
+    4. Adds new **Ref —** entries for any behavior bullet not yet cited
+    5. Bumps state to domain-sketch
 
-  Evidence is always under Extract headings: module **`### Extract`** (inventory bullets:
-  Source, Locator, optional short quote), and every concept/subtype **`#### Extract - ...`**
-  (Source, Locator, Extract whole|partial, blank line, verbatim or explicit pointer to a
-  module **`### Extract`** bullet). [Unallocated] and [Rejected] use the same **`### Extract`**
-  pattern.
-
-  Domain-logic (below): markdown list of short bullets, each one a testable rule
-  from the book/spec - random draws, comparisons, thresholds, stepped outcomes,
-  modifiers, state changes. Skip descriptive prose that does not change outcomes.
+  Contract:
+    - Everything from UDL and KA stages stays unchanged:
+        #### Domain Language bullets — never touched
+        ## KA prose definitions — never touched
+        #### References already present — only deduplicated (removed from later
+        terms when identical ref exists earlier in the same ## KA block)
+    - #### Domain Sketch is NEW — added under each ### term
+    - Subtypes use the heading form ### SubtypeName *is a type of* BaseName
+      and appear under the same ## KA as their base term
+    - No separate ## Domain logic section
+    - No ---- behavior separators, no ----- collaboration separators
+    - No concept role paragraphs as standalone text blocks outside #### sections
 -->
 
-# Object sketch - {{project_name}}
+---
+state: domain-sketch
+---
 
-Scope: {{e.g. Chapter 1; bounded slice of source context}}
-Sources: {{extracted-domain-logic.md if used}}; {{key-abstractions.md if used}}; {{source / spec pointer}}
-Seed: {{which file was copied first when materializing this sketch — see object-sketch Agent instructions}}
+# Module: [{{ModuleName}}]
+
+Scope: {{scope from partition — unchanged}}
+
+**Core terms**:
+- {{term1}}
+- {{term2}}
+- …
+
+**Moved to other modules**:
+- {{moved_term}} → {{DestinationModule}}
 
 ---
 
-## Module: [{{ModuleName}}]
+# Core Domain
 
-### Extract
+## {{KAName}}
 
-- Source: {{source or doc id}} | Locator: {{section or pointer}}
-- Source: {{...}} | Locator: {{...}}
-- {{Reason: ...}}  <-- only if this module is intentionally empty
+{{KA prose definition — unchanged from key-abstractions stage}}
 
-## Domain-logic
+#### Decisions made
 
-{{Domain logic sentences extracted from source (one rule per line; paraphrase or quote tight rule text from the source)}}
+- {{decision from KA stage — unchanged}}
+- {{new DS decision added here if needed}}
 
-- {{e.g. Outcome is decided by comparing a total to a target number; at or above succeeds.}}
-- {{e.g. Margin above or below the target is bucketed into discrete levels; fractions truncated.}}
-- ...
+### {{term_name}}
 
-### {{Concept}}    <-- title case if more than one word
+#### Domain Language
 
-{{Intent}} <--- purpose and responsibility of the concept; which other concepts it works with to fulfil that responsibility and how (2-3 sentences max)
+- {{behavioral line — unchanged from UDL stage}}
+- {{behavioral line — unchanged from UDL stage}}
 
-----
-{{verb noun phrase}}  <--- natural english language sentences
-{{verb noun phrase}}
-{{verb noun phrase}}
+#### Domain Sketch
 
------
-{{phrase for collaboration / relationship with other concept }}  <--- natural english language sentences
-{{phrase for collaboration / relationship with other concept }}
+{{Optional one-sentence role statement: what this term is for and who it works with.}}
 
-----
-Shape hint: {{...}}
-Tension: {{...}}  <--    Optional 
+- {{verb-led behavior bullet: what it does, enforces, or produces}}
+- {{verb-led behavior bullet}}
+- {{verb-led behavior bullet}}
+- **Invariant:** {{rule that must always hold, if any}}
 
-#### Core terms 
-- {{term}}
-- {{term}}
+#### Decisions made
 
-#### Extract - {{title}}
-Source: {{where this extract came from - e.g. key-abstractions row, file path, or doc id}}
-Locator: {{chapter / section}}
-Extract: {{whole | partial}}
+- {{boundary call, scope call, structural call, or open question with reasoning}}
 
-{{Verbatim source text - no fenced code block; preserve text as-is for identification.}}
+#### References
 
-### {{Subtype concept}} *is a type of* {{Base concept}}   <-- plain English generalization (not Colon syntax)
+**Ref — {{title}}**
+Source: {{source chunk path — unchanged}}
+Locator: {{locator — unchanged}}
+Extract: whole
 
-{{Intent}}
+```source
+{{verbatim text — unchanged}}
+```
 
-----
-{{verb noun phrase}}
-{{verb noun phrase}}
+---
 
------
-{{phrase for collaboration / relationship with other concept }}
+### {{SubtypeName}} *is a type of* {{BaseName}}
 
-----
-Shape hint: {{...}}
-Tension: {{...}}  <-- optional
+#### Domain Language
 
-#### Core terms
-- {{term}}
-- {{term}}
+- {{behavioral line — unchanged}}
 
-#### Extract - {{title}}
-Source: {{...}}
-Locator: {{...}}
-Extract: {{whole | partial}}
+#### Domain Sketch
 
-{{Verbatim source text - or one line pointing at the module ### Extract bullet index that holds the quote.}}
+{{One sentence: what this subtype adds beyond the base.}}
 
-## Module: [Unallocated]
+- {{delta behavior — only what the subtype adds, not what it shares with the base}}
+- {{delta behavior}}
 
-### Extract
+#### Decisions made
 
-- {{parked passages - Source | Locator}}
+- {{why this is a subtype rather than a separate concept}}
 
-## Domain-logic
+#### References
 
-- {{optional rules that apply to parked material}}
+**Ref — {{title}}**
+Source: {{source chunk path}}
+Locator: {{locator}}
+Extract: whole
 
-## Module: [Rejected]
+```source
+{{verbatim text}}
+```
 
-### Extract
+---
 
-- {{rejected passages - Source | Locator and why rejected in one line if needed}}
+## {{AnotherKAName}}
 
-## Domain-logic
+{{KA prose definition — unchanged}}
 
-- {{optional}}
+#### Decisions made
+
+- {{…}}
+
+### {{term_name}}
+
+#### Domain Language
+
+- {{behavioral line — unchanged}}
+
+#### Domain Sketch
+
+- {{verb-led behavior bullet}}
+
+#### References
+
+**Ref — {{title}}**
+Source: {{source chunk path}}
+Locator: {{locator}}
+Extract: whole
+
+```source
+{{verbatim text}}
+```
+
+---
+
+# Boundary Domain
+
+## {{boundary_term}}
+
+Owned by: {{module — unchanged}}
+
+#### Domain Language
+
+- {{behavioral line — unchanged}}
+
+#### References
+
+**Ref — {{title}}**
+Source: {{source chunk path}}
+Locator: {{locator}}
+Extract: whole
+
+```source
+{{verbatim text — unchanged}}
+```
+
+---
+
+<!-- EXAMPLE — delete this section after using the template. -->
+
+## Example (filled — Fulfillment module)
+
+```markdown
+---
+state: domain-sketch
+---
+
+# Module: [Fulfillment]
+
+Scope: Warehouse release, shipment tracking, delivery confirmation.
+
+**Core terms**:
+- shipment
+- clearance
+- proof of delivery
+- carrier event
+- line item
+
+---
+
+# Core Domain
+
+## Shipment Lifecycle
+
+Owns the end-to-end state of a shipment from warehouse to customer doorstep — whether it may leave, when it is in transit, and what confirms delivery. Groups clearance, release, and confirmation behaviors.
+
+#### Decisions made
+
+- Shipment Lifecycle is a single abstraction, not split into Release and Delivery — the source treats them as one flow with gates.
+- Payment check is a prerequisite consumed from another module, not owned here.
+
+### clearance
+
+#### Domain Language
+
+- Warehouse hold is removed only after payment clearance is on record.
+- A clearance event must carry the authorizing reference.
+
+#### Domain Sketch
+
+The gate that must be passed before a shipment may leave; it depends on an external payment status signal.
+
+- gates warehouse exit until payment clearance is on record
+- records the authorizing reference on the clearance event
+- rejects release if payment status is absent or failed
+
+#### Decisions made
+
+- Clearance owns the gate decision; Billing owns the payment status that satisfies it.
+
+#### References
+
+**Ref — Gate before ship**
+Source: Fulfillment requirements
+Locator: Operations manual 4.1
+Extract: partial
+
+```source
+A shipment may not leave the warehouse until payment clearance has been received
+and recorded against the shipment record.
+```
+
+### proof of delivery
+
+#### Domain Language
+
+- Confirmed when carrier posts a terminal scan or customer signs.
+- Conflicting signals require escalation.
+
+#### Domain Sketch
+
+The signal that closes the delivery loop; it works with carrier events and customer confirmations.
+
+- marks the shipment delivered when carrier scan or customer signature is present
+- escalates when carrier and customer signals conflict
+
+#### Decisions made
+
+- Escalation path (carrier vs. customer disagreement) is an open question for the domain expert.
+
+#### References
+
+**Ref — Delivery confirmation**
+Source: Fulfillment requirements
+Locator: Policy ch.4 (delivery)
+Extract: whole
+
+```source
+Delivery is confirmed when the carrier posts a terminal scan or the customer
+provides a signature. Conflicting signals require escalation to operations.
+```
+
+### International Shipment *is a type of* clearance
+
+#### Domain Language
+
+- Adds customs documentation and duty handling before the same exit rules apply.
+
+#### Domain Sketch
+
+Extends the clearance gate with customs prerequisites that domestic shipments do not have.
+
+- collects customs commodity codes for each line before gate evaluation
+- holds duty estimate until the broker accepts
+
+#### Decisions made
+
+- International Shipment is a subtype — it adds customs paperwork but reuses the same exit gate from the base.
+
+#### References
+
+**Ref — Broker filing**
+Source: Fulfillment requirements
+Locator: Customs addendum B
+Extract: partial
+
+```source
+International shipments require a commodity code for each line and a confirmed
+duty estimate from the licensed broker before the warehouse gate may open.
+```
+
+---
+
+# Boundary Domain
+
+## payment status
+
+Owned by: Billing
+
+#### Domain Language
+
+- Determines whether shipment clearance is granted.
+
+#### References
+
+**Ref — Payment gate**
+Source: Fulfillment requirements
+Locator: Policy ch.4 (warehouse gate)
+Extract: partial
+
+```source
+Clearance is contingent on a positive payment status signal from the Billing system.
+```
+```

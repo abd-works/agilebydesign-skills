@@ -1,495 +1,478 @@
 ---
 name: key-abstractions
 description: >-
-  Identify the Key Abstractions of a domain — the named domain units the source
-  text orbits, before any class-level decision. Each Key Abstraction carries a
-  source-grounded name, a one-line intent, the Core terms it absorbs, a
-  free-form Shape hint, any Tensions, and verbatim source extracts.
-  `module-partitioning.md` is optional: when present, mirror its modules; when
-  absent, work from the corpus and add lightweight `## Module:` groupings only
-  if it helps — otherwise keep a flat list of abstractions. No kinds (Entity /
-  Value Object / Service…), no properties, no operations, no cross-context
-  relationships, no super/sub decisions. Use when the user asks to "identify key
-  abstractions", "find the concepts in this domain", "name what this source
-  talks about", or needs the next rung of refinement before a class-level model.
+  Group UDL terms into named Key Abstractions with prose definitions and
+  verbatim source extracts, elevating a flat term list into defined domain
+  building blocks.
 ---
-
 # key-abstractions
 
 ## Purpose
 
-Produce **`key-abstractions.md`** — a list of named **Key Abstractions**: the named domain units the source text orbits. Each Key Abstraction has an intent, a list of Core terms it absorbs, a free-form Shape hint, optional Tensions, and the verbatim source extracts that ground it.
+A shared vocabulary names the pieces of the domain, but it doesn't tell you which concepts carry the weight — which ones anchor the model, own specific responsibilities, and enforce the rules that keep the domain coherent. This skill identifies those **Key Abstractions** and defines each one: what role it plays, what it owns, how it relates to other abstractions, and what must always be true about it. The result is a set of stable domain building blocks that everyone — modelers, developers, domain experts — can reason about consistently.
 
-This is the rung *before* any class-level modeling. It answers one question for the corpus (or for each chunk of scope you group): **what does this source talk about as if each one were a thing?** — without committing to whether any of those things are classes, values, services, events, or anything else.
-
-**Naming.** The term comes from Grady Booch's *Object-Oriented Analysis and Design*: the "key abstractions and mechanisms" that a team elevates to first-class status in the model and language. Evans reinforces the same move under distillation — "identify the most important concepts of the domain and elevate them in the model and the language". This skill is that elevation move.
-
-### Next rung (after identification)
-
-When overlaps and taxonomies should be **settled** (merges, splits, promotions/demotions only — still no fields, methods, or kinds), use the sibling skill **`key-abstraction-distillation`**, which produces `key-abstractions-distilled.md` from this file.
-
-### Module partitioning (optional)
-
-**If `module-partitioning.md` exists:** mirror it — one `## Module: [Name]` per partition module, in partition order, with `### Key Abstraction: Name` inside each. Sub-allocate verbatim extracts from the partition (split multi-subject extracts into partials; see Sub-allocation).
-
-**If it does not:** read the corpus (or the chunks the user gave you). You may use **no** outer modules and go straight to `## Key Abstraction: Name` under the H1, *or* add a few `## Module:` headings if loose grouping makes the file easier to read — do not treat that choice as a formal gate or a reason to block work. Same split-first rule for multi-subject passages. `## [Unallocated]` stays rare: only for a slice you truly cannot place after cutting, not a junk drawer.
-
-Do **not** invent a second, parallel "mode" vocabulary. One file, one pass: partition when you have it, light modules when you don't and it helps, flat abstractions when that is enough.
+---
 
 ## When to use this skill
 
-Load this skill when **any** of the following apply:
-
-- The user asks to **identify key abstractions**, **find the concepts in this domain**, **name what this source talks about**, **extract the concepts**, or **refine the source into named units**.
-- A `module-partitioning.md` exists and you want Key Abstractions aligned to that scope cut — or it does not exist and you still need named units from raw source.
-- A downstream distillation / vocabulary / class pass needs **named, source-grounded domain units** as its input — not a raw Core-terms bag.
-- You need a **defensible list of "what the modeled things are"** that is auditable back to verbatim source, *before* any class-level commitment is made.
-
-This skill **does not** define classes, stereotypes, kinds, properties, operations, responsibilities, cross-context relationships, or super/sub hierarchies. Those belong to later skills (distillation, then the class-level skills).
-
----
-
-## Agent Instructions
-
-1. **Templates**
-
-Generate content using **every** template file in this skill's `templates/` folder. **Do not** emit only a partial shape unless the user **explicitly** asks for a single format.
-
-| Template | What to produce |
-| -------- | --------------- |
-| `templates/key-abstractions-template.md` | `key-abstractions.md` under `<active_skill_workspace>/abd-ooad/`. With a partition: `## Module: [Name]` per partition module (order preserved), `### Key Abstraction: Name` under each, verbatim extracts from the partition. Without a partition: `## Key Abstraction: Name` under the H1 and/or optional lightweight `## Module:` — your judgment. **Multi-subject extracts are split into partials** (`Extract: partial` + `Part:`); each piece lives under **one** Key Abstraction; the same `Source:` on every partial from the same upstream extract is how reviewers reassemble coverage — no separate index section. `## [Unallocated]` at file end, rare, with `Reason:` when used. |
-
-2. **Rules**
-
-- Follow the **Identification rules**, **Sub-allocation rules**, and **Extract format** sections below for what counts as a Key Abstraction, how Core terms get divided, and how source extracts get sub-allocated.
-- Source text inside extracts is **never** paraphrased, summarized, edited, or reformatted. Copy bytes from the real source — partition extracts when you have them, otherwise the corpus chunk — as-is. The only allowed editorial mark is an ellipsis `[…]` for an explicit gap inside a partial extract, and that gap must be labelled in the `Part:` header line.
-- No kinds, no stereotypes, no UML notation. No `<<Entity>>`, `<<ValueObject>>`, `?`, typed properties, method signatures, or relationship arrows. Shape hints are **free-form prose**, not labels.
-- When the file uses `## Module:`, a Key Abstraction lives in exactly one module; the same name under two modules is a scope tension — record under one and flag overlap in `Tension:`, do not duplicate. With no modules, keep abstractions distinct from each other.
-- After drafting, act as a *peer reviewer*: every Key Abstraction has Intent + Core terms + Shape hint + at least one source extract; Core-terms phrases are attached sensibly (or `[Unallocated]` with `Reason:` — rare); no source passage silently dropped; multi-subject passages are **sliced into partials**, not parked whole under the wrong abstraction.
-
-3. **Who is checking**
-
-A **modeler** about to start distilling each abstraction toward a class-level model. They read the file front-to-back and ask: *can I trust that every phrase in the Core terms ended up attached to exactly one named Key Abstraction — and that the attachment is supported by verbatim source I can see inline?*
-
----
-
-## What is — and is not — a Key Abstraction
-
-A **Key Abstraction** is a named, source-grounded domain unit that the **source in scope** (a module's text, or the whole passage you are working on) orbits. At this fidelity, a Key Abstraction is **only** a name + intent + Core-terms absorption + Shape hint + source extracts; it carries **no kind, no fields, no methods, no relationships, no super/sub decisions**.
-
-### The text-orbits test (the only test that matters)
-
-For any candidate Key Abstraction, ask:
-
-> **Does the source speak about *this* as a named unit — with its own slice of the Core terms and its own sentences — or is it just vocabulary that hangs off another unit?**
-
-- If yes — the source treats this as a named unit with its own vocabulary cluster — it is a Key Abstraction.
-- If no — if removing the candidate and folding its terms into another abstraction would not lose any meaning the source is actually carrying — fold it in.
-
-A useful sanity check: if you can write the Intent line for a candidate in one source-grounded sentence *without referring to another Key Abstraction's Core terms*, the abstraction stands. If the Intent keeps wanting to borrow another abstraction's vocabulary to make sense, it is not yet its own abstraction.
-
-### Commitment-deferred on every axis except name and intent
-
-A Key Abstraction is deliberately *uncommitted* on every modeling decision a later skill will make. This is the entire reason the rung exists:
-
-| Decision | Deferred to |
-| -------- | ----------- |
-| Is this one class, two classes, or a hierarchy? | Distillation / class-level skills |
-| Does it have identity (Entity) or is it a value (Value Object)? | Class-level skill — stereotypes come later |
-| What fields / properties does it have? | Later still |
-| What operations / methods does it have? | Later still |
-| How does it relate to Key Abstractions in **other** modules? | Cross-module relationship skill, later |
-| Is it a Service, Event, Policy, Process, Role? | Tactical DDD skill, much later |
-| Is its "Not responsible for" line… | Never asked here — responsibility is a later rung |
-
-A Key Abstraction **may** hold a taxonomy (one base + several variants, all inside one abstraction). It **may** hold multiple responsibilities that will later split. It **may** be both noun-shaped and verb-shaped at once. It **may** later turn out to be a property of another abstraction (demoted in distillation). None of those are defects *at this rung*.
-
-### Shape hint — a free-form modeler note, never a tag
-
-Every Key Abstraction carries a one-line **Shape hint**: a free-form prose note about what the source seems to be treating it as. Common shapes you will observe (but never stop at):
-
-- *Single-thing* — one named domain unit with its own vocabulary cluster.
-- *Taxonomy* — one base with several named variants in the source.
-- *Value-like* — defined entirely by content, no identity cues.
-- *Procedure-like* — verb-shaped; a named mechanic with a trigger and an outcome.
-- *State-vocabulary-like* — a list of named statuses, each with transition rules.
-- *Rule-attached* — a rule the source frames as belonging to another abstraction rather than a unit of its own.
-- *Both-shaped* — noun-shaped and verb-shaped at once; a thing-with-state *and* a named procedure.
-
-These are **notes for the modeler**, not stereotypes. They are written as free-form prose sentences, never as `<<Tag>>` labels. Distillation may confirm or contradict any of them.
-
-### How to name a Key Abstraction
-
-- Pick the noun phrase the **source itself** uses for the unit. If the source has stable names, use them. Capitalize once (`Funds Transfer`, `Settlement Window`, `Loyalty Point`) so the name is distinguishable from ordinary prose.
-- Keep it short and singular where possible (`Funds Transfer`, not `Funds Transfers and Their Reconciliation`).
-- Do not invent names to generalize. If the source has one noun phrase for it, use that. If the source uses two or three phrases for the same unit, pick one and absorb the others into the Core terms list.
-- No compound glue words (`[Funds Transfer and Settlement]`, `[Loyalty Point System]`, `[Foundations]`, `[Core]`). A compound name is almost always a signal that you are naming a *module* inside a Key Abstraction, or two abstractions glued together.
-- No source-structure names (`[Section 3.2]`, `[Ch. 1 subsection 4]`).
+- The module file's front matter shows `state: domain-language`.
+- The user asks to "identify key abstractions," "define the abstractions," "run key abstractions," or "what are the building blocks."
+- The next modeling step needs defined domain units — not just a flat term list.
 
 ---
 
 ## Core concepts
 
-### Workspace
+### Key Abstraction
 
-Output: `<active_skill_workspace>/abd-ooad/key-abstractions.md` (engagement root from the parent agent's `workspace` skill).
+A **Key Abstraction** is a named domain building block that groups related terms and carries a prose definition explaining what it owns, what it does, and what rules it enforces. It transforms a flat vocabulary into an architecture — stable units that modelers, developers, and domain experts can reason about without ambiguity.
 
-### Inputs
-`module-partitioning.md` 
-When present: module names, per-module Core terms, verbatim partition extracts — use them and mirror module headings. When absent: skip; read the corpus instead
+Each KA definition is 1–2 paragraphs of flowing prose that weaves together five aspects:
 
-**Do not** treat missing partition as a blocker. If the corpus is huge and unpartitioned, you may still produce a useful `key-abstractions.md` with light modules or a flat list; optionally suggest running 
-`module-partitioning` later if the team wants a stricter scope cut.
+- **Role** — the unique purpose this KA serves that no other does, including its behavior and interactions with other KAs.
+- **Boundary** — what it owns (single source of truth for its concepts), what's external, and how it collaborates with other KAs and the constraints of those connections.
+- **Relationships** — explicit connections between terms and other abstractions, with cardinality where obvious and natural.
+- **Responsibilities** — the specific behaviors it performs and the services it provides to the rest of the system.
+- **Rules / invariants** — non-negotiable truths that must always hold for the KA to exist and operate correctly.
 
+### Two tests for every candidate
 
-### Structure
+Not every term deserves promotion to a Key Abstraction. Apply both tests before promoting:
 
-**With `module-partitioning.md`:** Each `## Module: [Name]` matches a partition module one-for-one, in partition order. Under each module, only:
+**1. Independence test.** Does this concept exist and make sense on its own, without the parent it came from? If it is just a component or output of another concept and has no meaning outside it, it stays as a term under a KA, not its own KA. Example: "degree of success" has no meaning outside a check, so it stays under Check.
 
-- `### Key Abstraction: {{Name}}` — in source order. **All** verbatim material for that abstraction lives here, including every **partial** slice cut from a longer extract. Multi-concept upstream extracts become **several partials** under **different** headings here; reviewers reassemble by matching `Source:` + `Part:` across those headings.
+**2. Module-fit test.** Does this concept fundamentally connect to the core purpose of THIS module, or does it just touch it tangentially? If only one of its many uses relates to this module, it doesn't belong here. Example: "hero point" is independent, but only one of six spend types touches checks — it belongs in Combat, not Check Resolution.
 
-**Without a partition (or you chose not to mirror it):**
+### Three outcomes for each term
 
-- Prefer `## Key Abstraction: {{Name}}` directly under the H1 when the scope is small or a flat list is clearer.
-- Optionally add `## Module:` groupings if it helps navigation — loose and practical, not a second formal partition pass.
-- `## [Unallocated]` at end of file — **rare**; same rules as above.
+- **Keep as KA term** — passes both tests. Group under a KA.
+- **Move to boundary** — independent, but this module *depends on* it without owning it. Add to `## Boundary terms` with an `Owned by:` field.
+- **Move to another module** — independent, but this module does not depend on it at all. It was incorrectly partitioned here. Remove entirely and add to the correct module's Core terms list, carrying its prose and refs.
 
+Be ruthlessly critical on both tests. When in doubt, keep it as a term under a real KA, or move it out. Inflating the KA count or the boundary list with tangential concepts weakens the model. A typical module has 3–8 Key Abstractions.
 
-### Identification rules
+### Decisions made
 
-Repeat the identification loop **per module** when the file has modules; **once over the whole scope** when it does not.
+Every Key Abstraction carries a **Decisions made** list — the specific judgment calls the modeler had to make. Each decision is a short statement that names the choice and enough reasoning that a domain expert can challenge it. Decisions include independence-test calls ("X is a part of Y, not its own KA"), module-fit calls ("X belongs in module Z, not here"), grouping calls ("merged these terms into one KA because..."), and open questions the team still needs to resolve. Making decisions explicit is how the model stays auditable and improvable.
 
-1. **Read the Core terms** for that scope. From the partition list when you have it; otherwise derive a phrase list from the source — repeated, source-grounded noun phrases.
-2. **Group the phrases** that cluster around the same named unit in the source.
-3. **Name each cluster** with the source's noun phrase. Prefer a single short name.
-4. **Write Intent** as one source-grounded sentence: what role the abstraction plays in the source.
-5. **List Core terms absorbed** — each phrase that the abstraction's extracts speak about.
-6. **Write Shape hint** as a one-line free-form prose observation — never a tag.
-7. **Write Tension** only if there is one. Common tensions: overlap with another abstraction; possible taxonomy under the abstraction; possible absorption into another.
-8. **Sub-allocate verbatim extracts** (see next section).
+### Source extracts
 
-Key Abstractions are listed in **source order** — the order the source introduces them.
-
-### Sub-allocation rules (verbatim source)
-
-**Default: break the extract into pieces and park each piece under the right concept.** A passage that mentions **more than one** Key Abstraction is **not** one extract under whichever abstraction you like best. **Cut** it at natural boundaries (paragraph, bullet, numbered step, sentence only when you must). For **each** slice:
-
-1. Put a separate `**Extract — …**` block under the **single** Key Abstraction (the named concept) that slice **primarily** supports — that is where the verbatim body lives.
-2. Set `Extract: partial` and a precise `Part:` line (which sentences, bullets, or paragraph range).
-3. Repeat the **same** `Source:` line on every partial that came from that one upstream extract (partition pointer or corpus locator), so a reviewer can reassemble by `Source:` + `Part:`.
-
-There is **no** shared holding area for “this belongs in the module but not under one abstraction.” Multi-concept prose is always **multiple partials**, each under its concept.
-
-Every byte of the input extract must appear in **exactly one** partial body across the module or across the flat file. No overlap between partials unless the source itself repeats text; no dropped sentences between slices.
-
-**Where things land:**
-
-1. **Under a `### Key Abstraction:`** — whole extracts (`Extract: whole`) when the entire source passage is about one abstraction only, or **partial extracts** when you sliced it. Sibling partials from the same upstream extract share the same `Source:` line and different `Part:` lines — that is the whole audit trail.
-2. **`## [Unallocated]`** — only when a slice cannot be placed after a genuine attempt to cut and name abstractions; document `Reason:`. Prefer adding or refining a Key Abstraction over growing Unallocated.
-
-Common rules:
-
-- **Verbatim copy** — extract bodies are copied byte-for-byte from the input. Do not paraphrase; do not "clean up" OCR artifacts, running headers, or page numbers — those are part of the audit trail.
-- **Non-contiguous slices** of the same input extract are **separate** `**Extract — …**` blocks (each with its own `Part:`), not one block with a gap unless you use `[…]` and describe the gap in `Part:`.
-- **Back-reference traceability.** When using the partition, `Source:` points at `module-partitioning.md` (module + extract title). Otherwise `Source:` points at the corpus (file / chunk / page / section). One hop back, not none.
-
-### When to use `[Unallocated]`
-
-**Try partial splits first.** If a passage spans several concepts, slice it and place each slice under its Key Abstraction before considering `[Unallocated]`.
-
-An extract goes to `## [Unallocated]` only when **all** of these are true **after** that attempt:
-
-- The passage clearly carries domain content (it names terms, describes rules, or establishes shape).
-- A **single remaining fragment** still cannot be placed under one Key Abstraction (genuinely ambiguous, missing context, or would force a bad name).
-- Splitting further would **not** improve attribution (not merely “awkward” — use partials when it is merely awkward).
-
-Each `[Unallocated]` extract carries a `Reason:` line. Empty `[Unallocated]` is healthy — it means every passage attributed cleanly on first pass.
-
-### Tensions inside a Key Abstraction
-
-If an abstraction has a meaningful pull toward merging with another, splitting, or containing a taxonomy the source hints at, add a `Tension:` line. This is **not** a second allocation — the abstraction's extracts still live under this one name. The Tension line is a flag for the downstream distillation pass.
-
-### What you do not do here
-
-- Do **not** leave a multi-concept extract **whole** under one Key Abstraction — **break it up**; one partial per concept, each under that concept’s heading.
-- Do **not** identify classes, stereotypes, kinds, properties, operations, or responsibilities.
-- Do **not** invent a Key Abstraction that the source text does not orbit.
-- Do **not** promote a rule or a property to its own Key Abstraction unless the source treats it as a named unit with its own vocabulary. When in doubt, absorb it into the abstraction it hangs off — and record a Tension if you are unsure.
-- Do **not** decide super/sub, Entity/VO, or kind tags — those belong to later skills.
-- Do **not** draw relationships between abstractions. `Tension:` may mention overlap with another **named** unit; structured relationships come later.
+Every term carries `**Ref —**` entries that trace its prose back to source. This skill reads each referenced source file, extracts the verbatim text, and adds a fenced `source` block beneath the ref. This grounds the model in evidence — no paraphrase, no cleanup, no reformatting.
 
 ---
 
-## Extract format
-
-Every verbatim extract sits under a **single** `### Key Abstraction:` or under `## [Unallocated]`, with an extract header. Sliced upstream passages appear as **multiple** partials in **different** Key Abstraction sections, tied together by the same `Source:` line — no extra index section.
-
-### Extract header (required for every extract)
-
-```
-**Extract — {{short title}}**
-Source: {{from partition: "module-partitioning.md — Module: [{{ModuleName}}] — \"{{partition extract title}}\"" — else: "{{corpus file or chunk id}} — \"{{section path or anchor}}\""}}
-Locator: {{precise locator — chapter / page / lines / section heading / etc.}}
-Extract: {{whole | partial}}
-{{Part: {{which slice — required when Extract: partial}}}}
-{{Reason: {{required only on [Unallocated] extracts}}}}
-```
-
-- The `Extract:` line is `whole` when the full source passage is copied under exactly one Key Abstraction; `partial` otherwise.
-- When `Extract: partial`, the `Part:` line is **mandatory** and names the slice in source-grounded terms (e.g. *the second paragraph of "Reconciliation Window"*, *the three-bullet list under "Outbound Wire Limits"*).
-- `Reason:` is required on `## [Unallocated]` extracts only; omit elsewhere.
-- The `Source:` line points back to the input one hop (partition or corpus).
-
-### Extract body (required)
-
-Place the verbatim text inside a fenced `source` block so reviewers see exactly what was copied (whitespace, bullets, OCR artifacts, page numbers — all preserved):
-
-```
-```source
-{{verbatim text — copied byte for byte from the input}}
-```
-```
-
-If a partial extract has an internal gap, mark the gap with `[…]` on its own line inside the fenced block, and describe the gap in the `Part:` header line.
-
----
-
-## The shape of a good `key-abstractions.md`
-
-**Front matter is thin by contract.** Source pointer(s) + counts (modules if any, key abstractions total). **Do not** put per-module or per-abstraction descriptions, intent statements, term lists, or rationale in the front matter. Every piece of information about a particular abstraction lives under that abstraction's heading.
-
-When the file uses modules, each module section follows this shape:
-
-1. `## Module: [{{Name}}]` — from the partition when you have it, or your lightweight grouping.
-2. *(Optional one-liner)* — tight scope note.
-3. A `### Key Abstraction: {{Name}}` sub-section per abstraction, in source order. Each carries Intent, Core terms, Shape hint, optional Tension, and one or more verbatim extracts (whole or partial). Partials from the same upstream extract use the **same** `Source:` in each section where they appear.
+## The shape of a Key Abstraction
 
 ```markdown
-# Key Abstractions — {{project_name}}
+## Key Abstractions
 
-Source: {{module-partitioning.md at path, and/or corpus roots}}
-Modules: {{N or 0}}     Key Abstractions: {{K}}
+### Check
+
+A check is the core resolution mechanic — the single mechanism through which
+any uncertain outcome in the game is determined. It interacts with Trait
+(supplying the modifier), Difficulty Class (setting the threshold), and Degree
+(interpreting the margin of success or failure). The check owns the
+roll-plus-modifier-versus-DC formula and serves as the single source of truth
+for whether an action succeeds or fails; no other abstraction may duplicate
+this determination. A check must always produce a binary success/failure
+result, and when graded, must yield a degree that downstream abstractions
+(conditions, resistance) can interpret. The GM sets the DC and decides when
+circumstances allow routine checks; the player rolls and applies modifiers.
+
+#### check
+
+- A check is d20 + trait rank (plus modifiers) vs DC; equal or above is success.
+- Whenever a character attempts something where outcome is in doubt, it requires a check.
+
+**Ref — Game Play**
+Source: context/rules/HeroesHandbook-rules__chunk_009.md
+Locator: lines 809–874
+Extract: whole
+
+#### Decisions made
+- Degree is a part of Check, not its own KA — it has no meaning outside a check (independence test).
+- DC is kept under Check rather than made standalone — it is always set in the context of a check.
+- Modifier stays under Check — it is the numeric contribution of a trait to a specific check, not an independent concept.
+
+#### Difficulty Class (DC)
+
+- The DC is a number set by the GM that a check result must equal or exceed.
+- A standard difficulty scale runs from Very Easy (DC 0) through Nigh-Impossible (DC 40).
+
+**Ref — Ch1 The Basics**
+Source: context/rules/HeroesHandbook-rules__chunk_005.md
+Locator: lines 244–284
+Extract: whole
+```
+
+The prose definition under each `### KA` heading is what makes a Key Abstraction more than a term grouping. It is the analytical contribution of this skill.
 
 ---
 
-## Module: [{{ModuleName}}]
+## Output file
 
-### Key Abstraction: {{Name}}
+This skill enriches the growing module file in place at `<workspace>/abd-domain-driven-design/modules/<module-name>.md`. Read it, extend it, write it back to the same path.
 
-Intent: {{one source-grounded sentence}}.
-
-Core terms (absorbed from this module's Core terms list):
-
-- {{noun phrase from the module's Core terms}}
-- {{noun phrase}}
-- …
-
-Shape hint: {{free-form prose observation — never a tag}}.
-
-Tension: {{optional; one or two sentences}}.
-
-**Extract — {{short title}}**
-Source: module-partitioning.md — Module: [{{ModuleName}}] — "{{partition extract title}}"
-Locator: {{partition locator}}
-Extract: whole
-
-```source
-{{verbatim text copied from module-partitioning.md}}
-```
-
-### Key Abstraction: {{AnotherName}}
-
-Intent: …
-Core terms:
-- …
-Shape hint: …
-
-**Extract — … (partial from same partition extract as above)**
-Source: (same Source line as sibling partial)
-Extract: partial
-Part: {{which slice}}
-
-```source
-{{verbatim slice}}
-```
-```
-
-Key Abstractions are listed in source order within each module. Coverage for a sliced upstream extract: find all partials with the same `Source:` and check `Part:` lines reassemble the original.
-
----
-
-## Example
-
-A small worked example: one module, two Key Abstractions, **sliced** module opener (two partials under two concepts — same `Source:`). **Payments / banking — illustrative only.**
-
-```markdown
-## Module: [Funds Transfer]
-
-### Key Abstraction: Funds Transfer
-
-Intent: The atomic operation that moves a specified amount from one account to another and records a matched debit/credit pair for reconciliation.
-
-Core terms (absorbed from this module's Core terms list):
-
-- funds transfer
-- source account / destination account
-- debit / credit
-- reconciliation window
-- exceptions desk
-
-Shape hint: Both noun-shaped and verb-shaped — a thing-with-state (pending / matched / escalated) and a named procedure (debit → credit → record → reconcile).
-
-**Extract — Funds Transfer (overview)**
-Source: module-partitioning.md — Module: [Funds Transfer] — "Funds Transfer (overview)"
-Locator: Ch.3 §Funds Transfer
-Extract: whole
-
-```source
-A funds transfer moves a specified amount from a source account to a
-destination account in a single atomic operation. Every transfer:
-- Debits the source account by the transfer amount.
-- Credits the destination account by the transfer amount.
-- Records a matched debit/credit pair on the ledger for reconciliation.
-…
-A transfer that cannot be matched within the reconciliation window is
-escalated to the exceptions desk.
-```
-
-**Extract — Module opener (partial — generic transfer framing)**
-Source: module-partitioning.md — Module: [Funds Transfer] — "Funds Transfer module opener"
-Locator: Ch.3 opening sentences
-Extract: partial
-Part: Sentences that define the generic transfer mechanism and reconciliation — before the wire / KYC paragraph.
-
-```source
-…first sentences of module opener, verbatim…
-```
-
-### Key Abstraction: Wire Transfer
-
-Intent: A named Funds Transfer variant whose per-transaction, daily, and beneficiary-jurisdiction caps are gated by the customer's KYC tier.
-
-Core terms:
-
-- Wire Transfer
-- per-transaction cap
-- daily cap
-- beneficiary-jurisdiction cap
-- KYC tier
-- EDD cap
-
-Shape hint: Taxonomy under Funds Transfer — the module treats it as a specialization with its own cap vocabulary; likely distils into a sub-type or a kind-tag on Funds Transfer.
-
-Tension: Overlaps Funds Transfer — the cap rules reference the base transfer mechanism and may collapse into attributes on Funds Transfer rather than stand as a sibling abstraction. Hold until distillation.
-
-**Extract — Module opener (partial — wire and KYC)**
-Source: module-partitioning.md — Module: [Funds Transfer] — "Funds Transfer module opener"
-Locator: Ch.3 opening sentences
-Extract: partial
-Part: Sentences on outbound wires, KYC tiers, and product-specific caps.
-
-```source
-…remaining sentences of module opener, verbatim…
-```
-
-**Extract — Wire Transfer limits**
-Source: module-partitioning.md — Module: [Funds Transfer] — "Wire Transfer limits"
-Locator: Ch.5 §Wire Transfer — bullet list of limits
-Extract: whole
-
-```source
-- Per-transaction cap: A single outbound wire cannot exceed the customer's
-  per-transaction limit for the assigned KYC tier. …
-- Daily cap: The total outbound wire amount on a single business day cannot
-  exceed twice the per-transaction cap. …
-- Beneficiary-jurisdiction cap: Wires destined for jurisdictions on the
-  enhanced-due-diligence list cannot exceed the EDD cap regardless of
-  KYC tier.
-```
-```
-
----
+**Copy-output mode:** when the user says "copy output," also produce a snapshot at `<workspace>/abd-domain-driven-design/modules/<module-name>-key-abstractions.md`.
 
 ## Build
 
-**Goal:** Author `key-abstractions.md`, using a partition when you have one and the corpus when you do not.
-
-1. **Scope the file** — If `module-partitioning.md` exists, list its `## Module: [Name]` headings in order. If not, decide whether to use flat `## Key Abstraction:` only or a few optional `## Module:` groupings; do not stall on this.
-2. **Per scope chunk (module or whole file), propose Key Abstraction names** — from the Core terms list (partition) or from reading the source. Group phrases that cluster around one named unit. Commonly 2–6 abstractions per chunk, sometimes 1, rarely more than ~8.
-3. **Apply the text-orbits test** to each candidate — fold weak candidates in.
-4. **Attach every Core-terms phrase** to exactly one Key Abstraction when you have a partition list; otherwise keep terms consistent with your extracts. No phrase silently dropped.
-5. **Write Intent, Shape hint, and optional Tension** for each Key Abstraction.
-6. **Sub-allocate verbatim extracts** — whole under one abstraction when the passage is single-subject; otherwise **slice** into partials, each block under its concept, shared `Source:` + distinct `Part:` on every partial from the same upstream extract.
-7. **Re-read sliced extracts** — partials reassemble to the full source; no gaps, no duplicate sentences.
-8. **Persistence:** engagement root from the parent agent `workspace`; file lives at `abd-ooad/key-abstractions.md`.
-
-**While writing:**
-
-- Multi-abstraction passages become multiple partials, not one mis-tagged whole extract.
-- Verbatim only — bodies from the partition or corpus; headers and labels are yours.
-- Tension lines do not move an abstraction — they only annotate it.
+1. **Read the module file.** Confirm `state: domain-language`.
+2. **Read all terms and prose.** Understand what each term means and how terms relate to each other.
+3. **Group terms into Key Abstractions.** Apply both the independence test and the module-fit test to every candidate. Name each KA using the source's own vocabulary. Three outcomes per term: keep under a KA, move to boundary (depends on, doesn't own), or move to another module entirely (doesn't depend on at all — carry prose and refs to the destination).
+4. **Update the Core terms list.** Remove any terms that were moved to another module. Add a `**Moved to other modules**` list recording where each moved term went (e.g. `- hero point → Combat`).
+5. **Write the prose definition** for each KA — 1–2 paragraphs covering role, boundary, relationships, responsibilities, and rules/invariants in flowing prose.
+6. **Record decisions.** Add a `#### Decisions made` bullet list under each KA after the prose definition, listing every judgment call: independence-test results, module-fit results, grouping choices, and open questions.
+7. **Insert the KA grouping layer.** In the `# Core Domain` section, insert a `## KAName` heading above each group of `### term` headings that belong to it. The `### term` headings stay at the same level — the `##` heading is inserted above them. Each `## KA` contains: prose definition, `#### Decisions made`, then its `### term` headings. Do not rename, remove, or reorder any `### term` headings or `#### Domain Language` bullets.
+8. **Add source blocks** under every `**Ref —**` entry in `#### References` sections (core and boundary). Copy bytes as-is from the source file.
+9. **Bump state** to `key-abstractions`.
+10. **Write the file** back to the same path. Follow the template in `templates/key-abstractions-template.md`.
 
 ---
 
 ## Validate
 
-**Goal:** Read the Key Abstractions file as a modeler about to distil, not as a second partition.
+After completion, check:
 
-### Coverage
-
-- If the engagement used `module-partitioning.md`, every `## Module: [Name]` from it appears here, in partition order, one-for-one.
-- Every module (if any) has at least one `### Key Abstraction:` — zero abstractions under a non-empty module is a signal to reread.
-- Every Core-terms phrase from each partition module (when present) appears under exactly one Key Abstraction in that module, or is explained via a rare `[Unallocated]` slice with `Reason:`.
-- Every verbatim extract you took from the partition (when present) appears inline here — reassembled from whole + partials — nothing silently dropped. Without a partition, spot-check against the corpus the same way.
-
-### Identification discipline
-
-- Every Key Abstraction has all four required fields: **Intent** (one source-grounded sentence), **Core terms** (bullet list), **Shape hint** (free-form one-liner), and **at least one source extract**. Any missing field is a gap; fix or demote.
-- Intent does not borrow vocabulary from another Key Abstraction's Core terms to make sense. If it does, the abstraction is not yet its own unit — fold it in or split the borrowed term into its own abstraction.
-- Names are source-grounded — the source uses these noun phrases. No invented generic names, no compounds, no source-structure names.
-- When modules exist: no Key Abstraction should appear under two modules as duplicate work; same name in two modules is a scope tension — record it, do not duplicate bodies.
-
-### Sub-allocation discipline
-
-- No source passage appears under two Key Abstractions except as **partials** — each with `Extract: partial`, its own `Part:`, and the **same** `Source:` as its sibling partials from that upstream extract.
-- Every `Extract: partial` has a `Part:` line naming the slice in source-grounded terms — not "the relevant bit".
-- Every `## [Unallocated]` extract has a `Reason:` line.
-- Verbatim discipline: pick three random extracts and spot-check against the partition or corpus — character-level identity, not light cleanup.
-
-### No-commitment discipline (the point of this rung)
-
-- No `<<Entity>>`, `<<ValueObject>>`, `<<Service>>`, `<<Event>>` or any other stereotype tag.
-- No typed properties, no method signatures, no cardinality arrows.
-- No super/sub commitments — a Key Abstraction may hold a taxonomy in one chunk; that is correct.
-- No cross-module relationships — Tension lines only note in-module pulls.
-- If the file carries any of the above, the rung has leaked into later skills; strip them and record the decisions as Tensions for distillation.
-
-### Hand-off readiness
-
-A reviewer running the next rung (distillation) should be able to:
-
-- Read a single `### Key Abstraction:` sub-section and have **all** the source they need to start resolving that abstraction — no need to re-open the partition or the corpus for that abstraction.
-- Trust that multi-subject text was **sliced**, not hidden: partials with matching `Source:` reassemble; `[Unallocated]` is rare and explained; nothing silently duplicated.
-
-If the file is thin, vague, or leaks into class-level commitments, **improve in place** with targeted re-reads of the partition or corpus — not a wholesale rework unless the scope was wrong.
+1. **No terms lost.** Every `###` term heading from the UDL stage is present under exactly one `## KA` in `# Core Domain`, or as a `##` heading under `# Boundary Domain`.
+2. **No prose lost.** Every `#### Domain Language` bullet under each term is unchanged.
+3. **Every KA has a prose definition.** 1–2 paragraphs immediately after the `## KA` heading, before `#### Decisions made`, covering role, boundary, responsibilities, and rules/invariants.
+4. **Every KA has decisions recorded.** A `#### Decisions made` bullet list is present under the prose definition, listing independence-test, module-fit, grouping, and open-question calls.
+5. **Every ref has a source block.** Every `**Ref —**` entry in `#### References` is followed by a fenced `source` block with verbatim content.
+6. **Ref entry format.** Every `**Ref —**` block has `Source:`, `Locator:`, and `Extract: whole|partial` — no missing or malformed fields.
+7. **Partial extracts have Part line.** Every `Extract: partial` has a `Part:` line naming the slice; no `Part:` on `Extract: whole`.
+8. **Verbatim accuracy.** Spot-check three source blocks against their source files — character-level identity.
+9. **State marker.** Front matter reads `state: key-abstractions`.
+10. **No old-model jargon.** No `Intent:`, `Shape hint:`, `Tension:`, `Core terms (absorbed`.
+11. **No class-level commitments.** No stereotypes, typed properties, method signatures, or cardinality notation outside of verbatim source blocks.
+12. **Boundary terms intact.** `Owned by:` fields preserved under `# Boundary Domain`. Source blocks added.
+13. **Independence and module-fit tests passed.** Every `## KA` is an independent concept that fundamentally connects to this module's core purpose.
+14. **Moved terms landed.** Every term in the `**Moved to other modules**` list appears in the destination module's `**Core terms**` bullet list.
 
 ---
 
 <!-- execute_rules:bundle_rules:begin -->
-<!-- No rules/*.md for this skill yet. If rules are added, bundle with:
-     python skills/execute_using_rules/scripts/bundle_rules_into_skill_md.py --skill-root <this-skill-dir>
--->
+### Rule: Every ref has a source block
+
+After key-abstractions enrichment, every `**Ref —**` entry in the module file must be followed by a fenced `source` block containing verbatim text from the referenced chunk. Passing means every ref has a non-empty source block. Failing means a ref exists without a corresponding source block.
+
+#### DO
+
+- Place a fenced `source` block immediately after the `Extract:` line of each `**Ref —**` entry.
+
+  **Example (pass):**
+  ```
+  **Ref — Game Play**
+  Source: context/rules/HeroesHandbook-rules__chunk_009.md
+  Locator: lines 809–874
+  Extract: whole
+
+  ```source
+  GAME PLAY
+  …verbatim text from chunk…
+  ```
+  ```
+
+- Ensure the source block is non-empty — at least one line of content.
+
+  **Example (pass):** Source block has 20 lines of verbatim text.
+
+#### DO NOT
+
+- Leave a `**Ref —**` entry without a source block.
+
+  **Example (fail):**
+  ```
+  **Ref — Game Play**
+  Source: context/rules/HeroesHandbook-rules__chunk_009.md
+  Locator: lines 809–874
+  Extract: whole
+
+  #### next term
+  ```
+  (No source block between the ref and the next heading.)
+
+- Place an empty source block.
+
+  **Example (fail):**
+  ```
+  ```source
+  ```
+  ```
+  (Empty body — must contain verbatim text.)
+
+### Rule: Every term accounted for — no drops
+
+After key-abstractions enrichment, every term from the original `**Core terms**` bullet list must be accounted for in exactly one of three places:
+
+1. As a `#### term` heading under exactly one `### KA` section inside `## Key Abstractions`.
+2. As a `### term` heading under `## Boundary terms` (if the KA step determined the term is depended on but not owned by this module).
+3. As an entry in the `**Moved to other modules**` list (if the KA step determined the term does not belong in this module at all), AND the destination module's `**Core terms**` bullet list must contain the term.
+
+No term dropped, no term duplicated across KAs, no term vanished without a trace.
+
+#### DO
+
+- Place every term that was under `## Core terms` in the UDL stage as a `#### term` heading under exactly one `### KA` section inside `## Key Abstractions`.
+
+  **Example (pass):** `#### check`, `#### DC`, and `#### modifier` all appear under `### Check` and nowhere else.
+
+- When a term is moved to another module, record it in the `**Moved to other modules**` list with its destination.
+
+  **Example (pass):**
+  ```
+  **Moved to other modules**:
+  - hero point → Combat
+  - extra effort → Combat
+  ```
+
+  And `combat.md`'s `**Core terms**` list includes `hero point` and `extra effort`.
+
+- Keep the `**Core terms**` bullet list in the module header as a reference inventory (minus moved terms).
+
+#### DO NOT
+
+- Drop a term that existed in the UDL stage without recording where it went.
+
+  **Example (fail):** `#### routine check` existed in UDL but does not appear under any `### KA` section, is not in `## Boundary terms`, and is not in the moved list.
+
+- Place the same term under two different KAs.
+
+  **Example (fail):** `#### modifier` appears under both `### Check` and `### Degree`.
+
+- Record a moved term without actually adding it to the destination module.
+
+  **Example (fail):** `- hero point → Combat` in the moved list, but `combat.md`'s Core terms does not include `hero point`.
+
+### Rule: Ref entry format compliance
+
+Every `**Ref — …**` block must carry the required header fields: `Source:`, `Locator:`, and `Extract: whole|partial`. These fields are inherited from the UDL stage and must not be removed or malformed during key-abstractions enrichment. Passing means every ref block has a complete, well-formed header. Failing means a header field is missing or malformed.
+
+#### DO
+
+- Preserve the `Source:` line pointing to the chunk file path.
+
+  **Example (pass):**
+  ```
+  **Ref — Game Play**
+  Source: context/rules/HeroesHandbook-rules__chunk_009.md
+  Locator: lines 809–874
+  Extract: whole
+  ```
+
+- Preserve the `Locator:` line with a precise locator (lines, section heading, etc.).
+
+  **Example (pass):** `Locator: lines 1238–1344`
+
+- Set `Extract:` to exactly `whole` or `partial` (no other values).
+
+  **Example (pass):** `Extract: whole`
+
+#### DO NOT
+
+- Remove the `Source:` line from a ref header during enrichment.
+
+  **Example (fail):** A ref block with title, Locator, and Extract but no Source line.
+
+- Change `Extract:` to a value other than `whole` or `partial`.
+
+  **Example (fail):** `Extract: summary` or `Extract: verbatim`.
+
+- Malform the `**Ref —**` header (e.g. `##Ref —` or `*Ref —*`).
+
+  **Example (fail):** `##Ref — Game Play##` instead of `**Ref — Game Play**`.
+
+### Rule: No class-level commitments
+
+The module file at `state: key-abstractions` must contain no stereotypes, typed properties, method signatures, cardinality arrows, or other class-level notation. The key-abstractions step adds verbatim source extracts — it does not introduce modeling decisions. Passing means the file stays at the enrichment level. Failing means class-level decisions have leaked in.
+
+#### DO
+
+- Keep behavioral lines as plain prose bullets — observations about what the term means and how it works.
+
+  **Example (pass):**
+  ```
+  - A check is d20 + trait rank (plus modifiers) vs DC; equal or above is success.
+  ```
+
+- Keep `Owned by:` fields on boundary terms as simple module names.
+
+  **Example (pass):** `Owned by: Power`
+
+#### DO NOT
+
+- Use UML stereotype tags like `<<Entity>>`, `<<ValueObject>>`, `<<Service>>`, `<<Event>>`, `<<Aggregate>>`.
+
+  **Example (fail):** `<<Entity>> with lifecycle states` anywhere in the file.
+
+- Add typed properties like `amount: Decimal`, `status: String`, or `checkId: UUID`.
+
+  **Example (fail):** A behavioral line includes `rollResult: Int` or `dc: Integer`.
+
+- Include method signatures like `resolve(modifier, dc) -> Result`.
+
+  **Example (fail):** `Operations: roll(d20) -> int, compare(result, dc) -> bool`
+
+- Use cardinality notation like `1..*`, `0..1`, or relationship arrows.
+
+  **Example (fail):** `Check 1..* --> Condition` in any section.
+
+- Commit to super/sub hierarchies or Entity/ValueObject distinctions.
+
+  **Example (fail):** `Condition <<extends>> BasicCondition` — this belongs to later skills.
+
+### Rule: No identification-model jargon or labeled definition sections
+
+The key-abstractions step must not introduce fields from the old identification model (`Intent:`, `Shape hint:`, `Tension:`, `Core terms (absorbed`) and must not use labeled sections to define a KA (`Role:`, `Boundary:`, `Responsibilities:`, `Invariants:`). KA definitions are flowing prose paragraphs. Passing means none of these appear. Failing means any of them are present.
+
+#### DO
+
+- Write KA definitions as 1–2 paragraphs of flowing prose covering role, boundary, responsibilities, and rules/invariants naturally.
+
+  **Example (pass):** A paragraph that says "A check is the core resolution mechanic — it interacts with Trait and DC, owns the roll-versus-DC formula, and must always produce a binary result."
+
+#### DO NOT
+
+- Add `Intent:` lines to any term or KA.
+
+  **Example (fail):** `Intent: The atomic resolution mechanic that determines success or failure.`
+
+- Add `Shape hint:` lines.
+
+  **Example (fail):** `Shape hint: Procedure-like — verb-shaped with trigger and outcome.`
+
+- Add `Tension:` lines.
+
+  **Example (fail):** `Tension: May merge with opposed check in later modeling.`
+
+- Add `Core terms (absorbed` lists that group terms under another term.
+
+  **Example (fail):**
+  ```
+  Core terms (absorbed from this module's Core terms list):
+  - d20
+  - modifier
+  ```
+
+- Use labeled sections to structure the KA definition.
+
+  **Example (fail):**
+  ```
+  Role: Determines success or failure of uncertain actions.
+  Boundary: Owns the roll+modifier vs DC formula.
+  Responsibilities: Resolves checks, produces degrees.
+  Invariants: Must always yield binary success/failure.
+  ```
+  (These must be woven into prose, not listed as fields.)
+
+### Rule: Partial extracts have Part line
+
+Every extract marked `Extract: partial` must have a corresponding `Part:` line that names the slice in source-grounded terms. Conversely, `Extract: whole` must not have a `Part:` line. This ensures reviewers can reassemble sliced upstream extracts. Passing means the pairing is correct on every extract. Failing means a partial without `Part:` or a whole with an unnecessary `Part:`.
+
+#### DO
+
+- When `Extract: partial`, include `Part:` naming the specific slice (paragraph range, bullet list, sentence group).
+
+  **Example (pass):**
+  ```
+  Extract: partial
+  Part: Sentences that define the generic transfer mechanism — before the wire/KYC paragraph.
+  ```
+
+- Name the slice in source-grounded terms a reviewer can locate in the upstream extract.
+
+  **Example (pass):** `Part: The three-bullet list under "Outbound Wire Limits".`
+
+- Omit `Part:` when `Extract: whole` (the entire passage lives here).
+
+  **Example (pass):**
+  ```
+  Extract: whole
+  ```
+  (No `Part:` line.)
+
+#### DO NOT
+
+- Set `Extract: partial` without a `Part:` line.
+
+  **Example (fail):**
+  ```
+  Extract: partial
+  ```
+  (Missing `Part:` — reviewer cannot identify which slice this is.)
+
+- Add a `Part:` line to a `Extract: whole` block (contradicts the "whole" claim).
+
+  **Example (fail):**
+  ```
+  Extract: whole
+  Part: First two paragraphs only.
+  ```
+  (If it is only part of the passage, it should be `Extract: partial`.)
+
+### Rule: State marker is key-abstractions
+
+After this skill runs, the module file's YAML front matter must contain `state: key-abstractions`. Passing means the marker is present and correct. Failing means the marker is missing, still shows a previous state, or has a typo.
+
+#### DO
+
+- Set the front matter to exactly `state: key-abstractions`.
+
+  **Example (pass):**
+  ```
+  ---
+  state: key-abstractions
+  ---
+  ```
+
+#### DO NOT
+
+- Leave the state at `domain-language` (the previous step).
+
+  **Example (fail):**
+  ```
+  ---
+  state: domain-language
+  ---
+  ```
+
+- Omit the front matter entirely.
+
+  **Example (fail):** File starts with `## Module:` and has no YAML front matter.
+
+- Use a different field name or value.
+
+  **Example (fail):** `stage: key-abstractions` or `state: ka` or `state: key_abstractions`.
+
+### Rule: Verbatim source blocks trace to disk
+
+Every fenced `source` block must contain text copied byte-for-byte from a file on disk. The `Source:` line in the parent `**Ref —**` entry must reference a resolvable path — not agent memory, training data, or generated content. Passing means every source block can be traced to a real file. Failing means a source block uses generated content or points to a non-existent file.
+
+#### DO
+
+- Reference real files on disk in the `Source:` line (context chunk files).
+
+  **Example (pass):** `Source: context/rules/HeroesHandbook-rules__chunk_009.md`
+
+- Copy text character-for-character from the source — preserve whitespace, bullets, markdown formatting, OCR artifacts.
+
+  **Example (pass):** The source block body matches the file byte-for-byte.
+
+- Stop and report to the user when a referenced source file does not exist on disk.
+
+  **Example (pass):** Agent says "chunk_009.md not found — cannot add source extract."
+
+#### DO NOT
+
+- Use markers that indicate generated content: `domain-knowledge`, `from memory`, `reconstructed`, `agent knowledge`.
+
+  **Example (fail):** `Source: domain-knowledge — "Resolution Rules"` — no file to verify.
+
+- Paraphrase, clean up, or reformat the source text inside source blocks.
+
+  **Example (fail):** Agent rewrites bullet points into clean prose before placing them in the source block.
+
+- Proceed with source block creation when the referenced file does not exist on disk.
+
+  **Example (fail):** `Source: context/rules/HeroesHandbook-rules__chunk_099.md` but that file is not in the workspace.
 <!-- execute_rules:bundle_rules:end -->
-
-
-
-
-## Steps
-
-What you do in practice. **Exact order** is **Sequence (normative)**; **block shapes** are **`templates/object-sketch-template.md`**.
-
-- **Group** related rules and concepts under **`## Module: [...]`**.
-- **Write `## Domain-logic`** as short bullets that capture the mechanics you are modeling (comparisons, state change, thresholds, and the like).
-- **Name each candidate object** under **`### Concept`**: **Intent** (why it exists and how it fits with others), **behaviors** (what it does), **collaborations** (relationships to other concepts), optional **shape** and **tension**, and **core terms** anchored in the source.
-- **Account for evidence** with **`### Module sources`** and, where useful, **`#### Extract`**, so every in-scope passage is **mentioned** once (including **Unallocated** or **Rejected** when you park or exclude text on purpose).
-- **Emit one file**, **`object-sketch.md`**, following **Sequence** and the template.
