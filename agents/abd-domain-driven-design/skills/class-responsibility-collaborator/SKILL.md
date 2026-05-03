@@ -48,38 +48,6 @@ A **responsibility** is a short, capitalized phrase naming what a concept **must
 
 If a concept collaborates with many others it may be doing too much; if it collaborates with none it may be a data bag rather than a true domain object.
 
-**Example — from the check-resolution domain sketch:**
-
-```
-Condition
-    State 
-    Penality | on Character
-    collaborators: Character, Condition Source
-
-Condition Source
-    responsible: Track Origin of Applied Condition
-    collaborators: (none)
-
-Character
-    responsible: Carry Active and Inactive Conditions
-    collaborators: Condition
-
-Power Effect  [boundary — owned by Power]
-    responsible: Require Resistance Check Each Turn When Ongoing
-    collaborators: Character, Condition
-```
-
-```
-Condition  
-    Name            | String
-    Game Modifier   | Game Modifier
-    Restriction     | String
-    isSuperseded By | Condition Chain, Concept
-    isSuperseded    | True or False
-    ------
-    ApplyTo         | Character, Source
-
-       
 
 *Condition* names *Character* (it enforces modifiers on the character) and *Condition Source* (it tracks the origin of the condition) in its behavior bullets — both are collaborators. *Condition Source* references nothing outside itself — `(none)`. *Character* names *Condition* — it carries them. *Power Effect* (boundary) names *Character* (who makes the resistance check) and *Condition* (which it removes on success) — boundary concepts can be collaborators when this module's behavior depends on them.
 
@@ -104,9 +72,16 @@ An **invariant** is a short declarative constraint — phrased with "must", "can
 Each concept from the sketch becomes one named block. The name is flush left; fields are indented beneath it. Subtypes use `Child : Parent` notation. Stateless concepts mark their lifecycle field `(stateless)`.
 
 ```markdown
-## Module: [Check Resolution]
+# Module: [Check Resolution]
+...
+   
+###  Check
+using Trait | Trait
+against DC  | Difficulty Class
+modifier    | Game Modifier
+ 
 
-Check
+
     responsible: Resolve Action Outcome Against Difficulty Class
     collaborators: Difficulty Class, Modifier
     lifecycle: (stateless)
@@ -135,6 +110,28 @@ Saving Throw : Check
     collaborators: Ability Score, Proficiency
     lifecycle: (stateless)
     invariants: (none)
+
+
+
+
+    ```
+Condition
+    State 
+    Penality | on Character
+    collaborators: Character, Condition Source
+
+Condition Source
+    responsible: Track Origin of Applied Condition
+    collaborators: (none)
+
+Character
+    responsible: Carry Active and Inactive Conditions
+    collaborators: Condition
+
+Power Effect  [boundary — owned by Power]
+    responsible: Require Resistance Check Each Turn When Ongoing
+    collaborators: Character, Condition
+``
 ```
 
 ---

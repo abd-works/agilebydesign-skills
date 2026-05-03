@@ -22,6 +22,8 @@ Scope: The d20 resolution mechanic (roll + modifier vs DC), checks (routine, opp
 - measure
 - condition
 - combined condition
+- difficulty scale
+- difficulty
 - dazed
 - stunned
 - staggered
@@ -72,6 +74,7 @@ A trait is the base abstraction for every quantifiable game characteristic a cha
 - is a *quantifiable characteristic* of a *character*
 - has exactly one *rank* — the single numeric value measuring its effectiveness
 - supplies its *rank* as the primary *modifier* for any *check* made using it; without a *trait* there is no *check*
+- may link to a *difficulty scale* — a set of named *difficulties* that define *difficulty classes* for *checks* of this *trait*
 - *abilities*, *defenses*, *skills*, *powers*, and *advantages* are all *traits* — each is a subtype owned by its own module
 
 #### Decisions made
@@ -205,8 +208,8 @@ Extract: whole
 
 #### Domain Sketch
 
-- is made using the *trait* of a *character*
-- is made against a *difficulty class* set by the *GM* or through a *trait difficulty table*
+- is made *using* the *trait* of a *character*
+- is made *against* a *difficulty class* set by the *GM* or through a *difficulty scale*
 - may have a *circumstance modifier* applied to the check *result* (±2 minor, ±5 major)
 - is resolved by *rolling* a *d20*, adding the *trait rank* and the *circumstance modifier* and comparing the *roll total* to the *difficulty class*
 - produces a *check result*
@@ -311,6 +314,52 @@ Extract: whole
 Source: context/rules/HeroesHandbook-rules__chunk_010.md
 Locator: lines 875–930
 Extract: whole
+
+---
+
+### Difficulty Scale
+
+#### Ubiquitous Language
+
+- A difficulty scale is a set of named difficulties for a trait, mapping difficulty descriptors (Very Easy, Easy, Average, Tough, Challenging, Formidable, Heroic, Super-heroic, Nigh-impossible) to DC values (0, 5, 10, 15, 20, 25, 30, 35, 40) with example tasks.
+- A trait may link to its own difficulty scale; each difficulty pairs a descriptor and DC with a task description showing what that level means for checks using that trait.
+- The standard Difficulty Classes scale is the general-purpose default; trait-specific scales (e.g. Vehicles Difficulties) reuse the same descriptor tiers but supply task descriptions specific to the trait.
+
+#### Domain Sketch
+
+- is a set of named *difficulties* 
+- is linked to a *trait*
+- provides the *GM* with defined *difficulty classes* 
+— can return a selected *difficulty* that is passed to a check rather than ana britarty  DC
+- provides a *Default Difficulty Sale* (Very Easy DC 0 … Nigh-impossible DC 40) when no *trait*-specific scale exists
+- trait-specific scales (e.g. *Vehicles Difficulties*) reuse the same *descriptor* tiers but supply *task descriptions* scoped to the *trait*
+- a *check* references the linked *trait's* *difficulty scale* to determine the *difficulty class* when the DC is not set by *opposition*, *effect rank*, or GM judgment
+
+### Difficulty
+
+#### Domain Sketch
+
+- is a single named entry within a *difficulty scale*
+- carries a *difficulty descriptor* (e.g. Easy, Challenging, Heroic), a *DC value* (in steps of 5, from 0 to 40), and a *task description* for the linked *trait*
+- the *difficulty descriptor* is the domain name — "Challenging" or "Formidable" — not a row number or index
+
+#### Decisions made
+
+- *Difficulty Scale* is a concept, not a property of *Trait* or *DC* — it owns its own structure (a set of *difficulties*) and its own responsibility (providing a lookup of named difficulties for a specific trait).
+- *Difficulty* is a concept within a *Difficulty Scale* — each difficulty carries its own descriptor, DC, and task description; it is not a generic "row."
+- The general Difficulty Classes scale (DC 0–40) is the default instance of *Difficulty Scale*; trait-specific scales are specializations with task descriptions scoped to the trait.
+
+#### References
+
+**Ref — Difficulty Classes**
+Source: context/rules/HeroesHandbook-rules__chunk_010.md
+Locator: lines 875–930
+Extract: Difficulty Classes scale (Very Easy DC 0 through Nigh-impossible DC 40 with example tasks)
+
+**Ref — Vehicles Difficulties**
+Source: context/rules/HeroesHandbook-rules__chunk_064.md
+Locator: lines 4046–4106
+Extract: Vehicles Difficulties scale (trait-specific difficulty descriptors with maneuver descriptions)
 
 ---
 
@@ -547,16 +596,16 @@ Condition is the status-effect system that translates mechanical outcomes — fa
 
 - is a named *state* carried by a *character*; the *source* (effect, injury, fatigue, or hazard) does the imposing — the condition is what the character then carries and enforces
 - is created from a *condition source* and carries an *active* or *inactive* status
-- *penalizes* a suffering *character* accorsing to a *game modifier* (*impaired* applies −2 penalty, *vulnerable* halves defenses)
-- may also *resrict* a suffering *character*  (e.g. *dazed* limits actions)
+- *penalizes* a suffering *character* according to a *game modifier* (*impaired* applies −2 penalty, *vulnerable* halves defenses)
+- may also *restrict* a suffering *character* (e.g. *dazed* limits actions)
 - enforces *penalties* and *restrictions* on a *character* only when *active*; enforcement handled by *action round structure* (Combat) and by *checks* (this module)
 - when multiple *active conditions* apply, all effects stack
 - it *supersedes* a less severe *condition*
-- is *superseded_by* by a more severe *condition* that overrides it
+- is *superseded_by* a more severe *condition* that overrides it
 - is *removed* when the same *source* imposes a more severe *condition*
 - is *unchanged* when the same *source* would impose a *condition* that is *superseded_by* an *active* more severe condition
-- is *inactive* when imposed by one source while *superseded_by* am active *condition* from a *different source* 
-- is *active* when the blocking  *condition* from the other source that *supersedes* this condition is removed — modifiers then apply
+- is *inactive* when imposed by one source while *superseded_by* an active *condition* from a *different source*
+- is *active* when the blocking *condition* from the other source that *supersedes* this condition is removed — modifiers then apply
 - is removed when its *condition source* ends
 - **Invariant:** only *active* conditions apply modifiers; same-source supersession removes the lesser condition entirely; different-source supersession parks it as *inactive* until the blocking condition is gone
 
