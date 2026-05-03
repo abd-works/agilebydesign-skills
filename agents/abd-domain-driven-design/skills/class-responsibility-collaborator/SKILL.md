@@ -32,13 +32,58 @@ This skill refines existing domain artifacts in context to formally structure ea
 
 A **class** in CRC modeling is any named domain concept that carries its own identity and behavior — not a programming-language class. It is distinct domain concept: each class gets its own CRC entry so the team can reason about what it owns, who it works with, and how it changes over time. Classes come from whatever domain analysis produced the concepts being refined.
 
+Use Capital Case for each word in *Class Title*.
+
 ### Responsibility
 
-A **responsibility** is a short English statement of what a concept **must do** — the behavior it owns and no other concept should duplicate. Responsibilities are derived from the sketch's behavior lines, but sharpened: each one names the single concern this concept is the authority on.
+A **responsibility** is a short, capitalized phrase naming what a concept **must do** — the single concern it owns and no other concept should duplicate. The form is **Active Verb + Noun + optional Classifiers**, Title Case throughout (e.g. *Apply Condition to Character*, *Track Condition Source*, *Resolve Check Against Difficulty Class*). If a **domain sketch** is present, use each behavior bullet as the primary source: each bullet is already sharpened into one owned behavior — distill it into the verb-noun phrase that names the single concern this concept is the authority on.
 
 ### Collaborators
 
-**Collaborators** are the other domain concepts this one works with to fulfill its responsibilities. They are derived from the sketch's collaboration lines and subtype edges. If a concept collaborates with many others it may be doing too much; if it collaborates with none it may be a data bag rather than a true domain object.
+**Collaborators** are the other domain classes this class works with to fulfill its responsibilities. The source depends on what artifact is available:
+
+- **Domain sketch present** — derive from two signals: other domain concepts *referenced by name in the behavior bullets* (italicized terms that belong to a different class) and subtype edges (`### Child *is a type of* Parent` headings).
+
+- **No domain sketch** — derive from whatever prior artifact exists: cross-references between terms in **key abstractions**, named concepts in **domain language** definitions, or named concepts mentioned in **source material**. Any concept whose definition or behavior explicitly names another domain concept is a collaborator candidate.
+
+If a concept collaborates with many others it may be doing too much; if it collaborates with none it may be a data bag rather than a true domain object.
+
+**Example — from the check-resolution domain sketch:**
+
+```
+Condition
+    State 
+    Penality | on Character
+    collaborators: Character, Condition Source
+
+Condition Source
+    responsible: Track Origin of Applied Condition
+    collaborators: (none)
+
+Character
+    responsible: Carry Active and Inactive Conditions
+    collaborators: Condition
+
+Power Effect  [boundary — owned by Power]
+    responsible: Require Resistance Check Each Turn When Ongoing
+    collaborators: Character, Condition
+```
+
+```
+Condition  
+    Name            | String
+    Game Modifier   | Game Modifier
+    Restriction     | String
+    isSuperseded By | Condition Chain, Concept
+    isSuperseded    | True or False
+    ------
+    ApplyTo         | Character, Source
+
+       
+
+*Condition* names *Character* (it enforces modifiers on the character) and *Condition Source* (it tracks the origin of the condition) in its behavior bullets — both are collaborators. *Condition Source* references nothing outside itself — `(none)`. *Character* names *Condition* — it carries them. *Power Effect* (boundary) names *Character* (who makes the resistance check) and *Condition* (which it removes on success) — boundary concepts can be collaborators when this module's behavior depends on them.
+
+
 
 ### Subtype notation
 
@@ -62,20 +107,20 @@ Each concept from the sketch becomes one named block. The name is flush left; fi
 ## Module: [Check Resolution]
 
 Check
-    responsible: resolves whether an attempted action succeeds or fails by comparing the total roll to the difficulty class
+    responsible: Resolve Action Outcome Against Difficulty Class
     collaborators: Difficulty Class, Modifier
     lifecycle: (stateless)
     invariants: shape is always roll total versus difficulty class; subtypes only vary how total or DC is produced
 
 Difficulty Class
-    responsible: holds the numeric threshold an action must meet or exceed to succeed
+    responsible: Hold Numeric Success Threshold
     collaborators: (none)
     lifecycle: (stateless)
     invariants: (none)
 
 Condition
-    responsible: represents a named state applied to a character that imposes specific modifiers or restrictions
-    collaborators: Check Result
+    responsible: Apply Named State and Modifiers to Character
+    collaborators: Check Result, Supersession Chain
     lifecycle:
         states: inactive, active, superseded, resolved
         transitions: inactive → active (source effect imposed), active → superseded (more severe condition in chain applied from same source), active → resolved (source effect ends or successful resistance check)
@@ -86,7 +131,7 @@ Condition
         - a combined condition is removed entirely when its source effect ends; its constituents do not revert to independent active states
 
 Saving Throw : Check
-    responsible: adds an ability-score basis and proficiency eligibility on top of the base check resolution
+    responsible: Add Ability-Score Basis and Proficiency to Check
     collaborators: Ability Score, Proficiency
     lifecycle: (stateless)
     invariants: (none)
@@ -96,17 +141,17 @@ Saving Throw : Check
 
 ## Build
 
-1. **Read the module file.** Confirm `state: domain-sketch` in the front matter.
-2. **Inventory concepts.** List every `### Concept` and `### Subtype *is a type of* Base` heading from the Object Sketch section.
+1. **Read the available artifacts.** Identify what is present. The **domain sketch** is the most relevant input — its sharpened behavior bullets map directly to responsibilities. In decreasing relevance: **key abstractions** (the most important core concepts in the domain — role, particpants, behaviors, interactions), **domain language** (term definitions with references), **raw source material** (rules text, specs, notes). If none of these exist, work from whatever unformed context is available — conversation, requirements, or descriptions. No single artifact is required.
+2. **Inventory concepts.** List every named domain concept from whatever artifact is available — `### Concept` headings in te source context.
 3. **Derive CRC fields.** For each concept, produce the first two fields using `templates/crc-outline-template.md`:
-   - **`responsible:`** — one sentence stating what this concept owns, derived from its sketch behaviors.
-   - **`collaborators:`** — comma-separated list of domain concepts it works with, derived from sketch collaborations and subtype edges. Write `(none)` when there are none.
-4. **Derive lifecycle fields.** For each concept, scan its CRC responsibilities and the sketch behavior bullets for state-shaped mechanics — state changes, threshold ladders, supersession, spend/recover. If found:
+   - **`responsible:`** — Active Verb + Noun + optional Classifiers, Title Case. Derive from behavior bullets if a domain sketch is present; otherwise from KA definitions, domain language entries, or source material descriptions.
+   - **`collaborators:`** — comma-separated list of other domain concepts this one works with. See **Collaborators** in Core concepts for how to derive these from each artifact type. Write `(none)` when there are none.
+4. **Derive lifecycle fields.** For each concept, scan its responsibilities and whatever artifact is available for state-shaped mechanics — state changes, threshold ladders, supersession, spend/recover. If found:
    - **`lifecycle:`** — list named states, allowed transitions (one line each), illegal transitions, and terminal states.
    - If stateless, write `lifecycle: (stateless)`.
 5. **Derive invariant fields.** For each concept, add declarative "must / cannot / only if" constraints as `invariants:` bullets. Tie to a state or transition when obvious. Write `(none yet)` when the lifecycle is clear but invariants are not yet enumerable. Write `(none)` for stateless concepts with no always-true constraints.
-6. **Write the `## CRC` section.** Append it after the existing Object Sketch content in the module file. Group blocks by module when the file has multiple `## Module:` sections. English only — no method signatures, no typed properties.
-7. **Bump state.** Change the front matter from `state: domain-sketch` to `state: crc`.
+6. **Write the `## CRC` section.** Append it after the existing Domain Sketch content in the module file. Group blocks by module when the file has multiple `## Module:` sections. Title Case English only — no method signatures, no typed properties.
+7. **Bump state.** Update the front matter `state:` field to `crc` if the module file has one.
 
 ---
 

@@ -13,13 +13,13 @@
 ## Module: [{{ModuleName}}]
 
 {{ConceptName}}
-    responsible: {{one sentence — what this concept owns}}
+    responsible: {{Active Verb + Noun + optional Classifiers, Title Case — e.g. Apply Condition to Character}}
     collaborators: {{TypeA, TypeB, ... or (none)}}
     lifecycle: {{(stateless) — or: states: ...; transitions: ...; illegal: ...; terminal: ...}}
     invariants: {{must/cannot/only-if bullets — or (none) / (none yet)}}
 
 {{SubtypeName}} : {{BaseConcept}}
-    responsible: {{delta only — what this subtype adds or overrides}}
+    responsible: {{Delta verb-noun phrase — what this subtype adds or overrides, Title Case}}
     collaborators: {{...}}
     lifecycle: {{...}}
     invariants: {{...}}
@@ -54,26 +54,26 @@ Instructions:
 ## Module: [Check Resolution]
 
 Check
-    responsible: resolves whether an attempted action succeeds or fails by comparing the total roll to the difficulty class
+    responsible: Resolve Action Outcome Against Difficulty Class
     collaborators: Difficulty Class, Modifier
     lifecycle: (stateless)
     invariants: shape is always roll total versus difficulty class; subtypes only vary how total or DC is produced
 
 Difficulty Class
-    responsible: holds the numeric threshold an action must meet or exceed to succeed
+    responsible: Hold Numeric Success Threshold
     collaborators: (none)
     lifecycle: (stateless)
     invariants: (none)
 
 Modifier
-    responsible: represents a single numeric adjustment applied to a check roll
+    responsible: Apply Numeric Adjustment to Check Roll
     collaborators: (none)
     lifecycle: (stateless)
     invariants: (none)
 
 Condition
-    responsible: represents a named state applied to a character that imposes specific modifiers or restrictions
-    collaborators: Check Result
+    responsible: Apply Named State and Modifiers to Character
+    collaborators: Check Result, Supersession Chain
     lifecycle:
         states: inactive, active, superseded, resolved
         transitions: inactive → active (source effect imposed), active → superseded (more severe condition in chain applied), active → resolved (source effect ends or resistance check succeeds)
@@ -84,7 +84,7 @@ Condition
         - a combined condition is removed entirely when its source effect ends
 
 Saving Throw : Check
-    responsible: adds an ability-score basis and proficiency eligibility on top of the base check resolution
+    responsible: Add Ability-Score Basis and Proficiency to Check
     not_responsible: does not own the generic pass/fail resolution — that is inherited from Check
     collaborators: Ability Score, Proficiency
     lifecycle: (stateless)
