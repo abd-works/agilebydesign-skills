@@ -301,7 +301,7 @@ Run scanners as final verification: `domain_structure_scanner.py`, `layer_purity
 
 <!-- execute_rules:bundle_rules:begin -->
 <!-- Rule prose is generated from rules/*.md — edit rules, then run:
-     python skills/execute_using_rules/scripts/bundle_rules_into_skill_md.py --skill-root skills/mern-technical-architecture
+     python skills/execute-skill-using-skills-rules/scripts/bundle_rules_into_skill_md.py --skill-root skills/mern-technical-architecture
 -->
 ---
 scanner: domain_structure_scanner.py
