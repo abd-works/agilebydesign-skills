@@ -56,18 +56,18 @@ Typical order (adjust per engagement):
 1. **Retrieve** — **abd-query-practice-sources** — read that skill first; **`inputs/`** only on the target package (no **`rules/`** or **SKILL.md** here); structured queries against abd-answers (`npm run rag:query` from **`agents/abd-answers/`** in this repo, or a standalone **abd-answers** clone); ensure **`skills/<name>/`** and **`inputs/`** exist; write **`inputs/abd-answers-retrieval.md`** with **Kept chunks** (verbatim fenced bodies) per **abd-query-practice-sources** template — not summary-only tables.
 2. **Author SKILL + rules** — **abd-author-practice-skill** — read that skill first; if **`SKILL.md`** is missing, copy **`templates/SKILL_template.md`** from that skill, add **Manual:** line and bundle markers, ensure **`rules/`** and **`templates/`**; fill **`SKILL.md`** from **`inputs/abd-answers-retrieval.md`**, write **`rules/*.md`**, run **`bundle_rules_into_skill_md.py`** on the **new** skill (no scanners in this step).
 3. **Scanners** — **abd-build-practice-scanners** — read that skill first; optional **`scanners/*.py`**, **`scanner:`** on rules; **`run_scanners.py`** when scanners exist (per **execute-skill-using-skills-rules**).
-4. **Catalog** — **abd-skill-catalog** — maintain **`skills/<name>/README.md`** catalogue copy (`catalogue_summary`, **`## Overview`**, optional **`## How it fits together`** + ascii); from **agilebydesign-skills** repo root run **`python agents/abd-practice-skill-builder/skills/abd-skill-catalog/scripts/generate_abd_catalog.py`**.
+4. **Catalog** — **abd-skill-catalog** — maintain **`skills/<name>/README.md`** catalogue copy (`catalogue_summary`, **`## Overview`**, optional **`## How it fits together`** + ascii); from **agilebydesign-skills** repo root run **`python skills/abd-practice-skill-builder/abd-skill-catalog/scripts/generate_abd_catalog.py`**.
 5. **Manual** — **abd-practice-skill-manual** — **`manual/<skill-name>/`** HTML, link from **`SKILL.md`** top and in-body section refs.
 
 **Skill index (this agent):**
 
 | Skill | Path |
 | --- | --- |
-| Query sources | [skills/abd-query-practice-sources/SKILL.md](skills/abd-query-practice-sources/SKILL.md) |
-| Author SKILL + rules | [skills/abd-author-practice-skill/SKILL.md](skills/abd-author-practice-skill/SKILL.md) |
-| Scanners | [skills/abd-build-practice-scanners/SKILL.md](skills/abd-build-practice-scanners/SKILL.md) |
-| Skill catalog | [skills/abd-skill-catalog/SKILL.md](skills/abd-skill-catalog/SKILL.md) |
-| HTML manual | [skills/abd-practice-skill-manual/SKILL.md](skills/abd-practice-skill-manual/SKILL.md) |
+| Query sources | [skills/abd-practice-skill-builder/abd-query-practice-sources/SKILL.md](../../skills/abd-practice-skill-builder/abd-query-practice-sources/SKILL.md) |
+| Author SKILL + rules | [skills/abd-practice-skill-builder/abd-author-practice-skill/SKILL.md](../../skills/abd-practice-skill-builder/abd-author-practice-skill/SKILL.md) |
+| Scanners | [skills/abd-practice-skill-builder/abd-build-practice-scanners/SKILL.md](../../skills/abd-practice-skill-builder/abd-build-practice-scanners/SKILL.md) |
+| Skill catalog | [skills/abd-practice-skill-builder/abd-skill-catalog/SKILL.md](../../skills/abd-practice-skill-builder/abd-skill-catalog/SKILL.md) |
+| HTML manual | [skills/abd-practice-skill-builder/abd-practice-skill-manual/SKILL.md](../../skills/abd-practice-skill-builder/abd-practice-skill-manual/SKILL.md) |
 | execute-skill-using-skills-rules (quality + corrections) | [../../skills/execute-skill-using-skills-rules/SKILL.md](../../skills/execute-skill-using-skills-rules/SKILL.md) |
 | track_task | [../../skills/track_task/SKILL.md](../../skills/track_task/SKILL.md) |
 
@@ -77,7 +77,7 @@ Typical order (adjust per engagement):
 
 **Delivery target is always the agilebydesign-skills repo:** new and updated practice skills live in **`agilebydesign-skills/skills/<skill-name>/`**, not only under this agent folder. This agent holds orchestration SKILLS and templates; generated packages are real repo skills.
 
-- **agilebydesign-skills** repo — outputs under **`skills/<skill-name>/`**; canonical **`SKILL.md`** skeleton: **`agents/abd-practice-skill-builder/skills/abd-author-practice-skill/templates/SKILL_template.md`**.
+- **agilebydesign-skills** repo — outputs under **`skills/<skill-name>/`**; canonical **`SKILL.md`** skeleton: **`skills/abd-practice-skill-builder/abd-author-practice-skill/templates/SKILL_template.md`**.
 - **abd-answers** repo — **`npm run rag:query`** (see **abd-query-practice-sources**); **`conf/.secrets`** per abd-answers docs.
 
 ## Cursor (workspace-local)
@@ -97,10 +97,10 @@ Pipeline **skills** use the same mechanism under **`<repo>\.cursor\skills\`** vi
 ### End-to-end
 
 1. Confirm **topic** and **skill name** (kebab-case under **`agilebydesign-skills/skills/`**).
-2. Run **abd-query-practice-sources** — read that skill first; **`inputs/`** only (no target **`rules/`** or **SKILL.md**); structured query plan; ensure **`skills/<skill-name>/`** and **`inputs/`**; write **`inputs/abd-answers-retrieval.md`** using **`agents/abd-practice-skill-builder/skills/abd-query-practice-sources/templates/abd-answers-retrieval-input.md`** (**Kept chunks** with verbatim bodies). If the log is wrong, run **Corrections workflow** (log + fix **`inputs/`** through **Confirm**) before authoring rules from it.
+2. Run **abd-query-practice-sources** — read that skill first; **`inputs/`** only (no target **`rules/`** or **SKILL.md**); structured query plan; ensure **`skills/<skill-name>/`** and **`inputs/`**; write **`inputs/abd-answers-retrieval.md`** using **`skills/abd-practice-skill-builder/abd-query-practice-sources/templates/abd-answers-retrieval-input.md`** (**Kept chunks** with verbatim bodies). If the log is wrong, run **Corrections workflow** (log + fix **`inputs/`** through **Confirm**) before authoring rules from it.
 3. Run **abd-author-practice-skill** — read that skill first; if needed, copy **`abd-author-practice-skill/templates/SKILL_template.md`** to **`SKILL.md`**, add **Manual:** line and bundle markers, ensure **`rules/`** / **`templates/`**; fill **SKILL.md**, write **`rules/*.md`**, bundle into **SKILL.md** (no scanners yet).
 4. Run **abd-build-practice-scanners** (optional) — **`scanners/*.py`**, **`scanner:`** on rules; **`run_scanners.py`** when applicable.
-5. Run **abd-skill-catalog** — **`skills/<skill-name>/README.md`** for catalogue; from repo root **`python agents/abd-practice-skill-builder/skills/abd-skill-catalog/scripts/generate_abd_catalog.py`**.
+5. Run **abd-skill-catalog** — **`skills/<skill-name>/README.md`** for catalogue; from repo root **`python skills/abd-practice-skill-builder/abd-skill-catalog/scripts/generate_abd_catalog.py`**.
 6. Run **abd-practice-skill-manual** — copy **`assets/`** from **abd-practice-skill-manual** into **`manual/<skill-name>/`**; HTML sections; **SKILL.md** **Manual:** links.
 
 ### When hub content changes

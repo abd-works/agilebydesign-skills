@@ -12,18 +12,18 @@ Run **convert → (assess markdown structure) → draft spec → chunk → embed
 
 **Run post-processors** after extraction where the built-ins apply (e.g. PDF banner cleanup and optional outline alignment). They stay **generic**. If the result still lacks **real sections or subsections**, **choose** the next fix: optional deps (e.g. PyMuPDF), env flags, or a **bespoke** script under `<topic_root>/scripts/`—not silent hope.
 
-**Shape the manuscript during conversion** (`pdf_markdown_post`, MarkItDown options, bespoke `<topic_root>/scripts/`): real headings, sensible sections, GFM tables, deduped running headers. **Cut** with the chunker only along boundaries the markdown and spec already expose; it does not rebuild hierarchy from a wall of text. See [chunking-spec.md](skills/abd-chunk-markdown/references/chunking-spec.md) (*Chunker vs converter*).
+**Shape the manuscript during conversion** (`pdf_markdown_post`, MarkItDown options, bespoke `<topic_root>/scripts/`): real headings, sensible sections, GFM tables, deduped running headers. **Cut** with the chunker only along boundaries the markdown and spec already expose; it does not rebuild hierarchy from a wall of text. See [chunking-spec.md](../../skills/abd-context-to-memory/abd-chunk-markdown/references/chunking-spec.md) (*Chunker vs converter*).
 
-**Full convert story** (assess headings, report to the human when bad, bespoke loop): **[convert-to-markdown.md](skills/abd-convert-to-markdown/references/convert-to-markdown.md)**. PDF specifics: [pdf-extraction-advanced.md](skills/abd-convert-to-markdown/references/pdf-extraction-advanced.md).
+**Full convert story** (assess headings, report to the human when bad, bespoke loop): **[convert-to-markdown.md](../../skills/abd-context-to-memory/abd-convert-to-markdown/references/convert-to-markdown.md)**. PDF specifics: [pdf-extraction-advanced.md](../../skills/abd-context-to-memory/abd-convert-to-markdown/references/pdf-extraction-advanced.md).
 
-For what appears on disk, see [output.md](skills/abd-chunk-markdown/references/output.md).
+For what appears on disk, see [output.md](../../skills/abd-context-to-memory/abd-chunk-markdown/references/output.md).
 
 #### 1b. Assess structure
 
 Check whether Markdown has **headings and subheadings** where you need them. Use a quick skim of `markdown/*.md`, **`markdown/structural_scan_report.txt`** from `draft_chunking_spec.py`, or both.
 
 - **If structure is bad:** Tell the user, suggest either a **new bespoke post-processor** in `<topic_root>/scripts/` or a **different existing** option (e.g. outline pass). **Create it, run it, report results, repeat** until good enough or a blocker needs a human call.
-- **If it is still a wall of text or mixed topics** after fixes: run an **AI semantic pass** — group sentences by meaning, identify **topics** / **sub-topics**, add headings or a cleaned markdown file, **complete the pass**, then **re-review** before drafting the spec. See [convert-to-markdown.md](skills/abd-convert-to-markdown/references/convert-to-markdown.md) (*Last resort*).
+- **If it is still a wall of text or mixed topics** after fixes: run an **AI semantic pass** — group sentences by meaning, identify **topics** / **sub-topics**, add headings or a cleaned markdown file, **complete the pass**, then **re-review** before drafting the spec. See [convert-to-markdown.md](../../skills/abd-context-to-memory/abd-convert-to-markdown/references/convert-to-markdown.md) (*Last resort*).
 - **If structure is OK:** Continue to draft spec (or use existing YAML) and chunk.
 
 ##### Corpus preprocess scripts (`<topic_root>/scripts/`)
@@ -38,33 +38,33 @@ When the **Markdown** still needs **code** to become chunkable—not just YAML e
 | **Docs** | Docstring at top of script; one-line pointer in `context_chunking_spec.yaml` comments; optional `scripts/README.md` (usage, `--dry-run`). |
 | **Backups** | Optional `archive/` under the topic root for a frozen copy before rewriting `markdown/*.md`. |
 | **Chunk scan** | Use `chunk_inputs` in the spec if backups, notes, or duplicates would otherwise be picked up as separate logical docs. |
-| **Tree** | Full folder layout (including `scripts/`, `archive/`) → [output.md](skills/abd-chunk-markdown/references/output.md). |
+| **Tree** | Full folder layout (including `scripts/`, `archive/`) → [output.md](../../skills/abd-context-to-memory/abd-chunk-markdown/references/output.md). |
 
 #### 2. Structural reports + draft chunking spec
 
 **Structural scan** (heading/table metrics) is written to **`markdown/structural_scan_report.*`** — it describes how **converted** markdown looks, not retrieval chunks. Fix conversion until those reports look good.
 
-**Drafted chunking spec** goes to **`memory/context_chunking_spec.yaml`** — rules for splitting into **`memory/`** chunk files. It is skipped on re-runs if a spec already exists (unless `--force`). What each YAML section means is in [chunking-spec.md](skills/abd-chunk-markdown/references/chunking-spec.md). Layout: [output.md](skills/abd-chunk-markdown/references/output.md).
+**Drafted chunking spec** goes to **`memory/context_chunking_spec.yaml`** — rules for splitting into **`memory/`** chunk files. It is skipped on re-runs if a spec already exists (unless `--force`). What each YAML section means is in [chunking-spec.md](../../skills/abd-context-to-memory/abd-chunk-markdown/references/chunking-spec.md). Layout: [output.md](../../skills/abd-context-to-memory/abd-chunk-markdown/references/output.md).
 
 #### 3. Chunk
 
-The Markdown is cut into smaller files under `memory/` (alongside **`memory/context_chunking_spec.yaml`** when drafted). Decks tend to become one file per slide; long pages split at headings; short pieces may stay one file. If `memory/context_chunking_spec.yaml` is present (or legacy YAML at topic root), the chunker follows it and adds front matter to each piece. If not, it uses simple defaults. Naming patterns and examples are in [output.md](skills/abd-chunk-markdown/references/output.md); behavior with and without a spec is in [chunking-spec.md](skills/abd-chunk-markdown/references/chunking-spec.md).
+The Markdown is cut into smaller files under `memory/` (alongside **`memory/context_chunking_spec.yaml`** when drafted). Decks tend to become one file per slide; long pages split at headings; short pieces may stay one file. If `memory/context_chunking_spec.yaml` is present (or legacy YAML at topic root), the chunker follows it and adds front matter to each piece. If not, it uses simple defaults. Naming patterns and examples are in [output.md](../../skills/abd-context-to-memory/abd-chunk-markdown/references/output.md); behavior with and without a spec is in [chunking-spec.md](../../skills/abd-context-to-memory/abd-chunk-markdown/references/chunking-spec.md).
 
 **Agent obligation (quality loop):** After chunking, **check** how many chunks were written and whether splits match the document (e.g. one file for an entire book means boundaries or headings failed). **Do not** tell the user "fix the spec yourself" as the first response. **Automatically** adjust preprocessing (e.g. inject `##` chapter headings when PDF export only repeated `CHAPTER N:` in running headers), **edit** `context_chunking_spec.yaml` (regexes, `split_on_heading_level`, optional `chunk_inputs` to ignore backups), **re-run** chunking, and **re-verify**. Repeat until the result is sane or a true blocker needs a human decision.
 
 #### 4. Embed
 
-Each chunk is passed through an embedding model. The vectors are stored in a FAISS index on disk under **your** `<source_folder>/memory/rag/` (whatever path you passed to the pipeline)—not under the agent package. API keys, env vars, and setup are in [config.md](skills/abd-embed-vectors/references/config.md). How the index is built and used is in [rag-retrieval.md](skills/abd-search-memory/references/rag-retrieval.md).
+Each chunk is passed through an embedding model. The vectors are stored in a FAISS index on disk under **your** `<source_folder>/memory/rag/` (whatever path you passed to the pipeline)—not under the agent package. API keys, env vars, and setup are in [config.md](../../skills/abd-context-to-memory/abd-embed-vectors/references/config.md). How the index is built and used is in [rag-retrieval.md](../../skills/abd-context-to-memory/abd-search-memory/references/rag-retrieval.md).
 
 #### 5. Search
 
-You ask a question (or paste a query). The search step compares it to the stored vectors and returns the chunks that match best in meaning, not just keywords. How to run search and what to expect is in [rag-retrieval.md](skills/abd-search-memory/references/rag-retrieval.md).
+You ask a question (or paste a query). The search step compares it to the stored vectors and returns the chunks that match best in meaning, not just keywords. How to run search and what to expect is in [rag-retrieval.md](../../skills/abd-context-to-memory/abd-search-memory/references/rag-retrieval.md).
 
 ---
 
 ### Strategy: ask once
 
-If the user asks to convert, chunk, ingest, or refresh and **does not** mention strategy, **ask once**: **strategy pass** (review or edit `context_chunking_spec.yaml` before chunk + embed) vs **straight through** (single `index_memory.py` run does everything in one go). Do **not** silently assume straight-through. Rationale ties to [chunking-spec.md](skills/abd-chunk-markdown/references/chunking-spec.md).
+If the user asks to convert, chunk, ingest, or refresh and **does not** mention strategy, **ask once**: **strategy pass** (review or edit `context_chunking_spec.yaml` before chunk + embed) vs **straight through** (single `index_memory.py` run does everything in one go). Do **not** silently assume straight-through. Rationale ties to [chunking-spec.md](../../skills/abd-context-to-memory/abd-chunk-markdown/references/chunking-spec.md).
 
 #### Pause before chunking
 
@@ -108,8 +108,8 @@ Per-stage script options: see each skill's **`SKILL.md`**.
 ### When something fails
 
 - Bad path → errors from convert or chunk; unsupported types skipped where possible.
-- Embed/search → needs API key and deps per [config.md](skills/abd-embed-vectors/references/config.md).
-- Broken YAML → warning; chunking may fall back—see [chunking-spec.md](skills/abd-chunk-markdown/references/chunking-spec.md).
+- Embed/search → needs API key and deps per [config.md](../../skills/abd-context-to-memory/abd-embed-vectors/references/config.md).
+- Broken YAML → warning; chunking may fall back—see [chunking-spec.md](../../skills/abd-context-to-memory/abd-chunk-markdown/references/chunking-spec.md).
 
 ---
 
@@ -117,25 +117,25 @@ Per-stage script options: see each skill's **`SKILL.md`**.
 
 | Topic | Location |
 |---|---|
-| **Convert → assess headings → bespoke post-process loop** | [abd-convert-to-markdown/references/convert-to-markdown.md](skills/abd-convert-to-markdown/references/convert-to-markdown.md) |
-| Artifact tree, chunk names, front matter | [abd-chunk-markdown/references/output.md](skills/abd-chunk-markdown/references/output.md) |
-| `context_chunking_spec.yaml` | [abd-chunk-markdown/references/chunking-spec.md](skills/abd-chunk-markdown/references/chunking-spec.md) |
-| Keys, env | [abd-embed-vectors/references/config.md](skills/abd-embed-vectors/references/config.md) |
-| Semantic search | [abd-search-memory/references/rag-retrieval.md](skills/abd-search-memory/references/rag-retrieval.md) |
-| PDF outlines vs built-in post-process | [abd-convert-to-markdown/references/pdf-extraction-advanced.md](skills/abd-convert-to-markdown/references/pdf-extraction-advanced.md) |
+| **Convert → assess headings → bespoke post-process loop** | [abd-convert-to-markdown/references/convert-to-markdown.md](../../skills/abd-context-to-memory/abd-convert-to-markdown/references/convert-to-markdown.md) |
+| Artifact tree, chunk names, front matter | [abd-chunk-markdown/references/output.md](../../skills/abd-context-to-memory/abd-chunk-markdown/references/output.md) |
+| `context_chunking_spec.yaml` | [abd-chunk-markdown/references/chunking-spec.md](../../skills/abd-context-to-memory/abd-chunk-markdown/references/chunking-spec.md) |
+| Keys, env | [abd-embed-vectors/references/config.md](../../skills/abd-context-to-memory/abd-embed-vectors/references/config.md) |
+| Semantic search | [abd-search-memory/references/rag-retrieval.md](../../skills/abd-context-to-memory/abd-search-memory/references/rag-retrieval.md) |
+| PDF outlines vs built-in post-process | [abd-convert-to-markdown/references/pdf-extraction-advanced.md](../../skills/abd-context-to-memory/abd-convert-to-markdown/references/pdf-extraction-advanced.md) |
 
 ---
 
 ### Agent rules
 
-1. **Taxonomy** — `draft_chunking_spec.py` leaves taxonomy lists empty until a human or AI fills them from the **actual** corpus ([chunking-spec.md](skills/abd-chunk-markdown/references/chunking-spec.md)).
+1. **Taxonomy** — `draft_chunking_spec.py` leaves taxonomy lists empty until a human or AI fills them from the **actual** corpus ([chunking-spec.md](../../skills/abd-context-to-memory/abd-chunk-markdown/references/chunking-spec.md)).
 2. **Labels** — Prefer `chunk_type` in specs; `modeling_kind` in defaults is a legacy alias in code.
-3. **Scope** — Single file: `convert_to_markdown.py --file`. Folder/project: `index_memory.py --path <folder>` or `index_memory.py` after setting **`CONTENT_MEMORY_ROOT`** in **`conf/.secrets`** (or **cwd** as the topic root) ([config.md](skills/abd-embed-vectors/references/config.md)).
-4. **Corpus preprocess scripts** — See the subsection **Corpus preprocess scripts (`<topic_root>/scripts/`)** under Pipeline process earlier in this file, and the folder tree in [output.md](skills/abd-chunk-markdown/references/output.md).
+3. **Scope** — Single file: `convert_to_markdown.py --file`. Folder/project: `index_memory.py --path <folder>` or `index_memory.py` after setting **`CONTENT_MEMORY_ROOT`** in **`conf/.secrets`** (or **cwd** as the topic root) ([config.md](../../skills/abd-context-to-memory/abd-embed-vectors/references/config.md)).
+4. **Corpus preprocess scripts** — See the subsection **Corpus preprocess scripts (`<topic_root>/scripts/`)** under Pipeline process earlier in this file, and the folder tree in [output.md](../../skills/abd-context-to-memory/abd-chunk-markdown/references/output.md).
 
 ### Running scripts
 
-Prefer **`CONTENT_MEMORY_ROOT=`** in **`conf/.secrets`** for a stable default; otherwise **`--path`**, or **`cd`** to the corpus — see [config.md](skills/abd-embed-vectors/references/config.md). Typical:
+Prefer **`CONTENT_MEMORY_ROOT=`** in **`conf/.secrets`** for a stable default; otherwise **`--path`**, or **`cd`** to the corpus — see [config.md](../../skills/abd-context-to-memory/abd-embed-vectors/references/config.md). Typical:
 
 `python scripts/index_memory.py --path <source_folder>`
 

@@ -17,7 +17,7 @@ Use it to track one **ingest run** over a **topic root** (`CONTENT_MEMORY_ROOT` 
 | Layer | Location |
 | --- | --- |
 | **Orchestration** (order, gates, this checklist) | **`content/*.md`** here → merged **`AGENTS.md`** |
-| **Stage how-to** (scripts, flags, YAML semantics) | **`skills/abd-*/SKILL.md`** and **`skills/abd-*/references/`** |
+| **Stage how-to** (scripts, flags, YAML semantics) | **`skills/abd-context-to-memory/abd-*/SKILL.md`** and **`skills/abd-context-to-memory/abd-*/references/`** |
 
 ### Optional engagement artifacts
 

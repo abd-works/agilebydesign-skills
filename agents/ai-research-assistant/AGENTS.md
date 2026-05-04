@@ -89,7 +89,7 @@ based on what you understand and confirm it.
 
 ### Phase 1 — Problem validation
 
-**Skill:** [research-problem-validation](skills/research-problem-validation/SKILL.md)
+**Skill:** [research-problem-validation](../../skills/ai-research-assistant/research-problem-validation/SKILL.md)
 
 Research whether the problem (Y) is real:
 - Who is talking about it? Volume, recency, credibility.
@@ -99,7 +99,7 @@ Research whether the problem (Y) is real:
 
 ### Phase 2 — Solution landscape
 
-**Skill:** [research-solution-landscape](skills/research-solution-landscape/SKILL.md)
+**Skill:** [research-solution-landscape](../../skills/ai-research-assistant/research-solution-landscape/SKILL.md)
 
 Map how people are solving it:
 - Categories of approaches (not just individual tools).
@@ -110,7 +110,7 @@ Map how people are solving it:
 
 ### Phase 3 — Approach comparison
 
-**Skill:** [research-compare-approach](skills/research-compare-approach/SKILL.md)
+**Skill:** [research-compare-approach](../../skills/ai-research-assistant/research-compare-approach/SKILL.md)
 
 If the user has their own approach (or picks 1-2 alternatives to investigate):
 - Classify the user's approach against the landscape.
@@ -123,7 +123,7 @@ If the user has their own approach (or picks 1-2 alternatives to investigate):
 ### Phase 4 — Report and drill-down
 
 Assemble the research into a report following the template at
-[research-report.md](skills/research-compare-approach/templates/research-report.md).
+[research-report.md](../../skills/ai-research-assistant/research-compare-approach/templates/research-report.md).
 
 Present the report to the user with deep-dive options. When they pick 1-2
 to investigate further, loop back to Phase 2 at higher resolution for those

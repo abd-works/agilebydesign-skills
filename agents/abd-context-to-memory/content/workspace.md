@@ -11,4 +11,4 @@ Use **`KEY=value`** lines (no spaces around `=`). Files are loaded **before** sc
 
 **Fallback:** `cd` to the topic folder before running (scripts use `cwd` when `CONTENT_MEMORY_ROOT` is unset).
 
-**Canonical detail for skills:** each stage skill’s **`SKILL.md`** points here and to **[config.md](skills/abd-embed-vectors/references/config.md)** so authors keep workspace behavior consistent with this agent.
+**Canonical detail for skills:** each stage skill’s **`SKILL.md`** points here and to **[config.md](../../skills/abd-context-to-memory/abd-embed-vectors/references/config.md)** so authors keep workspace behavior consistent with this agent.

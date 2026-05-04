@@ -11,9 +11,9 @@
 
 | Skill | `SKILL.md` |
 | --- | --- |
-| Convert | [skills/abd-convert-to-markdown/SKILL.md](skills/abd-convert-to-markdown/SKILL.md) |
-| Chunk | [skills/abd-chunk-markdown/SKILL.md](skills/abd-chunk-markdown/SKILL.md) |
-| Embed | [skills/abd-embed-vectors/SKILL.md](skills/abd-embed-vectors/SKILL.md) |
-| Search | [skills/abd-search-memory/SKILL.md](skills/abd-search-memory/SKILL.md) |
+| Convert | [skills/abd-convert-to-markdown/SKILL.md](../../skills/abd-context-to-memory/abd-convert-to-markdown/SKILL.md) |
+| Chunk | [skills/abd-chunk-markdown/SKILL.md](../../skills/abd-context-to-memory/abd-chunk-markdown/SKILL.md) |
+| Embed | [skills/abd-embed-vectors/SKILL.md](../../skills/abd-context-to-memory/abd-embed-vectors/SKILL.md) |
+| Search | [skills/abd-search-memory/SKILL.md](../../skills/abd-context-to-memory/abd-search-memory/SKILL.md) |
 
-**Where to read more:** each skill's **`SKILL.md`** documents its scripts and flags. Stage references: **`skills/<skill-name>/references/`**.
+**Where to read more:** each skill's **`SKILL.md`** documents its scripts and flags. Stage references: **`skills/abd-context-to-memory/<skill-name>/references/`**.
