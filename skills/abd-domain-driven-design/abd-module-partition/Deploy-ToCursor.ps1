@@ -1,10 +1,10 @@
-﻿<#
+<#
 .SYNOPSIS
   Create directory junctions so Cursor discovers the module-partition skill globally
   (~/.cursor/skills/) and under agilebydesign-skills/.cursor/skills/.
 
 .DESCRIPTION
-  Canonical source: agents/abd-domain-driven-design/skills/module-partition/. Junctions point here â€” no copies.
+  Canonical source: skills/abd-domain-driven-design/module-partition/. Junctions point here — no copies.
 
 .PARAMETER UserOnly
   Only create the user-level junction.

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Scanner: every Core term from module-partition must appear as a ### heading in the DL."""
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 _ROOT = Path(__file__).resolve().parent.parent
-_REPO = _ROOT.parent.parent.parent.parent  # agents/abd-domain-driven-design/skills/<skill> -> repo root
+_REPO = _ROOT.parent.parent.parent  # skills/abd-domain-driven-design/<skill> -> repo root
 for _p in (
     _REPO / "skills" / "execute-skill-using-skills-rules" / "scripts",
     _ROOT / "scanners",

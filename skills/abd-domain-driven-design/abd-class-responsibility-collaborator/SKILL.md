@@ -24,7 +24,7 @@ This skill takes domain concepts from a completed domain sketch and produces a s
 
 ## Core concepts
 
-For OO fundamentals, read [`common/oo-concepts.md`](../../common/oo-concepts.md) in full before proceeding. The sections below cover only what is specific to the CRC format.
+For OO fundamentals, read [`common/oo-concepts.md`](../common/oo-concepts.md) in full before proceeding. The sections below cover only what is specific to the CRC format.
 
 ### The CRC block format
 

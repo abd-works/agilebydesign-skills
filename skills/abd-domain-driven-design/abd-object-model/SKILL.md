@@ -19,7 +19,7 @@ Build a typed object model for a module. When a CRC model exists it is the prima
 
 ## Core concepts
 
-Before proceeding, read [`common/oo-concepts.md`](../../common/oo-concepts.md) **carefully and in full**. The sections below cover what is specific to this level of fidelity: typed notation and relationship flavors.
+Before proceeding, read [`common/oo-concepts.md`](../common/oo-concepts.md) **carefully and in full**. The sections below cover what is specific to this level of fidelity: typed notation and relationship flavors.
 
 ### Properties
 

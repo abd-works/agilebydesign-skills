@@ -15,7 +15,7 @@ from typing import Any, Dict, List, Optional
 import sys
 
 _ROOT = Path(__file__).resolve().parent.parent
-_REPO = _ROOT.parent.parent.parent.parent  # agents/abd-domain-driven-design/skills/<skill> -> repo root
+_REPO = _ROOT.parent.parent.parent  # skills/abd-domain-driven-design/<skill> -> repo root
 for _p in (
     _REPO / "skills" / "execute-skill-using-skills-rules" / "scripts",
     _ROOT / "scanners",

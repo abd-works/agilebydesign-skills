@@ -48,7 +48,7 @@ New concepts emerge not only from Key Abstractions but also from their **terms**
 
 ### Typing: a thing is a kind of other thing
 
-For the decision guide on when to use a subtype, type property, or instance — and the delta rule — read the **`## Inheritance and subtypes`** section of [`common/oo-concepts.md`](../../common/oo-concepts.md).
+For the decision guide on when to use a subtype, type property, or instance — and the delta rule — read the **`## Inheritance and subtypes`** section of [`common/oo-concepts.md`](../common/oo-concepts.md).
 
 **Do not read or apply the `## Decomposing responsibilities` section** — that section applies at CRC stage and beyond. At domain-sketch level there are no properties, operations, or typed signatures; everything stays in plain English.
 
