@@ -1,7 +1,9 @@
 ---
-description: Run the correction process on wrong output
+description: Fix wrong output and log the correction
 ---
 
-Read **`skills/correct_output/SKILL.md`** (full loop: **Instructions**, especially **Where the corrections log lives**).
+Something I produced is wrong. Follow the correction process in **`skills/correct_output/SKILL.md`** — read the **Instructions** and **Where the corrections log lives** sections.
 
-**On disk, same turn:** append the project’s ledger (`abd-ooad/corrections-log.md` if present, else repo-root `corrections-log.md`). **No `AGENTS.md` required.** Then re-generate until correct.
+1. Fix the output first.
+2. Append a corrections-log entry on disk in the same turn (use an existing log in this repo, or create `corrections-log.md` at the repo root).
+3. Re-generate the deliverable and iterate until it is right.

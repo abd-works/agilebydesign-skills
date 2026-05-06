@@ -2,32 +2,32 @@
 name: skill-garden-catalogue
 description: >-
   Scan a folder of deployed skills and regenerate a one-pager Markdown
-  inventory and an HTML catalogue. Each entry shows the challenge the skill
+  inventory and an HTML index page. Each entry shows the challenge the skill
   addresses and the solution it provides, hyperlinked to the skill directory.
-  Re-run on command to keep the catalogue current.
+  Re-run on command to keep the inventory current.
 license: MIT
 metadata:
   author: agilebydesign
   version: "1.0.0"
 ---
 
-# Skill Garden Catalogue
+# Skill Garden Inventory
 
 Generate a browsable inventory of every skill deployed in a folder.
 
 ## When to use this skill
 
 - You want a single-page overview of all available skills.
-- You need to share a skills catalogue with a team or stakeholder.
-- Skills have been added, removed, or updated and the catalogue is stale.
-- You want an HTML catalogue page to open in a browser.
+- You need to share a skills inventory with a team or stakeholder.
+- Skills have been added, removed, or updated and the inventory is stale.
+- You want an HTML index page to open in a browser.
 
 ## What it produces
 
 | Artifact | Format | Location |
 | --- | --- | --- |
 | **Skill inventory** | Markdown, one section per category | `skill-inventory.md` in the output directory |
-| **Skill catalogue** | HTML card grid, one section per category | `catalog/index.html` in the output directory |
+| **Skill index (HTML)** | HTML card grid, one section per category | `catalog/index.html` in the output directory |
 
 Both artifacts organise skills into **categories** — one per top-level folder
 directly under the skills root (e.g. `delivery/`, `engineering/`, `utilities/`).

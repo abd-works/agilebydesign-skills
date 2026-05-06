@@ -2,36 +2,26 @@
 
 **Scanner:** Manual review
 
-The `collaborators:` line in each CRC block must list domain concepts that appear in the Object Sketch's collaboration lines or subtype edges for that concept. Concepts with no sketch collaborations must say `(none)` explicitly. Passing means every listed collaborator is traceable and no-collaborator blocks are marked. Failing means collaborators are invented, omitted without explanation, or left blank.
+The collaborator column in each CRC block must list domain concepts that appear in the domain sketch's behavior bullets or subtype edges for that concept. No collaborator may be invented. An empty collaborator column must contain a value description in parentheses (for primitives/enums) or be explicitly empty only when the responsibility truly has no collaborating concept.
 
 ## DO
 
-- List collaborators that correspond to sketch collaboration lines or subtype relationships.
+- List collaborators that correspond to concepts named in the behavior bullet.
 
-  **Example (pass):** Sketch says "Check — collaborates with → Difficulty Class, Modifier"; CRC block has `collaborators: Difficulty Class, Modifier`.
+  **Example (pass):** Sketch says "supersedes a less severe condition from the same source"; CRC has `supersede | Condition`.
 
-- Write `(none)` when a concept has no sketch collaborations.
+- Use a parenthetical value description for primitive/enum collaborators.
 
-  **Example (pass):**
-  ```
-  Modifier
-      responsible: represents a single numeric adjustment to a check
-      collaborators: (none)
-  ```
+  **Example (pass):** `active status | (active or inactive)`
 
 ## DO NOT
 
-- Invent collaborators that have no basis in the Object Sketch.
+- Invent collaborators that have no basis in the domain sketch.
 
-  **Example (fail):** CRC block lists `collaborators: Logger, EventBus` but neither concept appears anywhere in the sketch.
+  **Example (fail):** CRC block lists `Logger, EventBus` but neither concept appears anywhere in the sketch.
 
-- Leave the collaborators line blank or omit it entirely.
+- Leave the collaborator column blank without explanation.
 
-  **Example (fail):**
-  ```
-  Check
-      responsible: resolves whether an attempted action succeeds or fails
-      collaborators:
-  ```
+  **Example (fail):** `supersede |` with nothing on the right.
 
 **Source:** Engagement convention (class-responsibility-collaborator skill).

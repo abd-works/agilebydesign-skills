@@ -50,7 +50,7 @@ When you **create or rewrite** a story map from requirements, you **must** deliv
 
 **If new files are added** under `templates/` later, produce a corresponding artifact for **each** new template the same way.
 
-**Depth:** Respect the depth level the user asks for (see **Depth levels** under *Iterating the map*). At **Level 1 (breadth pass)**, produce epics with confirming stories — include sub-epics where the domain naturally groups into distinct flows, but do not apply the full rule set. At **Level 2+**, apply the full hierarchy and rules. Default to Level 2 when the user does not specify.
+**Depth:** Respect the depth level the user asks for (see **Depth levels** under *Iterating the map*). At **Story Map Outline (breadth pass)**, produce epics with confirming stories — include sub-epics where the domain naturally groups into distinct flows, but do not apply the full rule set. At **Level 2+**, apply the full hierarchy and rules. Default to Level 2 when the user does not specify.
 
 
 
@@ -227,7 +227,7 @@ When new context arrives or downstream work (AC, scenarios, tests) exposes gaps,
 
 Apply progressive depth. Each level builds on the previous — do not skip ahead.
 
-**Level 1 — Breadth pass (Idea Shaping)**
+**Story Map Outline — Breadth pass (Idea Shaping)**
 
 Go wide, not deep. Produce **epics** and **confirming stories** — enough to prove each epic is real and the scope is right.
 
@@ -247,17 +247,17 @@ What you do **not** produce at this level:
 - Consolidation notes or mechanic-by-mechanic analysis
 - Full story decomposition per the deeper rules
 
-When to stop: every major capability area has an epic, each epic has confirming stories, and a reviewer can see the product scope. If the map reads as a credible table of contents for the product, the breadth pass is done.
+When to stop: every major capability area has an epic, each epic has confirming stories, and a reviewer can see the product scope. If the map reads as a credible table of contents for the product, the outline is done.
 
-When to use: first contact with new context, early discovery, scope alignment with stakeholders, or when the user asks for "just the epics", a "breadth pass", or "idea shaping."
+When to use: first contact with new context, early discovery, scope alignment with stakeholders, or when the user asks for "just the epics", a "breadth pass", "outline", or "idea shaping."
 
 **Level 2 — Increment discovery**
 
-Deepen selected epics into sub-epics and fully decomposed stories. Apply the full rule set: distinct mechanics get distinct stories, consolidate superficial duplicates, analyze before grouping, map system behaviors, scale by domain. Leave epics the team will not build soon at Level 1 depth.
+Deepen selected epics into sub-epics and fully decomposed stories. Apply the full rule set: distinct mechanics get distinct stories, consolidate superficial duplicates, analyze before grouping, map system behaviors, scale by domain. Leave epics the team will not build soon at outline depth.
 
 **Level 3 — Story refinement**
 
-Detail stories for the next delivery increment: acceptance-criteria hooks, failure modes, consolidation notes, passive-vs-active runtime analysis. Later increments stay at Level 1 or 2.
+Detail stories for the next delivery increment: acceptance-criteria hooks, failure modes, consolidation notes, passive-vs-active runtime analysis. Later increments stay at outline or Level 2.
 
 Do not over-elaborate areas the team will not build soon. Go deep where uncertainty is highest or delivery is imminent.
 

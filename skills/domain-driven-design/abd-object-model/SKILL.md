@@ -226,127 +226,236 @@ DifficultyClass  << ValueObject >>
 ---
 
 <!-- execute_rules:bundle_rules:begin -->
-### Rule: No technical terms in member names
+### Rule: All CRC collaborators are accounted for in the typed member
 
 **Scanner:** Manual review
 
-Property names and operation names must use domain language vocabulary. Technical implementation terms are forbidden.
+Every collaborator listed for a CRC responsibility must appear somewhere in the corresponding typed property or operation. A collaborator may be accounted for as:
 
-#### DO NOT use these terms (or their variants) in member names:
+1. A **parameter** to the operation
+2. The **return type** of the operation
+3. A **type** on the property
+4. A step in the **`Interaction:`** block
 
-- `flag` → use a domain phrase like `is ongoing`
-- `boolean`, `bool` → use the domain state name
-- `list`, `array`, `collection` → introduce a named collection class instead
-- `type` as a bare noun → use a qualified domain noun
-- `status` as a bare noun → qualify it: `active status`, `activation status`
-
-#### DO
-
-- Derive the noun or verb from the domain behavior that inspired the member.
-
-  **Example (pass):** Behavior says "penalises a character according to a game modifier" → property is `+ gameModifier: Modifier`, not `+ modifier` or `+ penalty`.
-
-  **Example (pass):** Behavior says "may be ongoing for a target character" → property is `+ isOngoing: Boolean`, not `+ ongoingFlag`.
-
-### Rule: Domain vocabulary matches inspiring behavior
-
-**Scanner:** Manual review
-
-Each member name must use vocabulary recognisably tight to the domain behavior that inspired it. A reader who sees the member name should be able to connect it to the behavior without explanation.
+If a collaborator appears nowhere in 1–4, it has been silently dropped. That is a modeling gap — either the collaborator belongs in the signature, the property type, or the interaction, or a deliberate decision to exclude it must be recorded.
 
 #### DO
 
-- Use the key noun or verb from the behavior description.
+- Account for every collaborator in the parameter list, return type, or interaction.
 
-  **Example (pass):** Behavior: "carries imposed conditions" → property `+ imposedConditions: ImposedConditions`.
+  **Example (pass):** CRC responsibility: `resolve | D20, Trait, Circumstance Modifier, Difficulty Class, Check Result`
 
-#### DO NOT
-
-- Use a generic name that could apply to any class.
-
-  **Example (fail):** Behavior says "enforces penalties only when active" but operation is named `+ apply(): void` — too vague.
-
-- Rename a domain term to a technical synonym.
-
-  **Example (fail):** Behavior says "imposing source" but property is named `+ originRef: Source`.
-
-### Rule: Introduce a state-carrier class when application requires unique state
-
-**Scanner:** Manual review
-
-When applying a concept to an entity requires state that is unique per application — state that varies per entity or over time — introduce a separate state-carrier class. Do not add that state to the original concept or to the entity.
-
-#### DO
-
-- Introduce a state-carrier class when the applied state is distinct from the concept's definition.
-
-  **Example (pass):** `Condition` holds its label, modifier, and supersession relationships. `ImposedCondition` holds active/inactive status, suppressing condition, and source — state unique to each application on a specific character.
-
-#### DO NOT
-
-- Add per-application state directly to the value object.
-
-  **Example (fail):** Adding `+ activeStatus: Boolean` to `Condition` — this varies per character and per imposition, not per condition type.
-
-### Rule: Introduce a collection class when the collection has unique behavior
-
-**Scanner:** Manual review
-
-When a class owns multiple related objects and managing that collection requires unique behavior — supersession logic, ordering, constraint enforcement — introduce a named collection class that owns that behavior.
-
-#### DO
-
-- Give the collection class the management operations and invariants.
-
-  **Example (pass):** `ImposedConditions` owns `+ applyCondition(condition: Condition, source: Source): void` with supersession invariants. `Character` simply holds `+ imposedConditions: ImposedConditions`.
-
-#### DO NOT
-
-- Put collection management behavior directly on the owning entity.
-
-  **Example (fail):** `Character` owns `+ applyCondition(...)` with all supersession logic — the character becomes bloated with condition-management concerns.
-
-### Rule: A class is not responsible for being acted upon
-
-**Scanner:** Manual review
-
-The receiver of an action does not own a responsibility for receiving it. Only the actor that performs the action owns the operation. If behavior describes something happening *to* a class, find the acting class and place the operation there.
-
-#### DO
-
-- Place the operation on the class that performs the action.
-
-  **Example (pass):** A character makes a resistance check against a power effect. `Character` owns `+ makeResistanceCheck(effect: PowerEffect): CheckResult`. `PowerEffect` owns `+ resistanceTrait: Trait` (declaring how it is resisted) — not a `resist()` operation.
-
-#### DO NOT
-
-- Give a class an operation that amounts to "be resisted," "be applied to," or "receive X."
-
-  **Example (fail):** `PowerEffect` has `+ resist(check: ResistanceCheck): void` — the effect does not resist itself.
-
-### Rule: Explicit chain of responsibility — no nebulous behavior
-
-**Scanner:** Manual review
-
-When behavior implies a chain of actors or steps, every actor in that chain must be traceable to a typed property or operation with explicit relationships. Nothing may be left implied.
-
-#### DO
-
-- Trace each step in the chain to a named member with explicit parameters and collaborating types.
-
-  **Example (pass):** Behavior: "may be ongoing — requires a resistance check at end of each target's turn."
+  None of these are parameters on `+ resolve(): CheckResult`. They are all internal. Every one must appear in the `Interaction:` block:
   ```
-  OngoingEffects
-  + ongoingTargets: List<Character>
-  + triggerResistanceChecks(turn: Turn): void
-  	Invariant: check triggered at end of each ongoing target's turn
+  + resolve(): CheckResult
+      Invariant: shape is always rollTotal vs dc.value
+      Interaction:
+          roll: Integer = d20.roll()                              ← D20 accounted for
+          total: Integer = trait.rank + roll + circumstanceModifier.value   ← Trait, CircumstanceModifier
+          success: Boolean = total >= dc.value                   ← DifficultyClass (dc)
+          margin: Integer = total - dc.value
+          result: CheckResult = new CheckResult(...)             ← CheckResult
+          return result
   ```
 
+- Account for a collaborator as a property type when the responsibility becomes a property.
+
+  **Example (pass):** CRC responsibility: `difficulty ladder | Difficulty Ladder` becomes `+ difficultyLadder: DifficultyLadder` — collaborator is the property type.
+
 #### DO NOT
 
-- Write a property that implies downstream action without naming the class that owns that action.
+- Drop a collaborator silently.
 
-  **Example (fail):** `PowerEffect` has `+ isOngoing: Boolean` with no corresponding operation or class owning the end-of-turn check trigger.
+  **Example (fail):** CRC responsibility `resolve | D20, Trait, Circumstance Modifier, Difficulty Class, Check Result` becomes:
+  ```
+  + resolve(): CheckResult
+  ```
+  with no `Interaction:` block — D20, Trait, CircumstanceModifier, and DifficultyClass are all unaccounted for.
+
+- Assume a collaborator is "obvious" and omit it from the model.
+
+  **Example (fail):** Interaction traces `d20.roll()` but never references `trait.rank` or `dc.value` — Trait and DifficultyClass are dropped.
+
+#### When a collaborator is intentionally excluded
+
+Record it as a decision: state which collaborator is excluded and why (e.g., "D20 is an internal implementation detail not exposed at this fidelity level"). Without an explicit decision, any missing collaborator is a gap.
+
+**Source:** Engagement convention (object-model skill).
+
+### Rule: Dependency magnet — split unrelated business concerns
+
+**Scanner:** Manual review
+
+A class whose **properties, operations, and typed relationships** span **multiple unrelated business concerns** acts as a **dependency magnet**: unrelated domain areas converge on one type, which makes the model brittle and couples changes that should be independent. At object-model fidelity, the smell shows up as member clusters that do not share a coherent story — disparate collaborators, unrelated invariants, or operations that read like a cross-cutting checklist. Split by moving coherent groups to focused classes or collaborators (align with any CRC split; if CRC already separated concerns, the typed blocks should mirror that separation).
+
+#### DO
+
+- Group members by concern; if one class mixes unrelated areas (for example catalog + billing + notifications), extract types so each class has one coherent responsibility thread. Collaborators and `Interaction:` blocks should tell one story per class.
+
+  **Example (pass):** `Order` exposes coordination; `OrderPricing`, `Shipment`, `PaymentAuthorization` own their operations and properties instead of overloading `Order` with every detail.
+
+#### DO NOT
+
+- Leave one class as a hub for unrelated domains with no structural boundary.
+
+  **Example (fail):** A single class exposes tax calculation, email dispatch, inventory validation, and PDF generation — each with different collaborator types and no domain reason for them to share one type.
+
+**Source:** Engagement convention (object-model skill).
+
+### Rule: Explicit chain of responsibility — no nebulous operations
+
+**Scanner:** Manual review
+
+When a typed operation implies a chain of actors or steps, every actor in that chain must be traceable to a typed property or operation with explicit parameters in the object model. Nothing may be left implied or nebulous. "May" and "requires" language in a behavior must be fully modeled as typed members.
+
+#### DO
+
+- Trace each step in the implied chain to a named typed operation or property.
+
+  **Example (pass):** Behavior: "may be ongoing for a target character: requires a resistance check at the end of each of the target's turns until ended."
+
+  This implies: someone tracks which characters are ongoing targets, and someone triggers end-of-turn resistance checks. The object model must reflect both:
+  ```
+  PowerEffect : Trait
+  + << aggregation >> ongoingTargets: List<Character>
+  + resist(effect: PowerEffect, check: Check): void    ← on OngoingEffects, not PowerEffect
+      Invariant: resistance check made at end of each of the character's turns while effect is active
+  ```
+
+  **Example (pass):** Behavior: "supersedes a less severe condition from the same source — removing the lesser."
+
+  This implies: someone knows the supersession hierarchy, and someone performs the removal. Both must appear — `+ supersedes: Condition` on `Condition` and `+ applyCondition(...)` with the supersession invariant on `ImposedConditions`.
+
+#### DO NOT
+
+- Write a property and leave the downstream action it implies without an owning operation.
+
+  **Example (fail):**
+  ```
+  PowerEffect
+  + ongoingTargets: List<Character>   ← who triggers the end-of-turn resistance check? No operation owns it.
+  ```
+
+- Leave "may" or "requires" language from a behavior with an incomplete typed chain.
+
+  **Example (fail):** Behavior says "requires a resistance check at end of each turn" but no operation for triggering that check appears anywhere in the model.
+
+- Leave an implied collaborator out of the operation signature.
+
+  **Example (fail):**
+  ```
+  + resist(check: Check): void   ← missing the PowerEffect parameter; which effect is being resisted?
+  ```
+
+**Source:** Engagement convention (object-model skill). Adapted from class-responsibility-collaborator/rules/explicit-chain-of-responsibility.md.
+
+### Rule: Extract complex sub-logic to a named operation
+
+**Scanner:** Manual review
+
+An `Interaction:` block traces the key collaborations of an operation — it is not pseudocode. When a branch or calculation inside an interaction is non-trivial, extract it into a named operation with an invariant describing the rule. Call that operation from the interaction instead of expanding every line inline.
+
+#### DO NOT
+
+Spell out multi-step branching logic inside an interaction block.
+
+```
++ resolve(): CheckResult
+	Interaction:
+		...
+		if activeResult.margin != 0: return activeResult
+		// exact tie: higher rank bonus wins
+		if trait.rank.value > opposingTrait.rank.value: return activeResult
+		if opposingTrait.rank.value > trait.rank.value: return opposingResult
+		// rank tie: d20 decides (1–10 active wins, 11–20 opposing wins)
+		tieBreak: Integer = new D20().roll()
+		activeWins: Boolean = tieBreak <= 10
+		return activeWins ? activeResult : opposingResult
+```
+
+The tie-breaking procedure is a domain rule in its own right. Burying it inside the interaction makes both operations harder to read and obscures the rule.
+
+#### DO
+
+Give the sub-logic a domain name, extract it as a separate operation, and describe the rule as its invariant. Call it from the interaction.
+
+```
++ resolve(): CheckResult
+	Interaction:
+		...
+		if activeResult.margin != 0: return activeResult
+		return resolveTie(activeResult: activeResult, opposingResult: opposingResult)
+- resolveTie(activeResult: CheckResult, opposingResult: CheckResult): CheckResult
+	Invariant: higher rank bonus wins; if ranks are equal, d20 decides (1–10 active wins, 11–20 opposing wins)
+```
+
+The interaction stays high-level. The tie-breaking rule is declared precisely where it lives and is independently readable.
+
+#### Guidance
+
+- If you find yourself writing more than two or three conditional branches inside a single `Interaction:` block, that is a signal to extract.
+- The extracted operation's invariant replaces the inline comments — it is the authoritative statement of the rule.
+- The name of the extracted operation should come from domain language, not from implementation vocabulary (`resolveTie`, not `handleTieCase` or `processTieBreaker`).
+
+### Rule: Interaction variable names use domain language
+
+**Scanner:** Manual review
+
+Variable names inside an `Interaction:` block must use domain language drawn from the ubiquitous language, domain sketch, or CRC — not generic technical placeholders. If a name is ambiguous, trace up the chain: CRC responsibility → domain sketch → ubiquitous language → source references.
+
+#### DO
+
+- Name variables after the domain concept they represent.
+
+  **Example (pass):** Resolving a check:
+  ```
+  roll: Integer = d20.roll()
+  total: Integer = trait.rank + roll + circumstanceModifier.value
+  success: Boolean = total >= dc.value
+  margin: Integer = total - dc.value
+  result: CheckResult = new CheckResult(rollTotal: total, dc: dc, isSuccess: success, margin: margin)
+  ```
+
+  **Example (pass):** Converting ranks to measures and back:
+  ```
+  throwingDistanceMeasure: Number = Measurement.lookup(rank: strengthRank, type: THROWING_DISTANCE).value
+  massMeasure: Number = Measurement.lookup(rank: massRank, type: THROWING_DISTANCE).value
+  combined: Number = throwingDistanceMeasure - massMeasure
+  throwingDistanceRank: Rank = Measurement.rankFor(measure: combined, type: THROWING_DISTANCE)
+  return throwingDistanceRank
+  ```
+
+#### DO NOT
+
+- Use generic placeholders that could mean anything.
+
+  **Example (fail):**
+  ```
+  measureA: Number = Measurement.lookup(rank: this, type: type).value
+  measureB: Number = Measurement.lookup(rank: other, type: type).value
+  ```
+  `measureA` and `measureB` say nothing about what is being measured. Name them after the domain quantities: `strengthMeasure`, `massMeasure`, `travelDistanceMeasure`, etc.
+
+- Use single-letter names, index names, or temp/result/data patterns.
+
+  **Example (fail):**
+  ```
+  r: Integer = d20.roll()
+  t: Integer = trait.rank + r
+  res: CheckResult = getResult(t)
+  ```
+
+#### When names are unclear
+
+Trace up the chain:
+1. Check the CRC responsibility name and its collaborator names
+2. Check the domain sketch description of the behavior
+3. Check the ubiquitous language definition
+4. Check the source references
+
+The right name is almost always already in the source material.
+
+**Source:** Engagement convention (object-model skill).
 
 ### Rule: Invariant lines trace to CRC invariants or always-true rules
 
@@ -397,6 +506,86 @@ Every `Invariant: ...` line under a member must be sourced from the CRC `invaria
   	           the system must verify that all line items are in stock
   	           ← too long; split into atomic invariants or keep prose in CRC
   ```
+
+### Rule: Invariants without interactions
+
+**Scanner:** Manual review
+
+An operation that carries multiple invariants must also carry an `Interaction:` block. Invariants declare *what must be true* — they cannot replace the step-chain that *makes it true*. Several invariants are a reliable signal that the operation is performing real internal work; that work must be made explicit.
+
+#### DO NOT
+
+Write multiple invariants with no interaction block.
+
+```
++ resolve(): CheckResult
+	Invariant: shape is always rollTotal vs dc.value
+	Invariant: subtypes vary only how total or DC is produced
+	Invariant: natural 20 always yields a critical success
+```
+
+These constraints hint at internal calculations (rolling a die, summing a total, comparing to DC) that are nowhere shown. A reader cannot tell how the result is produced.
+
+#### DO
+
+Follow every multi-invariant operation with an `Interaction:` block that shows the steps that satisfy those invariants.
+
+```
++ resolve(): CheckResult
+	Invariant: shape is always rollTotal vs dc.value; subtypes vary only how total or DC is produced
+	Interaction:
+		roll: Integer = d20.roll()
+		total: Integer = trait.rank + roll + circumstanceModifier.value
+		success: Boolean = total >= dc.value
+		margin: Integer = total - dc.value
+		result: CheckResult = new CheckResult(rollTotal: total, dc: dc, isSuccess: success, margin: margin)
+		return result
+```
+
+Now the invariants are backed by visible steps — the reader can see exactly how `rollTotal`, `dc`, and `isSuccess` are produced.
+
+#### Guidance
+
+- A single invariant on a simple setter or guard is fine without an interaction block.
+- Two or more invariants — especially ones describing how values are derived or compared — require an `Interaction:` block.
+- When in doubt: if the invariants collectively describe a *process*, the process belongs in `Interaction:`.
+
+### Rule: Name operations after their invariant
+
+**Scanner:** Manual review
+
+When the right name for an operation is unclear, name it after the invariant. The invariant is already the correct domain statement of what the operation does — the name should match it directly rather than inventing a separate abstract label.
+
+#### DO NOT
+
+Invent a name that describes *how* the operation works or uses vague process words.
+
+```
+- applySupersession(...)
+- handleSameSourceConflict(...)
+- incomingIsBlocked(...)
+```
+
+These names either describe internal mechanics or encode the answer from the wrong perspective. A reader cannot tell what the operation asserts.
+
+#### DO
+
+Read the invariant and use its subject-verb as the name.
+
+Invariant: *"if incoming supersedes existing — remove existing, return true"*
+
+```
+- incomingSupersedes(existing: ImposedCondition, incoming: Condition): Boolean
+	Invariant: if incoming supersedes existing — remove existing, return true; if existing supersedes incoming — return false
+```
+
+The name *is* the invariant's claim. The invariant then fills in the detail.
+
+#### Guidance
+
+- This applies especially to private Boolean helpers — they answer a yes/no question about a domain rule. Name the question from the domain, not from the implementation.
+- The invariant should not repeat the name verbatim — it adds precision (edge cases, side effects, return value meaning).
+- If the invariant is still hard to summarise in a name, that is a signal the invariant itself needs to be sharpened first.
 
 ### Rule: Operations use typed signatures tracing to CRC verbs
 
@@ -463,9 +652,9 @@ Every property in a domain-model block must be justified by a "Responsible for" 
   + totalPrice: Money
   ```
 
-- A class with only stateless responsibilities may have zero properties — that is valid. Only add a property when a responsibility requires the class to hold state.
+- Include at least one property for every CRC class that owns domain behavior.
 
-  **Example (pass):** A CRC class with three verb-phrase responsibilities (all stateless operations) produces a domain-model block with zero properties and three operation signatures — correct.
+  **Example (pass):** A CRC class with three "Responsible for" lines produces a domain-model block with three or more properties, each traceable to one of those lines.
 
 #### DO NOT
 
@@ -483,105 +672,98 @@ Every property in a domain-model block must be justified by a "Responsible for" 
 
   **Example (fail):** A CRC class is "Responsible for: maintaining the remaining budget" but its domain-model block has zero properties — the stored state was never surfaced.
 
-### Rule: Relationships are marked on properties, not as separate lines
+### Rule: A class is not responsible for being acted upon
 
-Composition and aggregation are marked with a stereotype directly on the property that holds the reference. Association is the default and needs no annotation. Explicit relationship lines (`*composes*`, `*aggregates*`, `*associates*`) are forbidden. Explicit cardinality notation (`[1..1 → 1..*]`) is forbidden — cardinality is implied by the property type (single type = 1..1; `List<T>` = one-to-many) or made explicit via an invariant.
+**Scanner:** Manual review
+
+The receiver of an action does not need an operation to receive it. Only the class that performs the action owns the operation. If a typed operation describes something happening *to* a class, find the acting class and place the operation there instead.
 
 #### DO
 
-- Mark composition and aggregation with a stereotype on the property.
+- Place the operation on the class that performs the action.
+
+  **Example (pass):** A character makes a resistance check against a power effect. `OngoingEffects` owns `+ resist(effect: PowerEffect, check: Check): void`. `PowerEffect` owns `+ resistanceTrait: Trait` (declaring how it is resisted) — not a `resist` operation.
+
+  **Example (pass):** A condition is applied to a character. `ImposedConditions` owns `+ applyCondition(source: ConditionSource, condition: Condition): void`. `Character` does not own `+ receiveCondition(...)`.
+
+#### DO NOT
+
+- Give a class an operation that amounts to "be resisted," "be applied to," or "receive X."
+
+  **Example (fail):**
+  ```
+  PowerEffect
+  + resist(check: Check): void   ← the effect does not resist itself; the character makes the check
+  ```
+
+  **Example (fail):**
+  ```
+  Character
+  + receiveCondition(condition: Condition): void   ← Character does not receive; ImposedConditions applies
+  ```
+
+  **Example (fail):**
+  ```
+  Condition
+  + imposeOn(character: Character): void   ← Condition doesn't impose itself; PowerEffect does through ImposedConditions
+  ```
+
+#### Clarification
+
+A class *may* have a property that describes what is used to act upon it. This is not the same as an operation to be acted upon.
 
   **Example (pass):**
   ```
-  + << composition >> stages: List<DifficultyStage>   ← child has no identity without parent
-  + << aggregation >> helpers: List<Check>            ← parent groups children
-  + linkedTrait: Trait                                ← plain association; no stereotype
+  PowerEffect
+  + resistanceTrait: Trait   ← declares which trait a character uses to resist; the effect is not doing the resisting
   ```
 
-- Use an invariant when a cardinality constraint needs to be stated explicitly.
+**Source:** Engagement convention (object-model skill). Adapted from class-responsibility-collaborator/rules/receiver-not-responsible-for-receiving.md.
+
+### Rule: Relationships have two named ends and cardinality
+
+Every relationship in a domain-model block must name both ends and state cardinality (`1..1`, `0..1`, `1..*`, `0..*`). Direction must match the CRC collaborator that sourced it. Passing means both ends, cardinality, and direction are present and traceable. Failing means an end is unnamed, cardinality is missing, or the direction contradicts the CRC collaborator line.
+
+#### DO
+
+- State both class names, the relationship kind (composition or association), and cardinality on both ends.
 
   **Example (pass):**
   ```
-  + << composition >> stages: List<DifficultyStage>
-  	Invariant: at least one stage required
+  Order *composes* OrderLine  [1..1 → 1..*]
+  ```
+
+- Derive direction from the CRC collaborator entry — the class that lists the collaborator is the navigating end.
+
+  **Example (pass):**
+  ```
+  CRC — Order collaborates with OrderLine
+  → Order navigates to OrderLine, not the reverse
   ```
 
 #### DO NOT
 
-- Write a separate relationship line.
+- Write a relationship with only one end named.
 
   **Example (fail):**
   ```
-  Order *composes* OrderLine  [1..1 → 1..*]    ← separate line; forbidden
+  *composes* OrderLine  [1..*]    ← owning end missing
   ```
 
-- Add a stereotype to a plain association.
+- Omit cardinality entirely.
 
   **Example (fail):**
   ```
-  + << association >> customer: Customer    ← association is the default; no annotation needed
+  Order *associates* Customer     ← no cardinality on either end
   ```
 
-- Write explicit cardinality notation outside an invariant.
+- Reverse the direction from what the CRC collaborator line states.
 
   **Example (fail):**
   ```
-  + stages: List<DifficultyStage>  [1..*]    ← cardinality belongs in an Invariant: line, not inline
+  CRC — Order collaborates with Customer
+  Relationship written as: Customer *associates* Order  ← direction flipped
   ```
-
-### Rule: Subtype blocks contain only delta members
-
-A subtype class block must contain only what the subtype adds or overrides. Passing means no inherited properties, operations, or relationships are repeated in the subtype block. Failing means the subtype duplicates members already present on the parent.
-
-#### DO
-
-- Write only delta members — properties, operations, and relationships that are new or overridden.
-
-  **Example (pass):**
-  ```
-  CreditCardPayment : Payment
-  + authorizationCode: String
-  + authorize(gateway: PaymentGateway): void
-  ```
-
-- Leave the subtype block empty of any member already on the base class.
-
-#### DO NOT
-
-- Repeat a parent property or operation in the subtype.
-
-  **Example (fail):**
-  ```
-  CreditCardPayment : Payment
-  + amount: Money              ← already on Payment
-  + authorizationCode: String
-  ```
-
-### Rule: Every class has an object initialisation decision recorded
-
-Every class block must show how its objects are initialised — at minimum one constructor signature, factory method signature, or an explicit note that initialisation is internal. Passing means the reader can tell how a valid instance is created. Failing means a class has properties and operations but no indication of how it is brought into existence.
-
-#### DO
-
-- Write at least one constructor or factory signature for every class.
-
-  **Example (pass):**
-  ```
-  + Order(customer: Customer, items: List<OrderLine>)
-  ```
-
-- When initialisation is internal (composition owner creates it), note it explicitly.
-
-  **Example (pass):**
-  ```
-  // initialised internally by Airplane
-  ```
-
-#### DO NOT
-
-- Leave a class with properties but no initialisation entry.
-
-  **Example (fail):** Class `Order` has `+ totalPrice: Money` and `+ status: OrderStatus` but no constructor or factory — the reader cannot tell how a valid `Order` is created.
 
 ### Rule: State marker is domain-model
 
@@ -612,4 +794,49 @@ After this skill runs, the module file's YAML front matter must contain `state: 
 - Omit the front matter entirely.
 
   **Example (fail):** File starts with `## Module:` and has no YAML front matter.
+
+### Rule: Subtypes use ClassName : ParentClass on the heading line
+
+**Scanner:** Manual review
+
+When a class is a specialization of another, its object-model heading must use `#### **ClassName : ParentClass**` notation. The block states only delta members — typed properties, operations, and invariants that the subtype adds or overrides beyond the parent. Passing means subtypes are correctly notated and carry only deltas. Failing means subtypes use the wrong format or duplicate inherited members.
+
+#### DO
+
+- Use `#### **ClassName : ParentClass**` on the heading line for subtypes.
+
+  **Example (pass):**
+  ```
+  #### **OpposedCheck : Check**
+
+  + resolve(opposing: Check): CheckResult
+      Invariant: both sides resolve as standard Checks; higher result wins
+  ```
+
+- State only delta members — typed properties and operations the subtype adds or overrides beyond the parent.
+
+  **Example (pass):** Parent `Check` owns `+ resolve(): CheckResult`; subtype `OpposedCheck : Check` overrides it with the opposing-check signature and adds its own invariants. No parent members are repeated.
+
+#### DO NOT
+
+- Use the domain sketch English heading form in object-model headings.
+
+  **Example (fail):** `#### **Opposed Check** *(is a type of Check)*` — use `: ParentClass` in the heading, not the sketch's English form.
+
+- Use code-style syntax from the implementation language.
+
+  **Example (fail):** `class OpposedCheck extends Check` or `OpposedCheck(Check)` — the domain model uses its own notation, not a language keyword.
+
+- Repeat inherited members in the subtype block.
+
+  **Example (fail):**
+  ```
+  #### **OpposedCheck : Check**
+
+  + trait: Trait                      ← inherited from Check; do not repeat
+  + dc: DifficultyClass               ← inherited from Check; do not repeat
+  + resolve(opposing: Check): CheckResult
+  ```
+
+**Source:** Engagement convention (object-model skill). Adapted from class-responsibility-collaborator/rules/subtype-uses-child-parent.md.
 <!-- execute_rules:bundle_rules:end -->

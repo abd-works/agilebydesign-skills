@@ -723,7 +723,7 @@ def generate_detail_page(e: SkillEntry, skills_dir: Path) -> str | None:
 </head>
 <body>
 <div class="page-wrap">
-  <a class="back-link" href="/abd-skills-catalog/">← Skill Catalog</a>
+  <a class="back-link" href="/abd-skills-catalog/">← AI Garden</a>
   <h1>{html_mod.escape(e.name)}</h1>
   <span class="skill-category">{html_mod.escape(category_label)}</span>
   {content_html}
@@ -769,7 +769,7 @@ def generate_agent_detail_page(a: AgentEntry, agents_dir: Path) -> str | None:
 </head>
 <body>
 <div class="page-wrap">
-  <a class="back-link" href="/abd-skills-catalog/">← Skill Catalog</a>
+  <a class="back-link" href="/abd-skills-catalog/">← AI Garden</a>
   <h1>{html_mod.escape(a.name)}</h1>
   <span class="skill-category">Agent</span>
   {content_html}

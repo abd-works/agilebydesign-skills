@@ -1,27 +1,27 @@
-# Rule: Every concept from object sketch has a CRC block
+# Rule: Every concept from domain sketch has a CRC block
 
 **Scanner:** Manual review
 
-After CRC enrichment, every concept and subtype heading from the Object Sketch section must have a corresponding CRC block in the CRC section. No concept may be silently dropped. Passing means every concept is accounted for. Failing means a concept exists in the Object Sketch but has no CRC block.
+After CRC enrichment, every concept and subtype represented in **`### Domain Sketch`** must have a corresponding CRC block in **`### Class Responsibility Collaborator`**. No concept may be silently dropped. Passing means every concept is accounted for. Failing means a concept exists in the domain sketch but has no CRC block.
 
 ## DO
 
-- Create a CRC block for each `### Concept` heading in the Object Sketch.
+- Create a CRC block for each `#### **ConceptName**` heading under `### Domain Sketch`.
 
-  **Example (pass):** Object Sketch has `### Check`, `### Difficulty Class`, `### Trait` — CRC section has blocks named `Check`, `Difficulty Class`, `Trait`.
+  **Example (pass):** Domain sketch lists `#### **Check**`, `#### **Difficulty Class**`, `#### **Trait`** — CRC section has blocks for `Check`, `Difficulty Class`, and `Trait`.
 
-- Create a CRC block for each `### Subtype *is a type of* Base` heading in the Object Sketch.
+- Create a CRC block for each subtype the sketch records (however phrased — e.g. bullets or wording that establishes *is a type of* / specialization), using `#### **ChildConcept : ParentConcept**` in the CRC section.
 
-  **Example (pass):** Object Sketch has `### Saving Throw *is a type of* Check` — CRC section has a block `Saving Throw : Check`.
+  **Example (pass):** Domain sketch establishes that Saving Throw is a kind of Check — CRC has `#### **Saving Throw : Check**` with delta responsibilities only.
 
 ## DO NOT
 
 - Drop a concept without creating a CRC block for it.
 
-  **Example (fail):** `### Trait` exists in the Object Sketch but no CRC block mentions Trait — it simply vanished.
+  **Example (fail):** `#### **Trait**` appears under `### Domain Sketch` but no CRC block addresses `Trait`.
 
-- Introduce a CRC block that has no corresponding concept in the Object Sketch.
+- Introduce a CRC block that has no corresponding concept in the domain sketch.
 
-  **Example (fail):** A CRC block for "Resolution Engine" appears but no concept heading in the sketch supports it.
+  **Example (fail):** A CRC block for `Resolution Engine` appears but no concept in the domain sketch supports it.
 
 **Source:** Engagement convention (class-responsibility-collaborator skill).
