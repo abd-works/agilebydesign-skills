@@ -1,5 +1,6 @@
 ---
 name: class-responsibility-collaborator
+catalog_garden_order: 5
 description: >-
   For every domain concept: assign responsibilities, name collaborators,
   and declare invariants — all in one structured pass before object-model.

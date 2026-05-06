@@ -1,5 +1,6 @@
 ---
 name: object-model
+catalog_garden_order: 6
 description: >-
   Build a typed object model for a module. A CRC model makes it faster but is
   not required. Use when a module needs a typed domain surface before writing

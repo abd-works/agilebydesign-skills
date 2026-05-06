@@ -1,5 +1,6 @@
 ﻿---
 name: module-partition
+catalog_garden_order: 1
 description: >-
   After domain scan, partition the source corpus into modules by allocating
   source file references to per-module index files. No classes, no anchors â€”

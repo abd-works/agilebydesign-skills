@@ -1,5 +1,6 @@
 ﻿---
 name: domain-language
+catalog_garden_order: 2
 description: >-
   Build a shared, rigorous vocabulary for each module so every conversation,
   document, and artifact uses the same domain language without translation.

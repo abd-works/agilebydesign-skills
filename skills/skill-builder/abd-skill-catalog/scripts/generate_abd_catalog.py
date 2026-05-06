@@ -1962,6 +1962,21 @@ def _html_agile_garden_agent_row(a: AgentEntry) -> str:
     )
 
 
+def _html_agile_garden_agent_col(a: AgentEntry) -> str:
+    """Each agent gets its own column so agents sit side by side in the prelude grid."""
+    href = _agile_garden_agent_href(a.dir_name)
+    return (
+        f'    <div class="catalog-garden-col">\n'
+        f'      <div class="catalog-garden-col-header catalog-garden-col-header--foundational">\n'
+        f"        {_CATALOG_AGENTS_COLUMN_ICON_SVG}\n"
+        f'        <span><a href="{href}" style="color:inherit;text-decoration:none;">{_h(a.name)}</a></span>\n'
+        f"      </div>\n"
+        f'      <div class="catalog-garden-row">'
+        f'<span class="catalog-garden-desc">{_h(a.summary)}</span></div>\n'
+        f"    </div>\n"
+    )
+
+
 def _html_agile_garden_stub_row(label: str, desc: str) -> str:
     return (
         f'      <div class="catalog-garden-row"><span class="catalog-garden-name catalog-garden-name--dim">'
@@ -2090,20 +2105,16 @@ def build_agile_garden_prelude_html(
     )
     agents_section = ""
     if agents_show:
-        rows_a = "".join(_html_agile_garden_agent_row(a) for a in agents_show)
+        n_agent_cols = len(agents_show)
+        agent_grid_style = f' style="grid-template-columns: repeat({n_agent_cols}, minmax(0, 1fr));"'
+        agent_cols_html = "".join(_html_agile_garden_agent_col(a) for a in agents_show)
         agents_section = (
             '\n  <div class="catalog-section-label catalog-section-label--agents">\n'
             f"    {_CATALOG_AGENTS_SECTION_LABEL_SVG}\n"
             "    Agents — Role-Based AI Collaborators\n"
             "  </div>\n"
-            '  <div class="catalog-agents-grid">\n'
-            '    <div class="catalog-garden-col">\n'
-            '      <div class="catalog-garden-col-header catalog-garden-col-header--foundational">\n'
-            f"        {_CATALOG_AGENTS_COLUMN_ICON_SVG}\n"
-            "        <span>Agents</span>\n"
-            "      </div>\n"
-            f"{rows_a}"
-            "    </div>\n"
+            f'  <div class="catalog-agents-grid"{agent_grid_style}>\n'
+            f"{agent_cols_html}"
             "  </div>\n"
         )
 
@@ -2444,6 +2455,22 @@ def main() -> None:
         agents = discover_agents(agents_dir, repo_root)
     if not skills and not agents:
         raise SystemExit("No skills or agents discovered.")
+
+    # Sort skills by canonical family order, then by garden_order within each family,
+    # then alphabetically — so outline.md and the flat skills grid respect the same
+    # sequence as the Agile Garden prelude columns.
+    _all_family_order = list(_CATALOG_SKILL_FAMILY_PRACTICE_ORDER) + [
+        f for f in _CATALOG_SKILL_FAMILY_FOUNDATIONAL_ORDER
+        if f not in _CATALOG_SKILL_FAMILY_PRACTICE_ORDER
+    ]
+    _family_idx: dict[str, int] = {f: i for i, f in enumerate(_all_family_order)}
+    skills.sort(
+        key=lambda s: (
+            _family_idx.get(_skill_catalog_family(s.pkg_rel_posix), 999),
+            s.garden_order,
+            s.name.lower(),
+        )
+    )
 
     output_dir.mkdir(parents=True, exist_ok=True)
 

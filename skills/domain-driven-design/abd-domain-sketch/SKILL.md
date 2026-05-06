@@ -1,5 +1,6 @@
 ---
 name: domain-sketch
+catalog_garden_order: 4
 description: >-
   Enrich a module file with structured, plain-English concept blocks so the team
   has a readable object model before committing to classes.

@@ -1,5 +1,6 @@
 ---
 name: scenario-walkthrough
+catalog_garden_order: 7
 description: >-
   Produce domain-walkthrough.md: indented scenario walks where every step maps to a
   class and responsibility from crc.md; lifecycle guards and invariants come from the

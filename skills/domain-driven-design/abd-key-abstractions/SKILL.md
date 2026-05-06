@@ -1,5 +1,6 @@
 ---
 name: key-abstractions
+catalog_garden_order: 3
 description: >-
   Group UDL terms into named Key Abstractions with prose definitions and
   verbatim source extracts, elevating a flat term list into defined domain
