@@ -1719,7 +1719,10 @@ def _abd_works_agile_garden_fragment_css(repo_root: Path) -> str:
     """Shared CSS for prelude block (same file linked from gardener lesson). Prepended to catalog.css."""
     p = repo_root.parent / "abd-works" / "commons" / "agile-garden-fragment.css"
     if not p.is_file():
-        return ""
+        # try one level up if this is being run from the git submodule inside abd-works
+        p = repo_root.parent / "commons" / "agile-garden-fragment.css"
+        if not p.is_file():
+            return ""
     return p.read_text(encoding="utf-8").strip() + "\n\n"
 
 
