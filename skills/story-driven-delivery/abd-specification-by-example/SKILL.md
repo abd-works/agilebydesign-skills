@@ -52,6 +52,8 @@ Before writing any scenario steps, check whether any of the following types of d
 
 These types of content are the outputs of domain-driven design practices. Look for object model content first, then CRC, then domain language.
 
+Also check for `domain.json` in the workspace. This file is written by the CRC, Ubiquitous Language, and Object Model skills as a machine-readable summary of the domain model (concept names + attribute names + inheritance). If it exists, the scanner will use it automatically to validate example-table column names — no extra step needed from you. If it does not exist and a domain model markdown file is present, produce `domain.json` before running the scanner by extracting every concept/class name and its attribute/property names into the template shape.
+
 **If domain content exists (grounded mode):**
 - Use exact concept names from that source — do not paraphrase, abbreviate, or rename.
 - Reflect relationships in Given/And step structure: if the model shows **Customer** uses **Account**, that relationship should appear explicitly in a Given or And step, not just as two disconnected nouns.

@@ -271,6 +271,7 @@ The Boundary Domain is one flat section — all boundary classes share a single 
 7. **Verify explicit chains.** For every responsibility that implies multiple actors or steps, confirm every implied actor appears as a collaborator on some responsibility. Nothing nebulous.
 8. **Set the state marker** to `crc`.
 9. **Write the file** to `<deliverables-folder>/<name>-crc.md`. Follow the template in `templates/crc-outline-template.md`.
+10. **Write `domain.json`** to `<deliverables-folder>/domain.json`. For every class block, add one entry whose key is the class name and whose `attributes` array lists every noun-phrase responsibility (left-column state rows — things the concept *holds* — not verb-phrase operations). For subtypes, set `inherits` to the base class name; for root classes set it to `null`. Use the template in `templates/domain.json`. This file is read by the specification-by-example scanner to validate example-table column names.
 
 ---
 

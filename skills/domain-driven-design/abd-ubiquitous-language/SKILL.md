@@ -362,6 +362,7 @@ Source: ...
 13. **Set the state marker** to `state: ubiquitous-language` in the file's YAML front matter.
 
 14. **Write the file** to `<deliverables-folder>/[<name>-]ubiquitous-language.md` following `templates/ubiquitous-language-template.md`.
+15. **Write `domain.json`** to `<deliverables-folder>/domain.json`. For every term/concept in the file, add one entry whose key is the concept name and whose `attributes` array lists the property-like qualities named in its behavior bullets (things it *has* or *holds*, not actions it performs). For subtypes, set `inherits` to the parent concept name; for root concepts set it to `null`. Use the template in `templates/domain.json`. This file is read by the specification-by-example scanner to validate example-table column names.
 
 ---
 

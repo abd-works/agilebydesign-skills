@@ -381,6 +381,7 @@ The Boundary Domain is one flat group with shared `### references` and `### deci
 8. **Add interaction blocks.** For each operation with inherent complexity, write a tab-indented `Interaction:` block tracing the step-chain. CRC collaborators not mapped to parameters are a useful signal.
 9. **Set the state marker** to `domain-model`.
 10. **Write the file** to `<deliverables-folder>/<name>-object-model.md`. Use `----` for clusters within a class and follow `templates/domain-model-scaffold.md` for placeholder shapes.
+11. **Write `domain.json`** to `<deliverables-folder>/domain.json`. For every class block, add one entry whose key is the class name and whose `attributes` array lists every `+ propertyName: Type` property name (camelCase, without the type). For subtypes (`ChildClass : BaseClass`), set `inherits` to the base class name; for root classes set it to `null`. Use the template in `templates/domain.json`. This file is read by the specification-by-example scanner to validate example-table column names.
 
 ## Templates
 

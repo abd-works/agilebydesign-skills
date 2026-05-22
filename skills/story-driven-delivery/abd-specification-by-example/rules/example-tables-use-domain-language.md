@@ -74,20 +74,22 @@ Owner:
 | custom_invented_field |
 ```
 
-## Scanner: domain-vocabulary.json
+## Scanner: domain.json
 
-The scanner validates tables mechanically against a `domain-vocabulary.json` file in the workspace. This file is produced by the AI pass before the scanner runs, extracting concepts, attributes, and inheritance from whatever domain source exists (object model, CRC, or domain language markdown).
+The scanner validates tables mechanically against a `domain.json` file in the workspace. This file is written by the CRC, Ubiquitous Language, or Object Model skills as a side-effect of producing their markdown output — it is the machine-readable version of whatever domain model exists.
+
+The scanner also accepts the legacy filename `domain-vocabulary.json`; `domain.json` takes precedence when both are present.
 
 ```json
 {
   "concepts": {
-    "Check": {
-      "attributes": ["rollTotal", "isSuccess", "margin", "d20", "isCritical"],
+    "Product": {
+      "attributes": ["name", "sku", "price", "brand", "description"],
       "inherits": null
     },
-    "GradedCheckResult": {
-      "attributes": ["degree"],
-      "inherits": "Check"
+    "ProductImage": {
+      "attributes": ["url", "altText"],
+      "inherits": null
     }
   },
   "aliases": {
@@ -96,4 +98,4 @@ The scanner validates tables mechanically against a `domain-vocabulary.json` fil
 }
 ```
 
-If `domain-vocabulary.json` is absent, the scanner emits one warning and exits clean — it cannot validate without a vocabulary.
+If neither file is present, the scanner emits one warning and exits clean — it cannot validate without a vocabulary.

@@ -9,7 +9,7 @@ Source: abd-specification-by-example skill (pipeline runs)
 
 - **Status:** confirmed
 - **Context:** story-driven phase output filename
-- **DO / DO NOT:** DO default to the template filename — `story-map.md`, `thin-slicing.md`, `acceptance-criteria.md`, `specification-by-example.md` (and their `.txt` partners where applicable). DO add a `<name>-` engagement prefix only when you need disambiguation: multiple products in the same workspace, multiple stories sharing one folder, or the user asks for it. DO NOT mandate the prefix as the only valid form, and DO NOT invent a sub-folder like `stories/`, `specs/`, `slices/`, `docs/` — write next to other engagement deliverables.
+- **DO / DO NOT:** DO default to the template filename ï¿½ `story-map.md`, `thin-slicing.md`, `acceptance-criteria.md`, `specification-by-example.md` (and their `.txt` partners where applicable). DO add a `<name>-` engagement prefix only when you need disambiguation: multiple products in the same workspace, multiple stories sharing one folder, or the user asks for it. DO NOT mandate the prefix as the only valid form, and DO NOT invent a sub-folder like `stories/`, `specs/`, `slices/`, `docs/` ï¿½ write next to other engagement deliverables.
 - **Example (wrong, forced prefix and folder):** Writing `docs/paw-place-thin-slicing.md` when the engagement workspace already keeps deliverables in `docs/` and only hosts one product. The `paw-place-` prefix is noise.
 - **Example (correct):** Default to `thin-slicing.md` written next to existing engagement deliverables. Add a prefix only when disambiguation is needed.
 - **Likely source:** earlier in this session the skill emitted `<name>-<phase>.md` unconditionally, then writing into a hardcoded folder; the user moved the files manually and asked that the prefix be optional and the folder driven by where other deliverables already live.
@@ -23,7 +23,7 @@ Source: abd-specification-by-example skill (pipeline runs)
 - **DO / DO NOT:**
   - **DO** translate every invariant of the form "X must hold when Y" into a scenario whose `When` triggers Y and whose `Then` is the observable that proves X. Each invariant earns at least one scenario; two-sided invariants (e.g. "set on change; cleared on save") earn one per side.
   - **DO** restrict `Then` clauses to things a human, the file system, another system actor, or the UI can verify: writes, error messages, refusals, UI state, file contents, status text.
-  - **DO NOT** write `Then` clauses that read internal state — "the *thing* has *flag* equal to *true*", "the *crowd* has *source file* equal to *path*", "the dirty flag is *false*". Those are data assertions, not behavior.
+  - **DO NOT** write `Then` clauses that read internal state ï¿½ "the *thing* has *flag* equal to *true*", "the *crowd* has *source file* equal to *path*", "the dirty flag is *false*". Those are data assertions, not behavior.
   - **DO NOT** write a scenario whose only payoff is a data equality (e.g. "after load, the crowd has source file X"). The invariant is real, but it has to be exercised through an observable downstream behavior (save writes to that path; save of an unchanged crowd is a no-op; etc.). If the property never drives an observable, the scenario is not worth writing.
 - **Example (wrong, internal-state assertion):**
 
@@ -46,7 +46,7 @@ Source: abd-specification-by-example skill (pipeline runs)
     Then **Crowd** *"Freedom Phalanx"* has **Source File** *"C:\COH\data\heroes.json"*
   ```
 
-  The `Then` reads a property nothing observes. The same invariant is provable through save behavior — that the changed crowd is written back to the file it came from.
+  The `Then` reads a property nothing observes. The same invariant is provable through save behavior ï¿½ that the changed crowd is written back to the file it came from.
 
 - **Example (correct, observable-only):**
 
@@ -71,9 +71,9 @@ Source: abd-specification-by-example skill (pipeline runs)
     And *"C:\COH\data\villains.json"* is not modified
   ```
 
-  Same two invariants (dirty-flag lifecycle, one-source-file-per-crowd) — now exercised entirely through observable file writes.
+  Same two invariants (dirty-flag lifecycle, one-source-file-per-crowd) ï¿½ now exercised entirely through observable file writes.
 
-- **Likely source:** instruction not read — the skill's bundled rules emphasise behavior over data, but the agent fell back on internal-state assertions when invariants happened to be phrased in data-shaped language ("flag is true", "field equals path"). The translation step from invariant phrasing to observable behavior needs to be explicit in the rule.
+- **Likely source:** instruction not read ï¿½ the skill's bundled rules emphasise behavior over data, but the agent fell back on internal-state assertions when invariants happened to be phrased in data-shaped language ("flag is true", "field equals path"). The translation step from invariant phrasing to observable behavior needs to be explicit in the rule.
 
 ---
 
@@ -82,10 +82,10 @@ Source: abd-specification-by-example skill (pipeline runs)
 - **Status:** confirmed
 - **Context:** writing `specification-by-example.md` for a feature whose Givens describe rich one-to-many-to-many domain data (top-level *Crowd* ? nested *Crowd* ? *Character*), driven by user input "this is better as an outline due to the one-to-many-to-many relationships of crowds, nested crowds, characters".
 - **DO / DO NOT:**
-  - **DO** use plain **Scenarios with inline values** for distinct logical flows. Express nested hierarchy in step prose — `containing top-level **Crowd** *"X"* with **Characters** *"a"*, *"b"* and nested **Crowd** *"Y"* with **Character** *"c"*`. **bold** for domain concepts, *italic* for values.
+  - **DO** use plain **Scenarios with inline values** for distinct logical flows. Express nested hierarchy in step prose ï¿½ `containing top-level **Crowd** *"X"* with **Characters** *"a"*, *"b"* and nested **Crowd** *"Y"* with **Character** *"c"*`. **bold** for domain concepts, *italic* for values.
   - **DO** use **Scenario Outlines with relationship-based Examples tables** when (and only when) the same steps repeat with row-by-row variation. One table per domain concept. Tables linked by foreign-key columns (`crowd_file_path`, `parent_crowd_name`). A `scenario` column joins all tables for a given example row.
-  - **DO NOT** attach Gherkin data tables (the inline `| col | col |` blocks) **inside** plain Scenario step lists. The plain `Scenario` form does not take tables — tables belong only to Scenario Outlines, placed **above** Givens or **below** When/Then.
-  - **DO NOT** flatten multiple concepts into one wide row (`top_level_crowd | nested_crowd | character`). That mashes three concepts (top-level *Crowd*, nested *Crowd*, *Character*) into a single row and breaks the relationship structure of the domain. Use three linked tables — `CrowdFile`, `Crowd` (with `crowd_file_path` and `parent_crowd_name` FKs), `Character` (with `crowd_name` FK).
+  - **DO NOT** attach Gherkin data tables (the inline `| col | col |` blocks) **inside** plain Scenario step lists. The plain `Scenario` form does not take tables ï¿½ tables belong only to Scenario Outlines, placed **above** Givens or **below** When/Then.
+  - **DO NOT** flatten multiple concepts into one wide row (`top_level_crowd | nested_crowd | character`). That mashes three concepts (top-level *Crowd*, nested *Crowd*, *Character*) into a single row and breaks the relationship structure of the domain. Use three linked tables ï¿½ `CrowdFile`, `Crowd` (with `crowd_file_path` and `parent_crowd_name` FKs), `Character` (with `crowd_name` FK).
   - **DO** run a **table-shape pre-check** before writing any Examples block: list the concepts referenced in the scenario data; if more than one, model them as separate tables linked by FK; never collapse into a wide row.
 
 - **Example (wrong, table inside a plain Scenario AND denormalized flat row):**
@@ -118,7 +118,7 @@ Source: abd-specification-by-example skill (pipeline runs)
     And the persisted **Active Crowd List** contains exactly *"C:\COH\data\armageddons.json"*
   ```
 
-- **Example (correct, Scenario Outline with relationship-based Examples — one table per concept, linked by FK):**
+- **Example (correct, Scenario Outline with relationship-based Examples ï¿½ one table per concept, linked by FK):**
 
   ```gherkin
   Scenario Outline: Re-activating an active Crowd File picks the next available integer suffix
@@ -136,17 +136,17 @@ Source: abd-specification-by-example skill (pipeline runs)
 
   **Examples**
 
-  ActiveCrowdEntry (Given — above scenario):
+  ActiveCrowdEntry (Given ï¿½ above scenario):
 
   | scenario      | existing_clone_path                  |
   | ------------- | ------------------------------------ |
-  | First clone   | (none — only the original)           |
+  | First clone   | (none ï¿½ only the original)           |
   | Second clone  | C:\COH\data\armageddons (2).json     |
   | Third clone   | C:\COH\data\armageddons (2).json     |
   | Third clone   | C:\COH\data\armageddons (3).json     |
   | Fill the gap  | C:\COH\data\armageddons (3).json     |
 
-  CloneResult (Then — below scenario):
+  CloneResult (Then ï¿½ below scenario):
 
   | scenario      | new_clone_path                       | new_top_level_crowd_name |
   | ------------- | ------------------------------------ | ------------------------ |
@@ -157,4 +157,4 @@ Source: abd-specification-by-example skill (pipeline runs)
 
   The `scenario` column joins `ActiveCrowdEntry` to `CloneResult`. Each table holds one concept; FK columns express the relationship.
 
-- **Likely source:** instruction not read — the user asked for richer data and used the words "data tables" and "outline", and the agent reached for Gherkin data tables inside plain Scenarios as the literal interpretation. The skill rules require: (a) tables only on outlines, (b) one table per concept, (c) FK-linked, never flattened. A pre-write checklist that asks "how many concepts in this Given? if >1, are they in separate FK-linked tables on an Outline?" would have caught both errors.
+- **Likely source:** instruction not read ï¿½ the user asked for richer data and used the words "data tables" and "outline", and the agent reached for Gherkin data tables inside plain Scenarios as the literal interpretation. The skill rules require: (a) tables only on outlines, (b) one table per concept, (c) FK-linked, never flattened. A pre-write checklist that asks "how many concepts in this Given? if >1, are they in separate FK-linked tables on an Outline?" would have caught both errors.

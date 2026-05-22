@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 """Validate that scenario outline example-table columns match domain model attributes.
 
-Reads ``domain-vocabulary.json`` from the workspace (produced by the AI pass before
-this scanner runs).  Every column in every scenario outline's example table must
-resolve to an attribute of some concept in the vocabulary — with inheritance walked
-transitively.  Unknown columns are **errors**.
+Reads ``domain.json`` from the workspace (written by the CRC, Ubiquitous Language,
+or Object Model skills as a side-effect of producing their markdown output).
+Falls back to ``domain-vocabulary.json`` if ``domain.json`` is absent.
+Every column in every scenario outline's example table must resolve to an attribute
+of some concept in the vocabulary — with inheritance walked transitively.
+Unknown columns are **errors**.
 
-If ``domain-vocabulary.json`` is absent the scanner emits one warning and exits clean.
+If neither file is present the scanner emits one warning and exits clean.
 
 Vocabulary shape::
 
     {
       "concepts": {
-        "Check":              {"attributes": ["rollTotal", ...], "inherits": null},
-        "GradedCheckResult":  {"attributes": ["degree"],         "inherits": "Check"}
+        "Product":            {"attributes": ["name", "sku", "price"], "inherits": null},
+        "DigitalProduct":     {"attributes": ["downloadUrl"],          "inherits": "Product"}
       },
       "aliases": {"scenario": "*"}
     }
@@ -75,10 +77,13 @@ def _resolve_all_attributes(
 
 
 def load_vocabulary(workspace: Path) -> Optional[Dict[str, Any]]:
-    vocab_path = workspace / "domain-vocabulary.json"
-    if not vocab_path.is_file():
-        return None
-    return json.loads(vocab_path.read_text(encoding="utf-8"))
+    # domain.json is the primary output from CRC / UL / OM skills.
+    # domain-vocabulary.json is the legacy name; check it as fallback.
+    for candidate in ("domain.json", "domain-vocabulary.json"):
+        vocab_path = workspace / candidate
+        if vocab_path.is_file():
+            return json.loads(vocab_path.read_text(encoding="utf-8"))
+    return None
 
 
 def build_valid_columns(vocab: Dict[str, Any]) -> Set[str]:
@@ -188,7 +193,7 @@ class ExampleTablesDomainScanner(StoryScanner):
                 Violation(
                     rule=self.rule,
                     violation_message=(
-                        "No domain-vocabulary.json found in workspace; "
+                        "No domain.json (or domain-vocabulary.json) found in workspace; "
                         "skipping domain-table column check. "
                         "Denormalization heuristic still active."
                     ),
@@ -295,7 +300,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Validate example-table columns against domain vocabulary")
     parser.add_argument("--workspace", type=Path, default=Path.cwd())
     parser.add_argument("--story-graph", type=Path, default=None)
-    parser.add_argument("--domain-vocabulary", type=Path, default=None)
+    parser.add_argument(
+        "--domain-vocabulary",
+        type=Path,
+        default=None,
+        help="Path to domain.json or domain-vocabulary.json. "
+             "If omitted the scanner searches the workspace for domain.json first, "
+             "then domain-vocabulary.json.",
+    )
     args = parser.parse_args()
 
     workspace = args.workspace.resolve()
