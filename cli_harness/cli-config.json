@@ -1,0 +1,12 @@
+{
+  "api_key": null,
+  "agent_mode": "local",
+  "repo_url": null,
+  "repo_ref": "main",
+  "model": "composer-2.5",
+  "stall_timeout_minutes": 15,
+  "notification_channel": null,
+  "sandbox": false,
+  "mcp_allowlist": [],
+  "approval_mode": "interactive"
+}

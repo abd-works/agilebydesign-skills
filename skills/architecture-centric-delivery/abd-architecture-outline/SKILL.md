@@ -65,34 +65,18 @@ A **decision record (ADR)** captures *why* a choice was made — context, option
 
 ## Example
 
-A typical outline for a web-plus-API SaaS — markdown plus paired `.drawio` sources:
+A typical outline for a web-plus-API SaaS:
 
 ```
-docs/architecture/
-├── architecture-outline.md              ← human-readable, embeds the four PNGs
-├── diagrams/
-│   ├── platform-architecture.drawio     ← source (edited in draw.io Desktop)
-│   ├── platform-architecture.png        ← rendered, embedded in the markdown
-│   ├── layered-architecture.drawio
-│   ├── layered-architecture.png
-│   ├── system-context.drawio
-│   ├── system-context.png
-│   ├── deployment-architecture.drawio
-│   └── deployment-architecture.png
-└── decisions/
-    ├── ADR-001-spa-plus-rest-api-platform.md
-    ├── ADR-002-layered-clean-architecture.md
-    └── ADR-003-aws-fargate-deployment.md
-
-architecture-outline.md sections:
-├── 1. Platform diagram                  ← React SPA + Node API + Postgres + Redis
-├── 2. Layered architecture diagram      ← Presentation / Application / Domain / Infra
-├── 3. System context diagram            ← actors + 3 external systems
-├── 4. Deployment topology diagram       ← AWS: CloudFront → ALB → ECS → RDS
-├── 5. Guiding principles (8 bullets)    ← "Domain never imports infrastructure", etc.
-├── 6. Technology stack (table)          ← runtime + framework + library + tool per layer
-├── 7. Major systems catalogue (table)   ← 5 named subsystems, 1 line each
-└── 8. Decision records                  ← 3 ADRs (platform, style, deployment)
+{SystemName} — Architecture Outline
+├── 1. Platform diagram          ← React SPA + Node API + Postgres + Redis
+├── 2. Layered architecture      ← Presentation / Application / Domain / Infra
+├── 3. System context            ← actors + 3 external systems
+├── 4. Deployment topology       ← AWS: CloudFront → ALB → ECS → RDS
+├── 5. Guiding principles        ← "Domain never imports infrastructure", etc.
+├── 6. Technology stack          ← runtime + framework + library + tool per layer
+├── 7. Major systems catalogue   ← 5 named subsystems, 1 line each
+└── 8. Decision records          ← 3 ADRs (platform, style, deployment)
 ```
 
 ## The shape of a good outline
@@ -149,15 +133,15 @@ architecture-outline.md sections:
 
 ## Build
 
-**Goal:** Produce `docs/architecture/architecture-outline.md`, four paired `.drawio` sources (+ rendered PNGs) under `docs/architecture/diagrams/`, and one ADR file per outline-level decision under `docs/architecture/decisions/`.
+**Goal:** Produce the outline markdown file, four paired `.drawio` sources (+ rendered PNGs), and one ADR file per outline-level decision. Place outputs wherever the project keeps its architecture docs — default convention is `docs/architecture/` but the location is the team's call.
 
-1. **Pick the output location and seed the diagrams folder.** Default is `docs/architecture/architecture-outline.md` with diagrams in `docs/architecture/diagrams/`. From this skill's folder, run:
+1. **Pick the output location and seed the diagrams folder.** From this skill's folder, run:
 
    ```powershell
    .\scripts\arch-drawio.ps1 init -ProjectRoot <target-project-root>
    ```
 
-   This copies the four `.drawio` templates (`platform-architecture.drawio`, `layered-architecture.drawio`, `system-context.drawio`, `deployment-architecture.drawio`) into the project's `docs/architecture/diagrams/` folder, skipping any that already exist (use `-Force` to overwrite).
+   This copies the four `.drawio` templates (`platform-architecture.drawio`, `layered-architecture.drawio`, `system-context.drawio`, `deployment-architecture.drawio`) into the project's diagrams folder, skipping any that already exist (use `-Force` to overwrite).
 
 2. **Open each `.drawio` in draw.io Desktop or app.diagrams.net and fill in the `{Placeholders}`.** The templates already match the canonical style (stacked layered platform, vertical layered dependency stack, central system + external actors context diagram, UML deployment with environment/host/process nesting). Replace placeholder text with real component names; add or remove boxes as the system demands. Do not break the canonical filenames — the verify command depends on them.
 

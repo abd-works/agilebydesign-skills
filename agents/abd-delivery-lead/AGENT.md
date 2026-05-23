@@ -35,6 +35,7 @@ start-stage: discovery
 Read each skill's `SKILL.md` for instructions.
 
 - **`abd-delivery-planning`** — Build and revise the agile delivery plan (context assessment, risks, strategies, runs, checkpoints). **Read this before Step 2 in every engagement.**
+- **`abd-delivery-war-room`** (`skills/delivery/abd-delivery-war-room/SKILL.md`) — War room protocol, templates, and slot file conventions. **Read this before Step 2** when running with the CLI harness. Templates under `templates/` provide the file formats for `manifest.md`, `INSTRUCTIONS.md`, slot files, and `profile.md`.
 - Engagement workspace — **`guidance/workspace/`** (rule + **`/workspace`** + **`guidance/workspace/scripts/`**). Set/read **`skill-config.json` → `active_skill_workspace`** for deploy and engagement paths.
 - **`execute-skill-using-skills-rules`** (`skills/execute-skill-using-skills-rules/SKILL.md`) — **Corrections.** When you identify wrong or missing deliverables, gate failures, or new constraints, log them in **`docs/corrections-log.md`** using the skill’s **correction process** (same contract as **`abd-team-member`**): identify → log with DO / DO NOT and **Example (wrong)** → direct rework; do not substitute informal chat for a log entry when a fix must stick for downstream work.
 - **`track_task`** (`skills/track_task/SKILL.md`) — Mandatory. Follow the skill for workspace resolution, checkbox rules, and **each-turn** updates. Use the skill’s **`abd-delivery-lead` (agent checklist)** section for where to write the file and what lines to include (orchestration + full plan: runs, stages, checkpoints).
@@ -115,6 +116,19 @@ Report to the user:
 
 Follow `abd-delivery-planning` procedure: context analysis, risk classification, strategy selection, run design, then present the plan at the **CHECKPOINT** defined there. **If** `agile-delivery-plan.md` exists, read it first and use it as the baseline to **continue** or **revise** unless the user replaces context. Treat its **context inventory** (provided vs missing) and per-run **rationales** (concrete outcomes, not risk-only summaries) as authoritative — surface gaps instead of assuming missing context. **Do not** default to "run all six stages." The plan is your primary contribution as orchestrator; the skill owns the mechanics of how to think about plans and runs.
 
+#### Step 2b — Set up war room (after plan approval)
+
+**When running with the CLI harness:** after the operator approves the plan at the CHECKPOINT:
+
+1. Create `<workspace>/delivery-war-room/` if it does not exist.
+2. Copy `INSTRUCTIONS.md` from `abd-delivery-war-room` templates.
+3. Write `manifest.md` with goal, profile, autonomy level, checkpoint policy, run sizing policy (from risk classification), and ordered slot definitions.
+4. Write `profile.md` summarizing the profile rationale.
+5. Initialize `run-log.jsonl` (empty file).
+6. Write only `slot-01-start.md` — do not author subsequent slots until `slot-01-finished.md` exists.
+
+**When resuming:** if `delivery-war-room/` already exists, read `manifest.md` and `run-log.jsonl`. Do not overwrite. Update `manifest.md` only if the plan was revised.
+
 ### Step 3 — Open a stage (within the current run)
 
 **Reads:**
@@ -167,7 +181,7 @@ For the current stage in the current run:
 
 ---
 
-Instantiate an `abd-team-member` agent with:
+Instantiate an `abd-team-member` agent. **When running with the CLI harness**, write `slot-NN-start.md` to `delivery-war-room/` using the `abd-delivery-war-room` template (`templates/slot-start.md`). The harness detects the file and launches the agent. **Without the harness**, bootstrap directly:
 
 ```text
 team-role: <role from stage definition>
@@ -245,6 +259,8 @@ Check off the completed stage in the checklist (**`track_task`**). Pass forward:
 - Open questions the user or next team member should address.
 - **Corrections relevant to downstream work** (e.g. domain terms corrected during exploration that story definition must respect) — use the `Affects` filter to pick these.
 
+**When running with the CLI harness:** append a slot-completion event to `run-log.jsonl`. Write `slot-(NN+1)-start.md` to `delivery-war-room/` for the next stage. The harness detects the new start file and launches the next team member.
+
 Return to **Step 3** for the next stage in the current run.
 
 ### Step 7 — Run complete, revise plan
@@ -282,7 +298,9 @@ Return to **Step 3** for the next stage in the current run.
 
 ---
 
-Summarize the run (stages completed, scope covered, artifacts produced, key decisions). Review the corrections log for patterns. Revise the plan per `abd-delivery-planning`. If more runs remain, confirm the next run and return to **Step 3**. If a different strategy fits better, state the shift and revise remaining runs.
+Summarize the run (stages completed, scope covered, artifacts produced, key decisions). **When running with the CLI harness:** write a run summary to `run-log.jsonl` (run number, stages completed, artifact quality, correction count, sizing outcome). Update `manifest.md` `run_sizing_policy` if changes are proposed. The harness reads the updated policy and adjusts enforcement.
+
+Review the corrections log for patterns. Revise the plan per `abd-delivery-planning`. If more runs remain, confirm the next run and return to **Step 3**. If a different strategy fits better, state the shift and revise remaining runs.
 
 ### Step 8 — Plan complete
 

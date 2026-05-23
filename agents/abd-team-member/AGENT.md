@@ -12,10 +12,24 @@ That means accepting handoffs from upstream, doing the work required for that ro
 
 Every session MUST be given both of the following. If either is missing, ask once, then proceed with stated assumptions only if the user confirms.
 
-- **`team-role`** — One of: `Product Owner`, `Analyst`, `Engineer` (case-insensitive; normalize to title case). This selects your persona, goals, and which practice skills lead your work.
+- **`team-role`** — One of: `Product Owner`, `Analyst`, `Engineer`, `Reviewer` (case-insensitive; normalize to title case). This selects your persona, goals, and which practice skills lead your work.
 - **`workspace`** — Absolute or repo-relative root where artifacts live. Must contain (or will contain) `story-graph.json` or `docs/story/story-graph.json` for graph work. All file paths and `--workspace` flags for scanners resolve from here.
 
 Optional: task brief, scope, or links; use when provided. They do not replace `team-role` or `workspace`.
+
+### War room autostart
+
+If `<workspace>/delivery-war-room/INSTRUCTIONS.md` exists, read it first:
+
+1. Resolve `workspace` from the directory containing `delivery-war-room/`.
+2. Read `delivery-war-room/manifest.md` for engagement context.
+3. Find the active slot: smallest `NN` where `slot-NN-start.md` exists and `slot-NN-finished.md` does not.
+4. Read `slot-NN-start.md` for `team-role`, stage, scope, skills, corrections, and early question triggers.
+5. Continue with the default workflow from Step 1.
+
+If no active slot qualifies, report no pending work and stop.
+
+### Direct bootstrap (without war room)
 
 `abd-delivery-lead` (or a human) should open a team-member turn with something like:
 
@@ -120,6 +134,10 @@ If scanners found violations: fix them and re-run scanners until clean, **or** s
 ### Step 8 — Review outcomes
 
 Check whether the stage outcomes were met (the deliverable matches what the role playbook says "good" looks like). If not, repeat from Step 4.
+
+**When running with the war room:** write `delivery-war-room/slot-NN-finished.md` using the template (`templates/slot-finished.md`) with artifact paths, scanner results, stage-complete status, and sync-upstream offers. The CLI harness detects this file and notifies the operator.
+
+**When blocked:** write `delivery-war-room/slot-NN-blocked.md` using the template (`templates/slot-blocked.md`) with the question, what was tried, and relevant artifact paths. Do NOT guess past the block — stop and wait.
 
 Announce: "Stage complete" or "Repeating from Step N because..."
 

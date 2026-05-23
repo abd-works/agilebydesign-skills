@@ -47,7 +47,7 @@ If the war-room folder, `agile-delivery-plan.md`, and `abd-delivery-lead/progres
 
 If `delivery-war-room/INSTRUCTIONS.md` exists at the workspace root:
 
-1. Read `INSTRUCTIONS.md` → resolve absolute `workspace` (parent of `delivery-war-room/`).
+1. Read `INSTRUCTIONS.md` → read `workspace` from the active `slot-NN-start.md`.
 2. Read `manifest.md`, pick active `NN` (smallest slot with `slot-NN-start.md` present and `slot-NN-finished.md` absent).
 3. Read `slot-NN-start.md` for role and scope, then continue per `abd-team-member/AGENT.md` from Step 1 (classic bootstrap).
 
@@ -99,9 +99,9 @@ Copy verbatim into each engagement (edit nothing unless you extend the protocol)
 ```markdown
 # Delivery war room — team member autostart
 
-## 1) Engagement root (`workspace`)
+## 1) Workspace
 
-The engagement root is the directory that **contains** this `delivery-war-room` folder. Resolve to an **absolute** path. Use it as `workspace` for all paths, scanners, and `story-graph-ops`.
+Read the `workspace` field from your `slot-NN-start.md`. That is the absolute path set by the operator. Use it for every `--workspace` flag, scanner path, and `story-graph-ops` call.
 
 ## 2) Cycle context
 
