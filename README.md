@@ -87,16 +87,16 @@ Covers single-responsibility, intention-revealing names, guard-clause flow, doma
 
 Install  any / each of these to make youre skills more robust
 
-### [execute-skill-using-skills-rules](skills/execute-skill-using-skills-rules/SKILL.md)
+### [execute-skill-using-skills-rules](skill-helpers/skills/execute-skill-using-skills-rules/SKILL.md)
 
 Run codescanners when validating output from skills, and enforce quality steps.
 Enable correction-improvement log when fixing ai mistakes.
 
-### [Workspace](guidance/workspace/README.md)
+### [Workspace](skill-helpers/content/workspace.md)
 
-Engagement root **`skill-config.json` → `active_skill_workspace`** — guided by **`guidance/workspace/`** (rule + **`/workspace`** command + scripts), not a packaged skill.
+Engagement root **`skill-config.json` → `active_skill_workspace`** — guided by **`skill-helpers/`** (rule + **`/workspace`** command + scripts), not a packaged skill.
 
-### [track_task](skills/track_task/SKILL.md)
+### [track_task](skill-helpers/skills/track_task/SKILL.md)
 
 Track multiple-step skills or multi-skill workflows you create with markdown checkboxes for skill or agent-pipeline phases, per-phase steps, or ad-hoc lists.
 Stored under the engagement workspace.

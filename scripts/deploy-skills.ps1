@@ -1,47 +1,33 @@
 <#
 .SYNOPSIS
-  Deploy all skills and agents in this repo to Cursor or VS Code.
+  Deploy capability family packages and remaining skills/agents to Cursor or VS Code.
 
 .DESCRIPTION
-  Scans <repo>/skills/ for folders containing SKILL.md.
-  Scans <repo>/agents/ for folders containing AGENT.md or AGENTS.md.
+  **Family packages** (repo root — canonical source, copied into the engagement):
 
-  Repo root is always derived from the script location (parent of scripts/), not cwd.
+    delivery/
+    story-driven-delivery/
+    domain-driven-design/
+    architecture-centric-delivery/
+    engineering/
+    user-experience-design/
+    context-to-memory/
+    idea-shaping/
+    skill-builder/
+    skill-helpers/
+    utilities/
 
-  Deploy root logic (when -DeployRoot is omitted), aligned with guidance/workspace
-  (guidance/workspace/README.md):
-    1. Read $RepoRoot/skill-config.json -> workspace.active_skill_workspace when set and path exists.
-    2. Else walk upward from $PWD for the nearest *.code-workspace folder (workspace-level deploy).
-    3. Else deploy at $RepoRoot (skills repo).
+  Each package may contain agents/, skills/, content/, lib/, instructions/, prompts/.
+  Deployed via ``scripts/deploy_family_package.py`` (copy/merge into .cursor/ or .github/).
+  Infra rules and slash commands deploy with the **skill-helpers** family package
+  (``skill-helpers/instructions/``, ``skill-helpers/prompts/``).
 
-  To pin engagement/deploy targets without overrides: maintain skill-config.json via guidance/workspace/scripts.
-
-  Cursor mode:
-    Flat junction per skill  → <deploy-root>/.cursor/skills/<skill-name>
-    Flat junction per agent  → <deploy-root>/.cursor/agents/<agent-name>
-    guidance/*.mdc           → <deploy-root>/.cursor/rules/           (hard link)
-    guidance/*.prompt.md     → <deploy-root>/.cursor/commands/        (hard link)
-
-  VSCode mode:
-    Flat junction per skill  → <deploy-root>/.github/skills/<skill-name>
-    Flat junction per agent  → <deploy-root>/.github/agents/<agent-name>
-    guidance/*.instructions.md → <deploy-root>/.github/          (hard link)
-    guidance/*.prompt.md       → <deploy-root>/.github/prompts/  (hard link)
-
-  guidance/ is preferred; falls back to the skill/agent root for legacy layouts.
-
-.PARAMETER IDE
-  Target IDE: cursor or vscode. Default: cursor.
-
-.PARAMETER Force
-  Remove existing junctions and hard links before creating new ones.
+  Deploy root (when -DeployRoot omitted): skill-config.json → *.code-workspace walk → repo root.
 #>
 param(
     [ValidateSet("cursor", "vscode")]
     [string] $ide = "cursor",
 
-    # Override the deploy root (where .cursor/ or .github/ is written).
-    # When omitted: skill-config.json workspace.active_skill_workspace -> *.code-workspace walk -> repo root.
     [string] $DeployRoot = "",
 
     [switch] $Force
@@ -49,18 +35,25 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-# Repo root = parent of scripts/
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot '..') | Select-Object -ExpandProperty Path
 
-# Find the deploy root:
-#   1. Walk up from StartPath looking for a *.code-workspace file.
-#      If found → that directory is the root (workspace-level deploy).
-#   2. Otherwise → StartPath itself is the root (single-repo deploy).
+$FamilyPackages = @(
+    'delivery',
+    'story-driven-delivery',
+    'domain-driven-design',
+    'architecture-centric-delivery',
+    'engineering',
+    'user-experience-design',
+    'context-to-memory',
+    'idea-shaping',
+    'skill-builder',
+    'skill-helpers',
+    'utilities'
+)
+
 function Find-DeployRoot {
     param(
-        # Directory to start walking upward from (normally the shell's current directory).
         [string]$StartPath,
-        # When no *.code-workspace exists in any ancestor, deploy into the skills repo itself.
         [string]$FallbackRepoRoot
     )
     $dir = [System.IO.DirectoryInfo]::new($StartPath)
@@ -101,7 +94,6 @@ function Get-DeployRootFromSkillConfig {
     }
 }
 
-# Repo root = agilebydesign-skills (parent of scripts/). Deploy destination follows guidance/workspace (skill-config) first.
 $CursorRoot = if ($DeployRoot) {
     $DeployRoot
 }
@@ -116,12 +108,11 @@ Write-Host "`nRepo root   : $RepoRoot"   -ForegroundColor Cyan
 Write-Host "Deploy root : $CursorRoot"  -ForegroundColor Cyan
 Write-Host "IDE         : $ide`n"       -ForegroundColor Cyan
 
-# --- Ensure workspace directories exist ---
 $deployFolder = if ($ide -eq "cursor") { '.cursor' } else { '.github' }
 $subDirs = if ($ide -eq "cursor") {
-    @('.cursor\skills', '.cursor\agents', '.cursor\rules', '.cursor\commands')
+    @('.cursor\skills', '.cursor\agents', '.cursor\rules', '.cursor\commands', '.cursor\content', '.cursor\lib')
 } else {
-    @('.github\skills', '.github\agents', '.github\prompts')
+    @('.github\skills', '.github\agents', '.github\instructions', '.github\prompts', '.github\content', '.github\lib')
 }
 foreach ($sub in $subDirs) {
     $dir = Join-Path $CursorRoot $sub
@@ -131,7 +122,6 @@ foreach ($sub in $subDirs) {
     }
 }
 
-# --- Add deploy folder to .code-workspace if present and not already listed ---
 $workspaceFile = Get-ChildItem -Path $CursorRoot -Filter '*.code-workspace' -File -ErrorAction SilentlyContinue | Select-Object -First 1
 if ($workspaceFile) {
     $ws = Get-Content $workspaceFile.FullName -Raw | ConvertFrom-Json
@@ -144,52 +134,43 @@ if ($workspaceFile) {
     }
 }
 
-# --- Discover folders ---
-# A deployable folder has SKILL.md/AGENT.md/AGENTS.md OR an guidance/ subdirectory.
+# --- Family packages (copy/merge) ---
+Write-Host "=== Family packages ===" -ForegroundColor Magenta
+$deployPy = Join-Path $RepoRoot 'scripts\deploy_family_package.py'
+if (-not (Test-Path -LiteralPath $deployPy)) {
+    throw "Missing $deployPy"
+}
+$ideArg = if ($ide -eq 'vscode') { 'vscode' } else { 'cursor' }
+& python $deployPy --to $CursorRoot --package all --ide $ideArg
+if ($LASTEXITCODE -ne 0) {
+    throw "deploy_family_package.py failed with exit code $LASTEXITCODE"
+}
+
 function Find-MarkedFolders {
     param([string]$Root, [string[]]$Markers)
     if (-not (Test-Path -LiteralPath $Root -PathType Container)) { return @() }
     $results = @()
-    # By marker file (SKILL.md, AGENT.md, AGENTS.md)
     foreach ($marker in $Markers) {
         Get-ChildItem -Path $Root -Recurse -Filter $marker -File -ErrorAction SilentlyContinue |
             ForEach-Object { $results += $_.DirectoryName }
     }
-    # By guidance/ subdirectory (skills with IDE outputs but no SKILL.md)
     Get-ChildItem -Path $Root -Recurse -Filter 'guidance' -Directory -ErrorAction SilentlyContinue |
         ForEach-Object { $results += $_.Parent.FullName }
-
-    # By direct .mdc presence (guidance folders with ide-files at root, no subfolder)
-    # Exclude paths ending in 'guidance' — those are already captured by the guidance/ scan above
     Get-ChildItem -Path $Root -Recurse -Filter '*.mdc' -File -ErrorAction SilentlyContinue |
         Where-Object { (Split-Path $_.DirectoryName -Leaf) -ne 'guidance' } |
         ForEach-Object { $results += $_.DirectoryName }
-
-    # By direct .prompt.md presence (command-only guidance folders with no .mdc)
     Get-ChildItem -Path $Root -Recurse -Filter '*.prompt.md' -File -ErrorAction SilentlyContinue |
         Where-Object { (Split-Path $_.DirectoryName -Leaf) -ne 'guidance' } |
         ForEach-Object { $results += $_.DirectoryName }
-
     $results | Sort-Object -Unique
 }
 
-$skillsRoot   = Join-Path $RepoRoot 'skills'
-$agentsRoot   = Join-Path $RepoRoot 'agents'
-$guidanceRoot = Join-Path $RepoRoot 'guidance'
-
-$skillFolders   = Find-MarkedFolders -Root $skillsRoot   -Markers @('SKILL.md')
-$agentFolders   = Find-MarkedFolders -Root $agentsRoot   -Markers @('AGENT.md', 'AGENTS.md')
-$guidanceFolders = Find-MarkedFolders -Root $guidanceRoot -Markers @()
-
-Write-Host "Skills   : $($skillFolders.Count)"   -ForegroundColor Cyan
-Write-Host "Agents   : $($agentFolders.Count)"   -ForegroundColor Cyan
-Write-Host "Guidance : $($guidanceFolders.Count)`n" -ForegroundColor Cyan
-
-# --- Helpers ---
 function Get-IdePayloadRoot {
     param([string]$Root)
     $ideDir = Join-Path $Root 'guidance'
     if (Test-Path -LiteralPath $ideDir -PathType Container) { return $ideDir }
+    $ideFiles = Join-Path $Root 'ide-files'
+    if (Test-Path -LiteralPath $ideFiles -PathType Container) { return $ideFiles }
     return $Root
 }
 
@@ -217,11 +198,10 @@ function New-LinkSafe {
     Write-Host "  OK : $Path" -ForegroundColor Green
 }
 
-# --- Deploy one folder (skill or agent) ---
 function Deploy-Folder {
     param(
-        [string] $Folder,       # source: folder containing SKILL.md or AGENT.md
-        [string] $JunctionRoot  # flat junction destination root
+        [string] $Folder,
+        [string] $JunctionRoot
     )
 
     $name       = (Split-Path $Folder -Leaf) -replace '_', '-'
@@ -229,20 +209,16 @@ function Deploy-Folder {
 
     Write-Host "[$name]" -ForegroundColor White
 
-    # Flat junction — skipped for guidance folders (no junction root)
     if ($JunctionRoot) {
         New-LinkSafe -Path (Join-Path $JunctionRoot $name) -Target $Folder
     }
 
     if ($ide -eq "cursor") {
-        # .mdc → <cursor-root>/.cursor/rules/
         Get-ChildItem -Path $idePayload -Filter '*.mdc' -File -ErrorAction SilentlyContinue |
             ForEach-Object {
                 New-LinkSafe -Path (Join-Path $CursorRoot ".cursor\rules\$($_.Name)") `
                              -Target $_.FullName -IsFile
             }
-
-        # .prompt.md → <cursor-root>/.cursor/commands/
         Get-ChildItem -Path $idePayload -Filter '*.prompt.md' -File -ErrorAction SilentlyContinue |
             ForEach-Object {
                 New-LinkSafe -Path (Join-Path $CursorRoot ".cursor\commands\$($_.Name)") `
@@ -251,26 +227,20 @@ function Deploy-Folder {
     }
 
     if ($ide -eq "vscode") {
-        # .instructions.md → <cursor-root>/.github/
         Get-ChildItem -Path $idePayload -Filter '*.instructions.md' -File -ErrorAction SilentlyContinue |
             ForEach-Object {
                 New-LinkSafe -Path (Join-Path $CursorRoot ".github\$($_.Name)") -Target $_.FullName -IsFile
             }
-
-        # .prompt.md → <cursor-root>/.github/prompts/
         Get-ChildItem -Path $idePayload -Filter '*.prompt.md' -File -ErrorAction SilentlyContinue |
             ForEach-Object {
                 New-LinkSafe -Path (Join-Path $CursorRoot ".github\prompts\$($_.Name)") -Target $_.FullName -IsFile
             }
     }
 
-    # scripts/.vscode/tasks.json → <cursor-root>/.vscode/tasks.json (shared, not per-repo)
     $skillTasksJson = Join-Path $Folder 'scripts\.vscode\tasks.json'
     if (Test-Path -LiteralPath $skillTasksJson -PathType Leaf) {
         New-LinkSafe -Path (Join-Path $CursorRoot '.vscode\tasks.json') `
                      -Target $skillTasksJson -IsFile
-
-        # Enable automatic tasks so the watcher starts on folderOpen without a prompt
         $settingsPath = Join-Path $CursorRoot '.vscode\settings.json'
         $settingsDir  = Split-Path $settingsPath -Parent
         if (-not (Test-Path -LiteralPath $settingsDir)) {
@@ -288,40 +258,42 @@ function Deploy-Folder {
     }
 }
 
-# --- Skills ---
-if ($skillFolders.Count -gt 0) {
-    Write-Host "=== Skills ===" -ForegroundColor Magenta
+# --- Standalone skills (skills/ — junction) ---
+$skillsRoot = Join-Path $RepoRoot 'skills'
+$skillFolders = Find-MarkedFolders -Root $skillsRoot -Markers @('SKILL.md')
 
+if ($skillFolders.Count -gt 0) {
+    Write-Host "`n=== Standalone skills (skills/) ===" -ForegroundColor Magenta
     $junctionRoot = if ($ide -eq "cursor") {
         Join-Path $CursorRoot '.cursor\skills'
     } else {
         Join-Path $CursorRoot '.github\skills'
     }
-
     foreach ($folder in $skillFolders) {
         Deploy-Folder -Folder $folder -JunctionRoot $junctionRoot
     }
 }
 
-# --- Agents ---
+# --- Legacy agents/ at repo root (junction) ---
+$agentsRoot = Join-Path $RepoRoot 'agents'
+$agentFolders = Find-MarkedFolders -Root $agentsRoot -Markers @('AGENT.md', 'AGENTS.md')
 if ($agentFolders.Count -gt 0) {
-    Write-Host "`n=== Agents ===" -ForegroundColor Magenta
-
+    Write-Host "`n=== Agents (agents/) ===" -ForegroundColor Magenta
     $junctionRoot = if ($ide -eq "cursor") {
         Join-Path $CursorRoot '.cursor\agents'
     } else {
         Join-Path $CursorRoot '.github\agents'
     }
-
     foreach ($folder in $agentFolders) {
         Deploy-Folder -Folder $folder -JunctionRoot $junctionRoot
     }
 }
 
-# --- Guidance (no junctions — ide-files only) ---
+# --- Guidance (repo root) ---
+$guidanceRoot = Join-Path $RepoRoot 'guidance'
+$guidanceFolders = Find-MarkedFolders -Root $guidanceRoot -Markers @()
 if ($guidanceFolders.Count -gt 0) {
     Write-Host "`n=== Guidance ===" -ForegroundColor Magenta
-
     foreach ($folder in $guidanceFolders) {
         Deploy-Folder -Folder $folder -JunctionRoot ""
     }
