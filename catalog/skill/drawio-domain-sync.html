@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Garden — skill · drawio-domain-sync</title>
+<script src="/commons/brand-nav.js?v=aigarden-4"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/*
+  Agile Garden — AI Garden prelude + gardener lesson fragment.
+  Inlined via generate_abd_catalog.py. Max border-radius 6px; flat surfaces.
+  Brand split: orange-500 (#E5531A) for column chrome / rails; ai-blue (#4FC3F7 / #81D4FA)
+  on dense mono skill links — see abd-works-brand BRAND-GUIDELINES §3.1 (ai-blue-500).
+*/
+.catalog-prelude {
+  margin: 0 0 24px;
+  padding: 0 0 20px;
+  border-bottom: 1px solid #2A2A2A;
+}
+.catalog-prelude-heading {
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.25;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #2A2A2A;
+  scroll-margin-top: 48px;
+}
+.catalog-prelude-tagline {
+  margin: 0 0 14px;
+  max-width: 60rem;
+  font-size: 1rem;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+/* Mission row */
+.catalog-mission {
+  margin: 0 0 18px;
+}
+.catalog-mission-card {
+  background: #1B1B20;
+  border: 1px solid #2A2A2A;
+  border-left: 3px solid #E5531A;
+  border-radius: 4px;
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 16px;
+}
+.catalog-mission-card h3 {
+  flex-shrink: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #F4F4F5;
+  margin: 0;
+  white-space: nowrap;
+}
+.catalog-mission-card p {
+  flex: 1 1 auto;
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.catalog-mission-card--teal,
+.catalog-mission-card--amber,
+.catalog-mission-card--purple {
+  background: #1B1B20;
+  border: 1px solid #2A2A2A;
+  border-left: 3px solid #E5531A;
+}
+.catalog-mission-card--teal h3,
+.catalog-mission-card--amber h3,
+.catalog-mission-card--purple h3 {
+  color: #F4F4F5;
+}
+@media (max-width: 720px) {
+  .catalog-mission { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) {
+  .catalog-mission { grid-template-columns: 1fr; }
+}
+
+/* Two-column skill lists */
+/* ── Section labels (full-width row above each grid) ── */
+.catalog-section-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0 10px;
+  margin: 24px 0 12px;
+  border-bottom: 1px solid #2A2A2A;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #E5531A;
+}
+.catalog-section-label--foundational {
+  margin-top: 28px;
+  color: #8A8A97;
+  border-bottom-color: #1A1A1E;
+}
+
+/* ── Practice grid — all 5 disciplines forced onto one row ── */
+.catalog-practice-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: #2A2A2A;
+  border: 1px solid #2A2A2A;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 0;
+}
+@media (max-width: 900px) {
+  .catalog-practice-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+  .catalog-practice-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Foundational grid — 2 wider columns ── */
+.catalog-foundational-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1px;
+  background: #2A2A2A;
+  border: 1px solid #2A2A2A;
+  border-radius: 6px;
+  overflow: hidden;
+}
+@media (max-width: 600px) {
+  .catalog-foundational-grid { grid-template-columns: 1fr; }
+}
+
+/* ── In the practice grid, stack name above desc ── */
+.catalog-practice-grid .catalog-garden-row,
+.catalog-foundational-grid .catalog-garden-row {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 10px 16px;
+}
+.catalog-practice-grid .catalog-garden-name,
+.catalog-foundational-grid .catalog-garden-name {
+  flex: none;
+  font-size: 0.85rem;
+}
+.catalog-practice-grid .catalog-garden-desc,
+.catalog-foundational-grid .catalog-garden-desc {
+  display: block !important;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #9B9BA8;
+}
+
+/* ── Agents grid — single wide column ── */
+.catalog-agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1px;
+  background: #2A2A2A;
+  border: 1px solid #2A2A2A;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.catalog-section-label--agents {
+  margin-top: 28px;
+  color: #E5531A;
+  border-bottom-color: #2A2A2A;
+}
+
+/* ── Shared column card ── */
+.catalog-garden-lists {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.catalog-garden-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+  margin: 0 0 8px;
+}
+@media (max-width: 760px) {
+  .catalog-garden-grid { grid-template-columns: 1fr; }
+}
+.catalog-garden-agents-wrap {
+  margin-top: 8px;
+}
+.catalog-garden-col--agents {
+  margin-top: 0;
+}
+.catalog-garden-col {
+  background: #111113;
+  border: none;
+  border-radius: 0;
+  overflow: hidden;
+}
+.catalog-garden-col-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-bottom: 1px solid #2A2A2A;
+  background: #1B1B20;
+  color: #E5531A;
+  border-left: 3px solid #E5531A;
+}
+.catalog-garden-col-header--practice,
+.catalog-garden-col-header--foundational,
+.catalog-garden-col-header--agents {
+  background: #1B1B20;
+  color: #E5531A;
+  border-left: 3px solid #E5531A;
+}
+.catalog-garden-ico { flex-shrink: 0; display: block; }
+.catalog-garden-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px;
+  border-bottom: 1px solid #1A1A1E;
+  font-size: 0.85rem;
+}
+.catalog-garden-row:last-child { border-bottom: none; }
+/* Skill/agent links — mono names stay near-white; ai-blue hairline/hover (brand AI accent, not orange wall) */
+.catalog-garden-name {
+  font-weight: 700;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  flex: 0 0 11.5rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  color: #4FC3F7;
+}
+/* !important beats global `a { … }`, :visited, and concatenation order */
+.catalog-prelude .catalog-garden-name a,
+.catalog-garden-lists .catalog-garden-name a {
+  color: #4FC3F7 !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  border-bottom: 1px solid rgba(79, 195, 247, 0.3);
+}
+.catalog-prelude .catalog-garden-name a:hover,
+.catalog-prelude .catalog-garden-name a:focus-visible,
+.catalog-garden-lists .catalog-garden-name a:hover,
+.catalog-garden-lists .catalog-garden-name a:focus-visible {
+  color: #81D4FA !important;
+  border-bottom-color: rgba(79, 195, 247, 0.95);
+}
+.catalog-garden-name--agent a,
+.catalog-garden-name--foundational a {
+  color: #4FC3F7 !important;
+  border-bottom: 1px solid rgba(79, 195, 247, 0.3);
+}
+.catalog-garden-name--agent a:hover,
+.catalog-garden-name--agent a:focus-visible,
+.catalog-garden-name--foundational a:hover,
+.catalog-garden-name--foundational a:focus-visible {
+  color: #81D4FA !important;
+  border-bottom-color: rgba(79, 195, 247, 0.92);
+}
+.catalog-garden-name--dim {
+  color: var(--muted);
+  opacity: 0.6;
+  font-weight: 600;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+.catalog-garden-desc {
+  color: var(--muted);
+  font-size: 0.82rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.catalog-garden-desc--muted { opacity: 0.5; }
+
+:root {
+  /* Primary accent — borders, nav “you are here”; keep saturated */
+  --orange:       #E5531A;
+  --orange-hover: #C64514;
+  /* Brand ai-blue (BRAND-GUIDELINES §3.1) — dense skill listings + card hover cue */
+  --ai-blue-500:  #4FC3F7;
+  --ai-blue-300:  #81D4FA;
+  /* Body links — soft orange (prose); garden grid uses ai-blue in agile-garden-fragment.css */
+  --link-soft:        #FFB380;
+  --link-soft-hover:  #FFCCA3;
+  --link-muted:       #F2A07A;
+  --bg:           #0B0B0B;
+  --surface:      #111113;
+  --raised:       #1B1B20;
+  --border:       #2A2A2A;
+  --border-muted: #1e1e22;
+  --text:         #F4F4F5;
+  --muted:        #9B9BA8;
+  --radius:       6px;
+  --font-sans:    'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--link-muted); text-decoration: none; transition: color 120ms ease; }
+a:hover { color: var(--link-soft-hover); text-decoration: none; }
+
+/* Wayfinding stays strong accent */
+.nav a.nav__link--current {
+  color: var(--orange) !important;
+}
+strong { font-weight: 600; }
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: rgba(255,255,255,0.06);
+  padding: 2px 5px;
+  border-radius: 3px;
+  color: #F2A07A;
+}
+
+/* ── Page layout ── */
+.page-wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 48px clamp(16px, 4vw, 48px) 96px;
+}
+
+/* ── Panel / legacy wrapper — flatten to plain surface ── */
+.panel {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+}
+
+/* ── Page header (replaces old panel-header) ── */
+.panel-header {
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+  border-left: none;
+  background: transparent;
+  display: block;
+}
+
+.header-icon { display: none; }
+
+.header-text { display: block; }
+.brand { display: none; }
+.brand-row { display: none; }
+.brand-row .brand { display: none; }
+.brand-row .cap-badge { display: none; }
+
+h1 {
+  margin: 0 0 10px;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+
+.tagline {
+  margin: 0;
+  font-size: 15px;
+  color: var(--muted);
+  max-width: 540px;
+  line-height: 1.65;
+  font-family: var(--font-sans);
+}
+
+.panel-body { padding: 0; }
+p { margin: 0 0 14px; }
+h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 32px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+h2:first-child { margin-top: 0; }
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 0 0 18px;
+  padding: 0 0 14px;
+  border-bottom: 1px solid var(--border-muted);
+}
+.nav a {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.nav a.nav__link--current {
+  pointer-events: none;
+}
+/* Kanban is a different experience (full-screen deck) — keep it last and visually apart */
+.nav a.nav__link--kanban {
+  margin-left: auto;
+  padding-left: 18px;
+  border-left: 1px solid var(--border-muted);
+}
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  margin: 18px 0 0;
+}
+.cap-card {
+  display: block;
+  text-decoration: none;
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  transition: background 0.15s, border-color 0.15s;
+  cursor: pointer;
+}
+a.cap-card {
+  color: var(--muted);
+}
+.cap-card:hover {
+  background: rgba(79, 195, 247, 0.06);
+  border-color: rgba(79, 195, 247, 0.32);
+  text-decoration: none;
+}
+.cap-card__title {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: #F4F4F5;
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+a.cap-card:hover .cap-card__title {
+  color: var(--ai-blue-300);
+}
+.cap-card__icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: rgba(79, 195, 247, 0.72);
+}
+a.cap-card:hover .cap-card__icon {
+  color: var(--ai-blue-500);
+}
+.cap-card__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.55;
+  margin-bottom: 1px;
+}
+.cap-card__summary { font-size: 0.85rem; color: var(--muted); line-height: 1.45; margin: 0 0 8px; }
+.cap-card__meta { font-size: 0.75rem; color: var(--muted); font-family: var(--font-mono, 'JetBrains Mono', monospace); margin: 0 0 8px; opacity: 0.85; }
+.cap-card__more {
+  font-size: 0.78rem;
+  color: rgba(79, 195, 247, 0.82);
+  opacity: 1;
+  margin: 10px 0 0;
+}
+
+/* Entry detail pages (skill/*.html, agent/*.html) — overview-style */
+.entry-detail-header .back-link {
+  font-size: 0.82rem;
+  color: var(--muted);
+  display: inline-block;
+  margin: 0 0 10px;
+}
+.entry-detail-header .back-link:hover {
+  color: var(--orange);
+}
+.cap-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--orange);
+  background: rgba(255, 122, 0, 0.08);
+  border: 1px solid rgba(255, 122, 0, 0.25);
+  border-radius: 3px;
+  padding: 2px 8px;
+  margin: 0 0 8px;
+}
+.entry-caption {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.entry-prose {
+  white-space: pre-wrap;
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+.entry-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 26px 0;
+}
+.entry-contents-doc {
+  margin: 0 0 8px;
+}
+.entry-contents-files {
+  margin: 0;
+}
+.entry-md-section {
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius);
+  margin: 0 0 10px;
+  background: rgba(0, 0, 0, 0.14);
+}
+.entry-md-section > summary.entry-md-section__summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.98rem;
+  padding: 12px 14px;
+  list-style: none;
+  color: var(--text);
+  user-select: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.entry-md-section > summary.entry-md-section__summary::before {
+  content: "+";
+  flex-shrink: 0;
+  width: 1.35em;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.05em;
+  line-height: 1.35;
+  color: var(--orange);
+}
+.entry-md-section[open] > summary.entry-md-section__summary::before {
+  content: "-";
+}
+.entry-md-section > summary.entry-md-section__summary::-webkit-details-marker {
+  display: none;
+}
+.entry-md-section .entry-md-section__body {
+  padding: 0 14px 14px 16px;
+  border-top: 1px solid var(--border-muted);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text);
+}
+.entry-md-section .entry-md-section__body p {
+  margin: 0 0 12px;
+}
+.entry-md-section .entry-md-section__body p:last-child {
+  margin-bottom: 0;
+}
+.entry-md-section .entry-md-section__body ul {
+  margin: 0 0 12px;
+  padding-left: 1.35rem;
+}
+.entry-md-section .entry-md-section__body h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 18px 0 8px;
+  padding-bottom: 0;
+  border-bottom: none;
+  color: var(--text);
+}
+.entry-md-section .entry-md-section__body h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 14px 0 8px;
+  color: var(--text);
+}
+.entry-md-section .entry-md-section__body pre {
+  margin: 0 0 12px;
+  overflow-x: auto;
+}
+.entry-md-section .entry-md-section__body hr {
+  margin: 14px 0;
+  border: none;
+  border-top: 1px solid var(--border-muted);
+}
+.ascii-diagram {
+  background: #111114;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.83em;
+  line-height: 1.55;
+  color: #b8b8c2;
+  margin: 0 0 18px;
+}
+.install-block {
+  margin: 22px 0 0;
+  padding: 16px 18px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--orange);
+}
+.install-block h2 {
+  margin-top: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.install-block .install-hint {
+  font-size: 0.92rem;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.install-snippet {
+  background: #111114;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 0;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.85em;
+  line-height: 1.5;
+  color: #d4d4d4;
+}
+.install-snippet code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.file-list li {
+  margin: 0 0 14px;
+  padding: 10px 12px 10px 14px;
+  border-left: 3px solid var(--border-muted);
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 0 4px 4px 0;
+}
+.file-list .file-meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+  display: block;
+  margin-top: 4px;
+}
+.file-list a {
+  font-weight: 600;
+}
+.file-list--root {
+  margin-top: 4px;
+}
+.file-list--nested {
+  margin: 8px 0 0 0;
+  padding-left: 0;
+  border-left: 2px solid var(--border-muted);
+  margin-left: 2px;
+  padding-left: 10px;
+}
+.file-list--nested li {
+  margin-bottom: 10px;
+  padding: 8px 10px 8px 12px;
+  font-size: 0.95rem;
+}
+.file-list__nested-note {
+  margin: 8px 0 0 0;
+  padding: 6px 0 4px 4px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+/* Expandable folder tree (<details> / <summary>) */
+.file-list > li.file-list__folder {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+}
+.file-list__folder > .file-tree__details {
+  margin: 0 0 10px 0;
+}
+/* Match .entry-md-section: folder trees (rules, scanners, templates, …) */
+.file-tree__details {
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.14);
+  overflow: hidden;
+}
+.file-tree__summary {
+  cursor: pointer;
+  padding: 12px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.98rem;
+  color: var(--text);
+  user-select: none;
+  background: transparent;
+}
+.file-tree__summary::-webkit-details-marker {
+  display: none;
+}
+.file-tree__summary::marker {
+  content: "";
+  display: none;
+}
+.file-tree__summary::before {
+  content: "+";
+  flex-shrink: 0;
+  width: 1.35em;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.05em;
+  line-height: 1.35;
+  color: var(--orange);
+}
+.file-tree__details[open] > .file-tree__summary::before {
+  content: "-";
+}
+.file-tree__summary:hover {
+  background: rgba(255, 122, 0, 0.06);
+}
+.file-tree__summary .file-meta {
+  display: inline;
+  margin-left: 6px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.file-tree__inner {
+  padding: 0 14px 14px 16px;
+  border-top: 1px solid var(--border-muted);
+}
+.file-tree__ul {
+  margin-top: 4px;
+}
+.file-tree__dir > .file-tree__details {
+  margin: 0;
+  border-radius: 4px;
+}
+.file-tree__dir--truncated {
+  font-size: 0.95rem;
+}
+.file-tree__file .file-meta {
+  display: block;
+  margin-top: 4px;
+}
+
+/* Agile Garden prelude + mission + lists: abd-works/commons/agile-garden-fragment.css (prepended by generate_abd_catalog.py) */
+
+/* Single-page hub (index.html): collapsible hub / skills / agents */
+.catalog-section {
+  border: 1px solid var(--border-muted);
+  border-radius: 8px;
+  margin: 0 0 16px;
+  background: rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+.catalog-section > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+}
+.catalog-section > summary::-webkit-details-marker { display: none; }
+.catalog-section > summary::marker { content: ""; }
+.catalog-section > summary::before {
+  content: "+";
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  line-height: 1.45rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 1px solid var(--border-muted);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+.catalog-section[open] > summary::before { content: "\2212"; }
+.catalog-section[open] > summary {
+  border-bottom: 1px solid var(--border-muted);
+}
+.catalog-section .section-body {
+  padding: 18px 16px 22px;
+}
+.catalog-section .section-body > p:first-of-type { margin-top: 0; }
+.catalog-section .cap-grid { margin-top: 8px; }
+.catalog-section .count {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Static markdown mirror pages (catalog/doc/...) */
+.rule-prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 52rem;
+}
+.rule-prose h1,
+.rule-prose h2,
+.rule-prose h3,
+.rule-prose h4 {
+  margin: 1.25em 0 0.5em;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+}
+.rule-prose h1:first-child,
+.rule-prose h2:first-child,
+.rule-prose h3:first-child {
+  margin-top: 0;
+}
+.rule-prose h1 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35em; }
+.rule-prose h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border-muted); padding-bottom: 0.25em; }
+.rule-prose h3 { font-size: 1.1rem; }
+.rule-prose p { margin: 0 0 12px; }
+.rule-prose pre {
+  margin: 12px 0;
+  padding: 12px 14px;
+  overflow: auto;
+  background: #1f1f24;
+  border: 1px solid var(--border-muted);
+  border-radius: 6px;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+.rule-prose code { font-size: inherit; }
+.rule-prose ul,
+.rule-prose ol {
+  margin: 8px 0 12px 1.25rem;
+  padding: 0;
+}
+.rule-prose li { margin-bottom: 6px; }
+.rule-prose strong { color: var(--text); }
+.rule-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-muted);
+  margin: 1.25em 0;
+}
+.rule-prose .md-table-wrap {
+  overflow-x: auto;
+  margin: 12px 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.rule-prose table.md-table {
+  width: max-content;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.rule-prose table.md-table th,
+.rule-prose table.md-table td {
+  border: 1px solid var(--border-muted);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.rule-prose table.md-table th {
+  background: rgba(255, 122, 0, 0.08);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rule-prose table.md-table td { background: var(--panel); }
+.rule-prose a { color: var(--accent, #ff7a00); text-decoration: underline; }
+.rule-prose a:hover { text-decoration: none; }
+
+.plugin-slots h3 {
+  margin: 28px 0 8px;
+  font-size: 1.05rem;
+}
+.plugin-slots h3:first-child { margin-top: 0; }
+.cap-grid--plugin-slot { margin-bottom: 8px; }
+
+</style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="panel" role="main">
+
+<header class="panel-header entry-detail-header">
+  <div class="header-text">
+    <div class="brand-row">
+      <p class="brand"><strong>abd.works</strong> &middot; AI Garden</p>
+      <p class="cap-badge">Skill</p>
+    </div>
+    <a class="back-link" href="../skills.html">← All skills</a>
+    <h1>drawio-domain-sync</h1>
+    <p class="tagline">Render Ubiquitous Language, CRC, or object model artifacts to Draw.io class diagrams — one page per Key Abstraction — and sync diagram edits back to the source model.</p>
+  </div>
+</header>
+
+<div class="panel-body">
+
+<nav class="nav" aria-label="AI Garden sections">
+  <a href="../index.html" class="nav__link">Complete</a>
+  <a href="../skills.html" class="nav__link nav__link--current">Skills</a>
+  <a href="../agents.html" class="nav__link">Agents</a>
+  <a href="../instructions.html" class="nav__link">Instructions</a>
+  <a href="../kanban-layout/index.html" class="nav__link nav__link--kanban">Delivery kanban</a>
+</nav>
+
+<h2>Description</h2>
+<div class="entry-prose">This skill turns any domain model artifact — a Ubiquitous Language, CRC model, or object model — into a Draw.io class diagram the whole team can read, annotate, and edit. Each Key Abstraction in the source file becomes its own page in the diagram, keeping visual scope manageable and per-abstraction structure clear. When the team edits the diagram in Draw.io, the skill syncs those changes back to the source model file, so diagram and text never drift apart.<br>
+<br>
+Positioning and layout are AI-driven: the agent reads the source, reasons about class relationships and inheritance chains, and places elements where the diagram reads best. There are no fixed grid scripts to run.<br>
+<br>
+---</div>
+
+<section class="install-block" aria-labelledby="install-npx-heading">
+  <h2 id="install-npx-heading">Install with npx</h2>
+  <p class="install-hint">Install this package from GitHub into your project or global agent skills directory (see <a href="https://skills.sh/">skills.sh</a> / Open Agent Skills).</p>
+  <pre class="install-snippet"><code>npx skills add agilebydesign/agilebydesign-skills@drawio-domain-sync -y</code></pre>
+</section>
+
+
+<hr class="entry-divider">
+
+
+
+<hr class="entry-divider">
+
+<h2 id="entry-contents">Contents</h2>
+<div class="entry-contents-doc">
+<details class="entry-md-section" id="md-overview"><summary class="entry-md-section__summary">Overview</summary><div class="entry-md-section__body"><p>﻿--- name: drawio-domain-sync catalog_garden_order: 7 description: &gt;- Render Ubiquitous Language, CRC, or object model artifacts to Draw.io class diagrams — one page per Key Abstraction — and sync diagram edits back to the source model.</p>
+<hr>
+<h1>drawio-domain-sync</h1></div></details>
+<details class="entry-md-section" id="purpose"><summary class="entry-md-section__summary">Purpose</summary><div class="entry-md-section__body"><p>This skill turns any domain model artifact — a Ubiquitous Language, CRC model, or object model — into a Draw.io class diagram the whole team can read, annotate, and edit. Each Key Abstraction in the source file becomes its own page in the diagram, keeping visual scope manageable and per-abstraction structure clear. When the team edits the diagram in Draw.io, the skill syncs those changes back to the source model file, so diagram and text never drift apart.</p>
+<p>Positioning and layout are AI-driven: the agent reads the source, reasons about class relationships and inheritance chains, and places elements where the diagram reads best. There are no fixed grid scripts to run.</p>
+<hr></div></details>
+<details class="entry-md-section" id="when-to-use"><summary class="entry-md-section__summary">When to use</summary><div class="entry-md-section__body"><ul>
+<li>A `&lt;deliverables-folder&gt;/&lt;name&gt;-ubiquitous-language.md`, `&lt;name&gt;-crc.md`, or `&lt;name&gt;-object-model.md` file exists and you want a visual class diagram.</li>
+<li>The team asks to &quot;render the diagram&quot;, &quot;draw the class diagram&quot;, &quot;visualise the domain model&quot;, or &quot;update the diagram&quot;.</li>
+<li>A `.drawio` file has been edited in the Draw.io app and needs to be reconciled with the source model.</li>
+</ul>
+<hr></div></details>
+<details class="entry-md-section" id="core-concepts"><summary class="entry-md-section__summary">Core concepts</summary><div class="entry-md-section__body"><h3>Source types</h3>
+<p>Three domain model artifacts can feed this skill. Each expresses domain concepts at a different fidelity level. All three render with the same card-rows-collaborators shape; the only difference is where rows and collaborators come from.</p>
+<ul>
+<li><strong>Ubiquitous Language</strong> — plain-English concept blocks with verb-led behavior bullets, `<em>italicized</em>` cross-concept references, and invariants. The diagram represents each `### concept` as a class card; each behavior bullet becomes one row with the bullet&#x27;s italicized terms as the collaborator column (`&lt;bullet text&gt; : Collaborator, Collaborator`); each unique cross-concept italicized reference becomes one folded association edge. `### Subtype <em>is a type of</em> Base` drives an inheritance edge. `### term <em>(boundary)</em>` scoped stubs render as imported cards with a `«boundary: OwningModule»` stereotype. Property/instance stubs become property rows on the parent or lightweight stub cards. Invariants appear in the third compartment. This is the second pass after a completed `*-ubiquitous-language.md` file — analogous to how CRC&#x27;s collaborator column feeds the diagram. See `rules/class-diagram-ubiquitous-language-bullets-become-rows.md`.</li>
+<li><strong>CRC model</strong> — responsibility and collaborator tables; behaviors are named with collaborators. The diagram shows class boxes with responsibilities as rows, each annotated with its collaborator types using `name : Collaborator` notation (e.g., `modifier : Character, Imposed Conditions`). Collaborator names also drive association edges between classes. Invariants appear in the class compartment.</li>
+<li><strong>Object model</strong> — typed properties (`+ name: Type`), typed method signatures, ownership semantics. The diagram is a full UML class diagram with typed property and operation compartments.</li>
+</ul>
+<p>The agent reads whichever source type is present and maps its content to class diagram elements. Object models produce the richest diagrams; CRC models produce slightly leaner cards with the same row+collaborator shape; Ubiquitous Languages produce the leanest cards by reading rows from prose bullets and collaborators from italicized term references.</p>
+<p><strong>Picking the source.</strong> When multiple source artifacts exist for the same scope, prefer the highest-fidelity one available (object model &gt; CRC &gt; Ubiquitous Language). The Ubiquitous Language render is the right choice when only the ULL has been written — typically the first time the team wants a visual of the domain, before CRC has been run.</p>
+<h3>Page per Key Abstraction</h3>
+<p>A Key Abstraction is a named grouping in the source file, introduced with a `## <strong>KA Name</strong>` heading. Each KA gets <strong>one Draw.io page</strong>. The page name matches the KA name exactly. All concepts that belong to that KA appear as classes on its page. When a concept from one KA extends or uses a concept from another KA, that external concept appears on the page as an imported ghost class — see <strong>cross-model ancestors</strong> below.</p>
+<h3>AI-driven layout</h3>
+<p>Positioning is a judgment call, not a script output. The agent reads the source, identifies which class is the base, which are children, which are collaborators, and then places them so the diagram reads naturally. The rules in `rules/` — base classes above derived classes, cross-model ancestors visible at the page top, distinct anchor points when multiple edges leave the same class side — are applied as reasoning constraints, not as CLI flags.</p>
+<h3>Sync back</h3>
+<p>When a user edits a diagram in Draw.io, the `sync-to-model` command reads the diagram and produces a diff against the source model file. The agent reviews the diff with the user and applies confirmed changes to the source model. The source model remains the authoritative text; the diagram is a derived view.</p>
+<hr></div></details>
+<details class="entry-md-section" id="build"><summary class="entry-md-section__summary">Build</summary><div class="entry-md-section__body"><h3>Before rendering</h3>
+<p>1. <strong>Identify the source file.</strong> Locate `&lt;deliverables-folder&gt;/&lt;name&gt;-ubiquitous-language.md`, `&lt;name&gt;-crc.md`, or `&lt;name&gt;-object-model.md`. Read the full file to understand all Key Abstractions and their concepts.</p>
+<p>2. <strong>Read the rules.</strong> Read all `rules/*.md` files in this skill before placing any class. The layout decisions below follow those rules.</p>
+<p>3. <strong>Identify the diagram file path.</strong> Use `&lt;deliverables-folder&gt;/&lt;name&gt;-class-diagram.drawio` alongside the source. The first `init` call creates the file if it does not exist.</p>
+<h3>Incremental vs full rendering</h3>
+<p><strong>Prefer incremental edits when the diagram already exists.</strong> If a `.drawio` file is present and the source model has changed, use `update-class`, `add-class`, `delete-class`, and edge commands to apply only the changes — do not regenerate the entire file from scratch. Full regeneration destroys any manual repositioning the user has done in Draw.io. Only use full rendering (steps 4–10 below) when creating a diagram for the first time.</p>
+<h3>Rendering (source → diagram)</h3>
+<p>For each Key Abstraction in the source file, work through these steps (full rendering — use only when no diagram exists yet):</p>
+<p>4. <strong>Init the page</strong> if it does not exist yet:</p>
+<pre><code>   python skills/domain-driven-design/drawio-domain-sync/scripts/drawio_class_cli.py init &lt;drawio-file&gt; --page &quot;&lt;KA Name&gt;&quot;</code></pre>
+<p>5. <strong>Plan layout for this page.</strong> Identify which concepts are base classes and which are derived. Apply `rules/class-diagram-base-classes-positioned-above-derived-classes.md`: bases go at low y-values, children below. Identify any cross-KA ancestor classes that need to be imported at the top of the page.</p>
+<p>6. <strong>Add imported ancestor classes</strong> — any base that belongs to a different KA — using `--imported-from &quot;&lt;Source KA Name&gt;&quot;`. Imported classes render with a dashed border and a `«from: KA Name»` stereotype. Position these at the very top of the page.</p>
+<p>7. <strong>Add local classes</strong> — each concept in this KA — with rows and invariants at the planned positions. Read rows and collaborators from the source per its fidelity:</p>
+<ul>
+<li><strong>Ubiquitous Language</strong> — for each `### concept`, emit one row per verb-led behavior bullet. Row label = the bullet text with italic markers stripped; collaborator column = the bullet&#x27;s `<em>italicized</em>` terms joined by commas, using `&lt;bullet text&gt; : Collaborator, Collaborator` notation. Fold duplicate cross-concept references into one association edge per pair (concept → italicized target), not one per bullet reference. `<strong>Invariant:</strong>` bullets render in the third compartment. `### Subtype <em>is a type of</em> Base` headings drive inheritance edges; do not also draw association edges between subtype and base for inherited behaviors. `### term <em>(boundary)</em>` scoped stubs render as imported cards with `«boundary: OwningModule»` stereotype. Property/instance stubs (e.g., `### roll total` with `is a property of <em>check</em>`) render as either a property row on the parent or a lightweight stub card with `«property of: Parent»` — agent&#x27;s choice per parent. See `rules/class-diagram-ubiquitous-language-bullets-become-rows.md`.</li>
+<li><strong>CRC model</strong> — show every collaborator from the pipe-separated collaborator column as a type annotation on the property or operation, using `name : Collaborator` notation. When a responsibility has multiple collaborators, list them all: `modifier : Character, Imposed Conditions, Condition, Game Modifier`. Collaborators that are not on this page but appear in the type annotation must either have an edge to an imported class or use parenthetical primitive notation `(integer)` / `(true or false)`.</li>
+<li><strong>Object model</strong> — add full typed signatures (`+ name: Type`).</li>
+</ul>
+<p>8. <strong>Add edges</strong> in this order: inheritance first (this establishes the vertical structure), then composition and aggregation (ownership), then associations (uses), then dependencies (creates). Use orthogonal routing for dependencies (`dependency-orthogonal`) when any class sits between source and target — straight dashed lines cut through intervening classes. Apply `rules/class-diagram-multiple-edges-use-distinct-anchor-points.md`: whenever more than one edge leaves the same side of a class, assign explicit `exitX/exitY` and `entryX/entryY` values so each path is visually separate. After adding all edges, verify no edge visually crosses through another class&#x27;s bounding box.</p>
+<p>9. <strong>Inspect</strong> to check for overlapping classes and edge stacking:</p>
+<pre><code>   python skills/domain-driven-design/drawio-domain-sync/scripts/drawio_class_cli.py inspect &lt;drawio-file&gt; --page &quot;&lt;KA Name&gt;&quot;</code></pre>
+<p>Use `move` to reposition any overlapping classes.</p>
+<p>10. <strong>Verify sync.</strong> Run `sync-to-model` — it should report &quot;no changes&quot; when the diagram accurately reflects the source:</p>
+<pre><code>    python skills/domain-driven-design/drawio-domain-sync/scripts/drawio_class_cli.py sync-to-model &lt;drawio-file&gt; --page &quot;&lt;KA Name&gt;&quot; --model &lt;source-file&gt;</code></pre>
+<h3>Persisting module build scripts</h3>
+<p>When a full render produces a bespoke Python script that builds the diagram programmatically (creating all classes, edges, anchors, and waypoints in a single atomic pass), <strong>keep the script in the destination repo</strong> at `&lt;repo-root&gt;/scripts/build_&lt;name&gt;_diagram.py`. Do not delete it after the render succeeds.</p>
+<p>These scripts are valuable because:</p>
+<ul>
+<li><strong>Re-runnable</strong> — the model evolves; re-running the script regenerates the diagram from the current source without replaying the entire layout reasoning from scratch.</li>
+<li><strong>Extendable</strong> — adding a new KA page, class, or relationship is a small edit to an existing script rather than a from-scratch generation session.</li>
+<li><strong>Auditable</strong> — the script is a readable record of every layout decision (positions, widths, anchor points, waypoints) that produced the current diagram.</li>
+</ul>
+<p>Each script should:</p>
+<p>1. Import `drawio_tools` from the skill&#x27;s `scripts/` directory. 2. Build the entire diagram atomically — load/create the mxfile, add all pages, classes, and edges, save once. 3. Run `audit_diagram_report()` at the end and print the result. 4. Be runnable standalone: `python scripts/build_&lt;name&gt;_diagram.py`.</p>
+<p>When the model changes incrementally, prefer editing the existing build script over writing a new one. The script is the module&#x27;s diagram source of truth alongside the model markdown.</p>
+<h3>Sync back (diagram → source)</h3>
+<p>When the user edits the diagram in Draw.io and asks to reconcile it with the source model:</p>
+<p>11. <strong>Run sync-to-model</strong> to surface the diff:</p>
+<pre><code>    python skills/domain-driven-design/drawio-domain-sync/scripts/drawio_class_cli.py sync-to-model &lt;drawio-file&gt; [--page &quot;&lt;KA Name&gt;&quot;] --model &lt;source-file&gt;</code></pre>
+<p>12. <strong>Review the diff</strong> with the user. Apply confirmed additions, changes, and deletions to the source model file. The source model is the record of intent; the diagram is the visual surface.</p>
+<p><strong>Ubiquitous Language sync caveat.</strong> When the source is a `<em>-ubiquitous-language.md` file, sync-back is </em><em>one-way for new/deleted concepts only</em><em>. Card additions, card deletions, and inheritance-edge additions round-trip back to the ULL as new/deleted `### concept` headings and `### Subtype </em>is a type of<em> Base` headings. Row edits, collaborator-list edits, and free-text bullet rewrites do </em><em>not</em>* round-trip — the ULL&#x27;s prose form is the authoritative record, and bullet-level changes must be made in the markdown directly. CRC and object-model sources do not have this asymmetry.</p>
+<h3>CLI reference</h3>
+<p>The full CLI command reference — `add-class`, `update-class`, `delete-class`, `move`, all relationship commands, `inspect`, and `sync-to-model` — is documented in <a href="./diagrams.html">`diagrams.md`</a> alongside detailed layout guidelines, UML relationship selection, and cross-model import conventions. Read that file during rendering; this SKILL.md does not duplicate those mechanics.</p>
+<hr></div></details>
+<details class="entry-md-section" id="validate"><summary class="entry-md-section__summary">Validate</summary><div class="entry-md-section__body"><ul>
+<li><strong>Source identified</strong> — a Ubiquitous Language, CRC, or object model file was located before any diagram work began; the agent read the full file.</li>
+<li><strong>Rules read</strong> — all `rules/*.md` in this skill were consulted before placing any class on any page.</li>
+<li><strong>One page per KA</strong> — the `.drawio` file has one page per `## <strong>KA</strong>` heading in the source; page names match KA headings exactly.</li>
+<li><strong>All KA concepts represented</strong> — every concept listed under a KA in the source appears as a class on that KA&#x27;s page; no concepts are silently skipped.</li>
+<li><strong>ULL bullets become rows</strong> — when the source is a `<em>-ubiquitous-language.md` file, every behavior bullet on every concept renders as a row, every italicized term resolves to a collaborator, every cross-concept reference is folded into one association edge, every `### Subtype </em>is a type of<em> Base` heading produces an inheritance edge, and every `### term </em>(boundary)*` stub renders as an imported card with `«boundary: OwningModule»` stereotype. No bullets, italicized terms, or invariants are silently dropped.</li>
+<li><strong>Cross-KA ancestors imported</strong> — any ancestor class belonging to a different KA appears as an imported class (dashed border, `«from: KA Name»` stereotype) on the page that extends it.</li>
+<li><strong>Base classes above derived</strong> — on every page, base and imported classes are at lower y-coordinates than their children; inheritance arrows point upward.</li>
+<li><strong>Distinct anchor points</strong> — no two edges from the same side of a class use the same default anchor when more than one edge leaves that side.</li>
+<li><strong>Build script persisted</strong> — when a full render used a bespoke build script, it was saved to `&lt;repo-root&gt;/scripts/build_&lt;name&gt;_diagram.py`, not deleted.</li>
+<li><strong>Sync verified</strong> — after rendering each page, `sync-to-model` reported &quot;no changes&quot;.</li>
+<li><strong>No placeholder</strong> — no `{{PLACEHOLDER}}` remains in this file.</li>
+<li><strong>Bundle markers present</strong> — `execute_rules:bundle_rules` begin/end markers exist and the bundled block matches current `rules/*.md` files.</li>
+</ul>
+<hr>
+<p>&lt;!-- execute_rules:bundle_rules:begin --&gt;</p>
+<h1>Rule: Base Classes Positioned Above Derived Classes</h1>
+<p><strong>Scanner:</strong> Manual review</p>
+<p>A passing diagram positions base (parent) and imported ancestor classes at higher vertical positions (lower y-coordinates) than their derived classes. Inheritance arrows point upward — from child to parent — so the visual hierarchy matches the conceptual hierarchy: readers see the most general abstraction first, then specialisations below. A failing diagram places a derived class at a lower y than its parent, or puts a base class at the bottom of the page with children stacked above it, forcing the reader to scan backwards to find the root of an inheritance chain.</p></div></details>
+<details class="entry-md-section" id="do"><summary class="entry-md-section__summary">DO</summary><div class="entry-md-section__body"><ul>
+<li>Position base and imported classes at the top of the page (low y-value) with derived classes extending downward.</li>
+</ul>
+<p><strong>Example (pass):</strong> `Rollable` import at y=40, `Check` import at y=180, `AttackCheck` and `DamageResistance` side-by-side at y=400. Inheritance arrows point upward from children to parents.</p>
+<ul>
+<li>Place multiple sibling derived classes at the same y-level, side by side below their shared parent.</li>
+</ul>
+<p><strong>Example (pass):</strong> `AttackCheck` at (x=40, y=400) and `DamageResistance` at (x=340, y=400) — same row, each pointing up to `Check` at (x=190, y=180).</p></div></details>
+<details class="entry-md-section" id="do-not"><summary class="entry-md-section__summary">DO NOT</summary><div class="entry-md-section__body"><ul>
+<li>Place a base class below its derived classes.</li>
+</ul>
+<p><strong>Example (fail):</strong> `AttackCheck` at y=40, `Check` at y=550. Inheritance arrow points downward — readers see the specialisation before the abstraction.</p>
+<ul>
+<li>Mix inheritance depth levels on the same y-row, so a grandchild appears at the same height as its grandparent.</li>
+</ul>
+<p><strong>Example (fail):</strong> `Rollable` at y=40 and `AttackCheck` (which inherits `Check`, which inherits `Rollable`) also at y=40 on the same page — three levels flattened to one row.</p>
+<h1>Rule: Cross-Model Ancestors Shown on Page</h1>
+<p><strong>Scanner:</strong> Manual review</p>
+<p>When a page&#x27;s local concepts extend or use concepts that belong to a different Key Abstraction, the full ancestor chain from that other KA must appear at the top of the page as imported classes (dashed border, `«from: KA Name»` stereotype). A passing diagram lets the reader trace the complete ancestry without leaving the page. A failing diagram shows only the immediate imported parent while omitting the grandparent that explains where the parent comes from, leaving an incomplete ancestry chain.</p></div></details>
+<details class="entry-md-section" id="do-2"><summary class="entry-md-section__summary">DO</summary><div class="entry-md-section__body"><ul>
+<li>Import every ancestor class needed to understand the full ancestry chain, including grandparents, at the top of the page.</li>
+</ul>
+<p><strong>Example (pass):</strong> An Attack-and-Damage page imports both `Rollable [from: Resolution System]` and `Check [from: Resolution System]`, with a `creates` dependency edge from `Rollable` to `Check`. The reader sees the full chain: `Rollable → Check → AttackCheck / DamageResistance`.</p>
+<ul>
+<li>Render imported classes with a dashed border and a `«from: KA Name»` stereotype label placed above the class name.</li>
+</ul>
+<p><strong>Example (pass):</strong> `add-class … --imported-from &quot;Resolution System&quot;` produces a dashed-border box with stereotype `«from: Resolution System»` shown above `Rollable`.</p>
+<ul>
+<li>Show only the key properties on an imported class — enough to recognise it; full detail stays on the home-KA page.</li>
+</ul>
+<p><strong>Example (pass):</strong> Imported `Check` shows `+ modifier: Integer` and `+ degree: Degree` only. Full operations and invariants are not duplicated.</p></div></details>
+<details class="entry-md-section" id="do-not-2"><summary class="entry-md-section__summary">DO NOT</summary><div class="entry-md-section__body"><ul>
+<li>Show only the immediate imported parent while omitting the grandparent that establishes context.</li>
+</ul>
+<p><strong>Example (fail):</strong> Attack-and-Damage page imports `Check` but not `Rollable` — the reader cannot see that `Check` originates from `Rollable.perform_check()` and cannot understand where the `Check` concept comes from.</p>
+<ul>
+<li>Render an imported class as a normal solid-border class indistinguishable from local classes.</li>
+</ul>
+<p><strong>Example (fail):</strong> `Rollable` appears with a solid border and no stereotype on the Attack-and-Damage page — readers cannot tell it belongs to a different KA.</p>
+<h1>Rule: Multiple Edges Use Distinct Anchor Points</h1>
+<p><strong>Scanner:</strong> Manual review</p>
+<p>When more than one edge leaves from — or arrives at — the same side of a class, each edge must be given explicit `exitX/exitY` or `entryX/entryY` anchor values so the paths are visually distinct. A passing diagram shows clearly separated lines; a failing diagram stacks all outgoing edges on the default anchor, making them appear as a single thick line where the individual relationships are indistinguishable.</p></div></details>
+<details class="entry-md-section" id="do-3"><summary class="entry-md-section__summary">DO</summary><div class="entry-md-section__body"><ul>
+<li>Assign explicit exit and entry anchor coordinates when two or more edges share the same source or target side of a class.</li>
+</ul>
+<p><strong>Example (pass):</strong> `CombatManeuver` has three outgoing edges — inheritance exits top-center (exitX=0.5, exitY=0), a `creates` dependency exits left-low (exitX=0, exitY=0.7), and an opposed `creates` exits left-high (exitX=0, exitY=0.15). Each edge is visually distinct.</p>
+<ul>
+<li>Spread multiple children that inherit from the same parent across the parent&#x27;s bottom edge using distributed entry points.</li>
+</ul>
+<p><strong>Example (pass):</strong> Three child classes inherit from `Action`: first child enters at entryX=0.25, second at entryX=0.5, third at entryX=0.75 — three clearly separated arrows arriving at distinct points.</p></div></details>
+<details class="entry-md-section" id="do-not-3"><summary class="entry-md-section__summary">DO NOT</summary><div class="entry-md-section__body"><ul>
+<li>Leave multiple edges from the same class side with default anchor routing.</li>
+</ul>
+<p><strong>Example (fail):</strong> `CombatManeuver` has three edges all using Draw.io&#x27;s default center anchor — they stack and render as one thick line. A reader cannot distinguish the inheritance edge from the two dependency edges.</p>
+<ul>
+<li>Add explicit anchors only to some edges while leaving others on the default when they share the same exit or entry side.</li>
+</ul>
+<p><strong>Example (fail):</strong> Two of three inheritance arrows from sibling classes have `entryX` set; the third uses default center entry — it overlaps the second arrow and both appear to merge at the parent class.</p>
+<h1>Rule: Ubiquitous Language Bullets Become Card Rows; Italicized Terms Become Collaborators</h1>
+<p><strong>Scanner:</strong> Manual review</p>
+<p>When the source is a Ubiquitous Language file (`<em>-ubiquitous-language.md`), the renderer produces a class diagram with the same shape it produces for CRC — cards with rows and collaborators — but reads its structure from the ULL&#x27;s prose form. Each `### concept` is a card. Each verb-led behavior bullet is one row formatted `&lt;bullet text&gt; : Collaborator, Collaborator`, where the collaborator column is the bullet&#x27;s `</em>italicized<em>` terms. Each unique cross-concept italicized reference is folded into one association edge per pair. `### Subtype </em>is a type of<em> Base` headings drive inheritance edges. `### term </em>(boundary)*` scoped stubs render as imported cards with `«boundary: OwningModule»` stereotype. Invariants render in the third compartment. A passing diagram drops no bullets, no italicized terms, and no invariants, and emits no duplicate association edges between the same pair of cards.</p></div></details>
+<details class="entry-md-section" id="do-4"><summary class="entry-md-section__summary">DO</summary><div class="entry-md-section__body"><ul>
+<li>Emit one row per verb-led behavior bullet; collaborator column = the bullet&#x27;s italicized terms.</li>
+</ul>
+<p><strong>Example (pass):</strong> ULL bullet `- supplies its <em>rank</em> as the primary <em>modifier</em> for any <em>check</em>` on the `trait` concept renders to row `supplies its rank as the primary modifier for any check : Rank, Modifier, Check` and produces folded association edges `trait → Rank`, `trait → Modifier`, `trait → Check`.</p>
+<ul>
+<li>Fold duplicate cross-concept references into a single edge.</li>
+</ul>
+<p><strong>Example (pass):</strong> Three bullets on `check` each italicize `<em>trait</em>`. The diagram has exactly one `check → Trait` association edge.</p>
+<ul>
+<li>Render `### term <em>(boundary)</em>` scoped stubs as imported cards.</li>
+</ul>
+<p><strong>Example (pass):</strong> `### power effect <em>(boundary)</em>` under the Check KA, with canonical `## Effect / power effect` under `# Boundary Domain` carrying `Owned by: Power`, renders as a dashed-border card on the Check page with stereotype `«boundary: Power»`.</p></div></details>
+<details class="entry-md-section" id="do-not-4"><summary class="entry-md-section__summary">DO NOT</summary><div class="entry-md-section__body"><ul>
+<li>Drop italicized terms or invariants during rendering.</li>
+</ul>
+<p><strong>Example (fail):</strong> A bullet with three italicized terms renders as a row with only one collaborator listed. The reader cannot reconstruct the relationship.</p>
+<ul>
+<li>Emit one association edge per bullet reference instead of folding duplicates.</li>
+</ul>
+<p><strong>Example (fail):</strong> `check` references `<em>trait</em>` in three bullets and the diagram shows three parallel `check → Trait` edges stacked on the same anchor.</p>
+<ul>
+<li>Draw association edges from a subtype to its base for behaviors that are already inherited.</li>
+</ul>
+<p><strong>Example (fail):</strong> `opposed check <em>is a type of</em> check` renders an inheritance edge `opposed check → check` AND an association edge `opposed check → check` because a bullet says `is made against another <em>check&#x27;s</em> result`. The inheritance edge already carries the relationship.</p>
+<ul>
+<li>Invent type annotations the source does not contain.</li>
+</ul>
+<p><strong>Example (fail):</strong> Adding `+ name: String` or `+ rank: Integer` to a ULL-sourced card whose source uses no types. Object-model fidelity is only appropriate when the source is an object model.</p>
+<h1>Rule: Run Audit After Every Render</h1>
+<p><strong>Scanner:</strong> `audit_diagram_report(path)` from `drawio_tools.py`</p>
+<p>After generating or modifying a diagram, run `audit_diagram_report()` and iterate until <strong>all `edge_crosses_class` violations are eliminated</strong>. Secondary violations (`edge_on_edge_overlap`, `shared_anchor`) should be minimized but may be unavoidable in complex diagrams with many edges. Never declare a diagram done while `edge_crosses_class` violations exist.</p>
+<p>The audit checks four categories in priority order:</p>
+<p>1. <strong>`class_overlap`</strong> — two class boxes intersect. Must be zero. 2. <strong>`edge_crosses_class`</strong> — an edge route passes through a class it is not connected to. Must be zero. 3. <strong>`edge_on_edge_overlap`</strong> — two edges share the same visual path segment. Minimize. 4. <strong>`shared_anchor`</strong> — multiple edges enter/exit the same default anchor point. Minimize (use explicit `exit_x/exit_y/entry_x/entry_y`).</p></div></details>
+<details class="entry-md-section" id="do-5"><summary class="entry-md-section__summary">DO</summary><div class="entry-md-section__body"><ul>
+<li>Run `audit_diagram_report(path)` after every render pass and read the output.</li>
+</ul>
+<p><strong>Example (pass):</strong> Agent renders diagram, runs audit, sees `edge_crosses_class: Check→Check Result crosses Difficulty Class`. Repositions Check Result to a row below DC, reruns audit, sees zero crossings.</p>
+<ul>
+<li>Use `inheritance-orthogonal` when a subtype is not directly below the parent in the same column.</li>
+</ul>
+<p><strong>Example (pass):</strong> Three subtypes inherit from Check. Only Routine Check is directly below. Opposed Check (offset left) and Team Check (offset right) use `inheritance-orthogonal` with explicit anchors.</p></div></details>
+<details class="entry-md-section" id="do-not-5"><summary class="entry-md-section__summary">DO NOT</summary><div class="entry-md-section__body"><ul>
+<li>Declare a diagram done when `edge_crosses_class` violations exist.</li>
+</ul>
+<p><strong>Example (fail):</strong> Audit reports &quot;Edge Routine Check→Check crosses through Check Result&quot;. Agent says &quot;the Draw.io router will handle it&quot; and moves on. The rendered diagram shows an inheritance arrow cutting through the Check Result box.</p>
+<ul>
+<li>Skip the audit because the layout &quot;looks right&quot; during generation.</li>
+</ul>
+<p><strong>Example (fail):</strong> Agent positions 10 classes, writes edges, saves file, and declares done — never running `audit_diagram_report`. Three edges cut through class boxes that the agent didn&#x27;t notice because it can&#x27;t see the rendered diagram.</p>
+<p>&lt;!-- execute_rules:bundle_rules:end --&gt;</p></div></details>
+</div>
+<hr class="entry-divider">
+<div class="entry-contents-files">
+<ul class="file-list file-list--root">
+<li class="file-list__folder"><details class="file-tree__details"><summary class="file-tree__summary"><strong>ide-files/</strong><span class="file-meta"> → Folder (1 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../domain-driven-design/skills/drawio-domain-sync/ide-files/drawio-domain-sync.instructions.md" target="_blank" rel="noopener noreferrer"><strong>drawio-domain-sync.instructions.md</strong></a><span class="file-meta"> → ﻿# drawio-domain-sync</span></li>
+</ul></div></details></li>
+<li class="file-list__folder"><details class="file-tree__details"><summary class="file-tree__summary"><strong>rules/</strong><span class="file-meta"> → Practice rules (DO/DON&#x27;T) and constraints used with scanners.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../domain-driven-design/skills/drawio-domain-sync/rules/class-diagram-base-classes-positioned-above-derived-classes.md" target="_blank" rel="noopener noreferrer"><strong>class-diagram-base-classes-positioned-above-derived-classes.md</strong></a><span class="file-meta"> → Rule: Base Classes Positioned Above Derived Classes</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../domain-driven-design/skills/drawio-domain-sync/rules/class-diagram-cross-model-ancestors-shown-on-page.md" target="_blank" rel="noopener noreferrer"><strong>class-diagram-cross-model-ancestors-shown-on-page.md</strong></a><span class="file-meta"> → Rule: Cross-Model Ancestors Shown on Page</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../domain-driven-design/skills/drawio-domain-sync/rules/class-diagram-multiple-edges-use-distinct-anchor-points.md" target="_blank" rel="noopener noreferrer"><strong>class-diagram-multiple-edges-use-distinct-anchor-points.md</strong></a><span class="file-meta"> → Rule: Multiple Edges Use Distinct Anchor Points</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../domain-driven-design/skills/drawio-domain-sync/rules/class-diagram-run-audit-after-every-render.md" target="_blank" rel="noopener noreferrer"><strong>class-diagram-run-audit-after-every-render.md</strong></a><span class="file-meta"> → Rule: Run Audit After Every Render</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../domain-driven-design/skills/drawio-domain-sync/rules/class-diagram-ubiquitous-language-bullets-become-rows.md" target="_blank" rel="noopener noreferrer"><strong>class-diagram-ubiquitous-language-bullets-become-rows.md</strong></a><span class="file-meta"> → Rule: Ubiquitous Language bullets become card rows; italicized terms become collaborators</span></li>
+</ul></div></details></li>
+<li class="file-list__folder"><details class="file-tree__details"><summary class="file-tree__summary"><strong>scripts/</strong><span class="file-meta"> → Build, catalogue, validation, or packaging automation.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
+<li class="file-tree__dir"><details class="file-tree__details"><summary class="file-tree__summary"><strong>__pycache__/</strong><span class="file-meta"> → Folder (2 items).</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../domain-driven-design/skills/drawio-domain-sync/scripts/__pycache__/drawio_tools.cpython-312.pyc" target="_blank" rel="noopener noreferrer"><strong>drawio_tools.cpython-312.pyc</strong></a><span class="file-meta"> →     ͬj��  �            </span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../domain-driven-design/skills/drawio-domain-sync/scripts/__pycache__/drawio_tools.cpython-313.pyc" target="_blank" rel="noopener noreferrer"><strong>drawio_tools.cpython-313.pyc</strong></a><span class="file-meta"> →     �]j��  �            </span></li>
+</ul></div></details></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../domain-driven-design/skills/drawio-domain-sync/scripts/drawio_tools.py" target="_blank" rel="noopener noreferrer"><strong>drawio_tools.py</strong></a><span class="file-meta"> → DrawIO class diagram toolkit — core XML read/write functions.</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../domain-driven-design/skills/drawio-domain-sync/scripts/model_to_drawio.py" target="_blank" rel="noopener noreferrer"><strong>model_to_drawio.py</strong></a><span class="file-meta"> → !/usr/bin/env python3</span></li>
+</ul></div></details></li>
+<li class="file-list__folder"><details class="file-tree__details"><summary class="file-tree__summary"><strong>templates/</strong><span class="file-meta"> → Authoring templates and structural skeletons.</span></summary><div class="file-tree__inner"><ul class="file-list file-list--nested file-tree__ul">
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../domain-driven-design/skills/drawio-domain-sync/templates/class-diagram-rendering-example.md" target="_blank" rel="noopener noreferrer"><strong>class-diagram-rendering-example.md</strong></a><span class="file-meta"> → drawio-domain-sync — Rendered Diagram Example</span></li>
+</ul></div></details></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../domain-driven-design/skills/drawio-domain-sync/diagrams.md" target="_blank" rel="noopener noreferrer"><strong>diagrams.md</strong></a><span class="file-meta"> → &lt;!-- section: story_synthesizer.diagrams --&gt;</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../domain-driven-design/skills/drawio-domain-sync/skill-errors-log.md" target="_blank" rel="noopener noreferrer"><strong>skill-errors-log.md</strong></a><span class="file-meta"> → ﻿# drawio-domain-sync — skill errors log</span></li>
+<li class="file-tree__file"><a class="file-tree__file-link" href="../../domain-driven-design/skills/drawio-domain-sync/SKILL.md" target="_blank" rel="noopener noreferrer"><strong>SKILL.md</strong></a><span class="file-meta"> → name: drawio-domain-sync</span></li>
+</ul>
+</div>
+
+</div>
+</div>
+</div>
+</body>
+</html>
