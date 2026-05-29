@@ -17,9 +17,8 @@ child_spec_json is a JSON array of objects:
 The script:
 1. Archives the parent ticket (moves from done to archived with timestamps)
 2. Creates child tickets at the next stage's scope level
-3. Populates children with skills from system of work for the next stage
-4. Places children in backlog ordered by priority
-5. Logs scatter event to metrics-log.jsonl
+3. Children enter backlog with empty progress (skills come from system-of-work.json)
+4. Logs scatter event to metrics-log.jsonl
 """
 from __future__ import annotations
 
@@ -35,15 +34,11 @@ if str(_SCRIPT_DIR) not in sys.path:
 
 from delivery_model import (
     Ticket,
-    SkillProgress,
     append_metrics_log,
-    get_stage_def,
     load_board,
     load_system_of_work,
     next_stage,
-    populate_skills_for_stage,
     save_board,
-    war_room_dir,
 )
 
 
@@ -109,8 +104,8 @@ def scatter(
             stage=nxt.name,
             priority=spec.get("priority", 1),
             scatter_from=parent.ticket_id,
+            entered_stage=now,
         )
-        populate_skills_for_stage(child, nxt)
         children.append(child)
 
     backlog = [Ticket.from_dict(t) for t in board.get("backlog", [])]

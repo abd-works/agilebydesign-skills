@@ -2,11 +2,13 @@
 """Shared delivery model for JIT Kanban with ticket scattering.
 
 Ticket-based model: no slots, no run-catalog, no run-state.
-Board state lives in board.json with tickets tracking per-skill progress.
+Board state lives in board.json with tickets flowing through stages.
+Skills are defined ONLY in system-of-work.json — tickets carry a `progress`
+map that is lazily populated when agents claim work.
 
-Machine files under `<workspace>/docs/planning/delivery-war-room/`:
+Machine files under `<workspace>/docs/planning/kanban/`:
   - `system-of-work.json` — stage definitions with scope levels and ordered skills
-  - `board.json` — Kanban state (backlog, active, done, archived, wip_policy, metrics)
+  - `board.json` — Kanban state (backlog, active, done, archived, wip_policy)
   - `metrics-log.jsonl` — timestamped events
 """
 from __future__ import annotations
@@ -42,8 +44,8 @@ class SystemOfWork:
 
 @dataclass
 class SkillProgress:
+    """Tracks execution state for one skill on a ticket. Lazily created when claimed."""
     status: str = "to_do"
-    role: str = ""
     agent: str | None = None
     start: str | None = None
     end: str | None = None
@@ -55,7 +57,6 @@ class SkillProgress:
     def to_dict(self) -> dict[str, Any]:
         return {
             "status": self.status,
-            "role": self.role,
             "agent": self.agent,
             "start": self.start,
             "end": self.end,
@@ -69,7 +70,6 @@ class SkillProgress:
     def from_dict(cls, d: dict[str, Any]) -> "SkillProgress":
         return cls(
             status=d.get("status", "to_do"),
-            role=d.get("role", ""),
             agent=d.get("agent"),
             start=d.get("start"),
             end=d.get("end"),
@@ -87,7 +87,7 @@ class Ticket:
     scope_level: str = "all"
     stage: str = "shaping"
     priority: int = 1
-    skills: dict[str, SkillProgress] = field(default_factory=dict)
+    progress: dict[str, SkillProgress] = field(default_factory=dict)
     entered_stage: str | None = None
     completed_stage: str | None = None
     scatter_from: str | None = None
@@ -95,32 +95,34 @@ class Ticket:
     notes: str = ""
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        d: dict[str, Any] = {
             "ticket_id": self.ticket_id,
             "lineage": self.lineage,
             "scope_level": self.scope_level,
             "stage": self.stage,
             "priority": self.priority,
-            "skills": {k: v.to_dict() for k, v in self.skills.items()},
             "entered_stage": self.entered_stage,
             "completed_stage": self.completed_stage,
             "scatter_from": self.scatter_from,
             "scatter_to": self.scatter_to,
             "notes": self.notes,
         }
+        if self.progress:
+            d["progress"] = {k: v.to_dict() for k, v in self.progress.items()}
+        return d
 
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> "Ticket":
-        skills = {}
-        for k, v in (d.get("skills") or {}).items():
-            skills[k] = SkillProgress.from_dict(v) if isinstance(v, dict) else SkillProgress()
+        progress = {}
+        for k, v in (d.get("progress") or {}).items():
+            progress[k] = SkillProgress.from_dict(v) if isinstance(v, dict) else SkillProgress()
         return cls(
             ticket_id=d["ticket_id"],
             lineage=d.get("lineage", []),
             scope_level=d.get("scope_level", "all"),
             stage=d.get("stage", "shaping"),
             priority=d.get("priority", 1),
-            skills=skills,
+            progress=progress,
             entered_stage=d.get("entered_stage"),
             completed_stage=d.get("completed_stage"),
             scatter_from=d.get("scatter_from"),
@@ -128,18 +130,21 @@ class Ticket:
             notes=d.get("notes", ""),
         )
 
-    def is_stage_complete(self) -> bool:
-        if not self.skills:
+    def is_stage_complete(self, stage_def: StageDef) -> bool:
+        """A stage is complete when ALL skills defined in the system of work
+        for this stage have progress entries with status=done and review_status=done."""
+        if not stage_def.skills:
             return False
-        return all(
-            sp.status == "done" and sp.review_status == "done"
-            for sp in self.skills.values()
-        )
+        for skill_def in stage_def.skills:
+            sp = self.progress.get(skill_def.skill)
+            if sp is None or sp.status != "done" or sp.review_status != "done":
+                return False
+        return True
 
     def is_active(self) -> bool:
         return any(
             sp.status == "in_progress" or sp.review_status == "in_progress"
-            for sp in self.skills.values()
+            for sp in self.progress.values()
         )
 
 
@@ -152,7 +157,14 @@ def _write_json(path: Path, data: dict[str, Any]) -> None:
 
 
 def war_room_dir(workspace: Path) -> Path:
-    return workspace / "docs" / "planning" / "delivery-war-room"
+    """Look for kanban/ first, fall back to delivery-war-room/ for compatibility."""
+    kanban = workspace / "docs" / "planning" / "kanban"
+    if kanban.is_dir():
+        return kanban
+    legacy = workspace / "docs" / "planning" / "delivery-war-room"
+    if legacy.is_dir():
+        return legacy
+    return kanban
 
 
 def load_system_of_work(workspace: Path) -> dict[str, SystemOfWork]:
@@ -193,7 +205,6 @@ def load_board(workspace: Path) -> dict[str, Any]:
             "done": [],
             "archived": [],
             "wip_policy": {},
-            "metrics": {},
         }
     return _read_json(path)
 
@@ -217,16 +228,12 @@ def next_stage(sow: SystemOfWork, current_stage: str) -> StageDef | None:
     return None
 
 
-def populate_skills_for_stage(ticket: Ticket, stage_def: StageDef) -> None:
+def advance_ticket_to_stage(ticket: Ticket, stage_def: StageDef) -> None:
+    """Move ticket to a new stage. Clears progress (agents will claim lazily)."""
     ticket.stage = stage_def.name
-    ticket.skills = {}
+    ticket.progress = {}
     ticket.entered_stage = datetime.now(timezone.utc).isoformat()
     ticket.completed_stage = None
-    for skill_def in stage_def.skills:
-        ticket.skills[skill_def.skill] = SkillProgress(
-            status="to_do",
-            role=skill_def.role,
-        )
 
 
 def append_metrics_log(workspace: Path, event: dict[str, Any]) -> None:

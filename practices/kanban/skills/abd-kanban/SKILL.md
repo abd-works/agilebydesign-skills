@@ -23,7 +23,7 @@ Single on-disk home for **progress** and **handoffs**. Models delivery as a **JI
 | **Backlog** | Ordered list of tickets awaiting their next stage — hierarchy from story map |
 | **Scatter** | When a ticket completes a stage whose next stage has finer scope, it decomposes into child tickets |
 | **Lineage** | Every ticket carries its ancestry: project > increment > sprint > story |
-| **Skill progress** | Each ticket tracks per-skill status (to_do, in_progress, done) within its current stage |
+| **Progress** | Lazily-populated map on a ticket tracking execution state per skill (only written when an agent claims) |
 
 ## Kanban model
 
@@ -73,11 +73,9 @@ A ticket is the **unit of Kanban flow**. Its scope matches the system of work's 
   "scope_level": "increment",
   "stage": "exploration",
   "priority": 1,
-  "skills": {
-    "abd-ubiquitous-language": { "status": "done", "role": "business-expert", "agent": "business-expert", "start": "...", "end": "...", "review_status": "done", "reviewer": "business-expert-reviewer", "review_start": "...", "review_end": "..." },
-    "abd-acceptance-criteria": { "status": "in_progress", "role": "product-owner", "agent": "product-owner", "start": "...", "end": null, "review_status": null, "reviewer": null, "review_start": null, "review_end": null },
-    "abd-ux-mockup": { "status": "to_do", "role": "ux-designer", "agent": null, "start": null, "end": null, "review_status": null, "reviewer": null, "review_start": null, "review_end": null },
-    "abd-architecture-template": { "status": "to_do", "role": "engineer", "agent": null, "start": null, "end": null, "review_status": null, "reviewer": null, "review_start": null, "review_end": null }
+  "progress": {
+    "abd-ubiquitous-language": { "status": "done", "agent": "business-expert", "start": "...", "end": "...", "review_status": "done", "reviewer": "business-expert-reviewer", "review_start": "...", "review_end": "..." },
+    "abd-acceptance-criteria": { "status": "in_progress", "agent": "product-owner", "start": "...", "end": null, "review_status": null }
   },
   "entered_stage": "2026-05-28T10:00:00Z",
   "completed_stage": null,
@@ -86,13 +84,15 @@ A ticket is the **unit of Kanban flow**. Its scope matches the system of work's 
 }
 ```
 
+**Skills are NOT declared on the ticket.** The `system-of-work.json` defines which skills apply for a given stage. The ticket only carries a `progress` map — lazily populated when an agent claims a skill.
+
 ### Skill status flow
 
 Each skill within a ticket follows: **to_do → in_progress → done**
 
 Each skill also has a review cycle: **review_status: null → in_progress → done** (or **failed** → rework)
 
-A ticket's stage is **done** when ALL skills have `status: done` AND `review_status: done`.
+A ticket's stage is **done** when ALL skills defined in `system-of-work.json` for that stage have a `progress` entry with `status: done` AND `review_status: done`.
 
 ### Ticket lifecycle
 
@@ -100,7 +100,7 @@ A ticket's stage is **done** when ALL skills have `status: done` AND `review_sta
 2. **Active** — at least one skill claimed by an agent (in_progress)
 3. **Stage done** — all skills executed and reviewed
 4. **Scatter** (if next stage has finer scope) — parent archived, children enter backlog
-5. **Continue** (if next stage has same scope) — ticket enters next stage, skills reset to to_do per system of work
+5. **Continue** (if next stage has same scope) — ticket enters next stage, progress cleared (agents claim from system of work)
 6. **Complete** — final stage done; ticket archived with full timing data
 
 ## Scattering
@@ -122,7 +122,7 @@ When a ticket completes a stage and the **next stage's scope** is finer than the
 
 ### When scope stays the same
 
-Discovery (increment) → Exploration (increment): no scatter. The same ticket moves to the next stage; its skills are populated from the system of work for that stage.
+Discovery (increment) → Exploration (increment): no scatter. The same ticket moves to the next stage; its progress is cleared and agents claim skills from `system-of-work.json`.
 
 ## Backlog
 
@@ -145,9 +145,9 @@ The backlog is **ordered** and **hierarchical**:
 
 Agents are **instantiated once** per engagement as **isolated subagents**. They pull skill-level work from active tickets. An agent claims a skill on a ticket when:
 
-1. The skill's `role` matches the agent's `team-role`
-2. The skill's `status` is `to_do` (executor) or skill is `done` and `review_status` is null (reviewer)
-3. Prior skills in the stage's ordered list are done (skills execute in order)
+1. The skill's `role` in `system-of-work.json` matches the agent's `team-role`
+2. The skill has no `progress` entry yet or `status` is `to_do` (executor), or `status` is `done` and `review_status` is null (reviewer)
+3. Prior skills in the stage's ordered list (from system of work) are done (skills execute in order)
 
 ## Progress authority
 
@@ -191,9 +191,9 @@ After strategy selection:
 
 Each tick:
 
-1. Read `board.json` — active tickets, backlog, wip_policy.
-2. **Detect completed skills** — mark reviewed skills done, check if stage is complete.
-3. **Stage transitions** — if all skills done on a ticket, either scatter or advance to next stage.
+1. Read `board.json` and `system-of-work.json` — active tickets, backlog, wip_policy, stage skill definitions.
+2. **Detect completed skills** — compare each active ticket's `progress` against the stage's skill list in `system-of-work.json`.
+3. **Stage transitions** — if all required skills are done on a ticket, either scatter or advance to next stage (clear progress).
 4. **Scatter** — run `scatter_ticket.py` when scope changes; archive parent, create children in backlog.
 5. **Pull from backlog** — move next-priority tickets from backlog to active (respecting WIP).
 6. **Bottleneck analysis** — which stage/skill has the most waiting work? Report to operator.
@@ -202,10 +202,10 @@ Each tick:
 
 ## Role agent — work cycle
 
-1. Read `board.json` and `manifest.md`.
-2. Find active tickets with a skill matching your `team-role` and `slot_type`.
+1. Read `board.json`, `system-of-work.json`, and `manifest.md`.
+2. Find active tickets where `system-of-work.json` lists a skill for this stage matching your `team-role` — and the skill has no `progress` entry or is `to_do`.
 3. **Priority**: rightmost stage first (engineering > spec > explore > discovery > shaping).
-4. Claim the skill (set `status: in_progress`, `agent: <role>`, `start: <now>`).
+4. Claim the skill: write a `progress` entry on the ticket (`status: in_progress`, `agent: <role>`, `start: <now>`).
 5. Execute the practice skill per executor or reviewer workflow.
 6. Mark done (`status: done`, `end: <now>`).
 7. Pull next eligible skill.
@@ -240,5 +240,6 @@ Copy from `templates/`: `INSTRUCTIONS.md`, `manifest.md`, `board.json`, `system-
 ## Limits
 
 - Exit gates remain in `stages/*.md`; war room records Kanban state, it does not replace stage definitions.
-- System of work defines skill order; agents follow it without pre-authored assignments.
+- `system-of-work.json` is the **single source of truth** for which skills a stage requires — tickets never duplicate that list.
+- Tickets carry only a `progress` map (lazily populated when agents claim); no `skills` key.
 - Scatter logic is deterministic from the system of work scope transitions and story map structure.

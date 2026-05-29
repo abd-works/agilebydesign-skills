@@ -1,4 +1,4 @@
-# Delivery war room — role agent autostart
+# Kanban war room — role agent autostart
 
 Eight **persistent role agents** pull skill-level work from tickets on the **Kanban board** (`board.json`). Open the agent matching your role.
 
@@ -21,18 +21,19 @@ Bootstrap must include **`workspace`** — the engagement root.
 
 ## 2) Board state
 
-Read `docs/planning/delivery-war-room/board.json` and `system-of-work.json`.
+Read `docs/planning/kanban/board.json` and `system-of-work.json`.
 
 Each **ticket** is in one list: `backlog` · `active` · `done` · `archived`.
 
-Each ticket tracks **per-skill progress** (to_do, in_progress, done + review status).
+**Skills are defined in `system-of-work.json`** — not on the ticket. The ticket only carries a `progress` map (lazily populated when agents claim).
 
 ## 3) Claim next skill
 
-1. Read **`board.json`** — find active tickets with skills matching your role.
-2. Check **skill order**: prior skills in the stage must be done before you can claim the next.
-3. Priority: **downstream stage first** (engineering > spec > explore > discovery > shaping).
-4. Claim: set skill `status: in_progress`, `agent: <your-role>`, `start: <now>`.
+1. Read **`system-of-work.json`** — find the skill list for the ticket's current stage.
+2. Read **`board.json`** — find active tickets where a skill matching your role has no progress entry or is `to_do`.
+3. Check **skill order**: prior skills in the stage (from system of work) must be done before you can claim the next.
+4. Priority: **downstream stage first** (engineering > spec > explore > discovery > shaping).
+5. Claim: write a `progress` entry on the ticket — `status: in_progress`, `agent: <your-role>`, `start: <now>`.
 
 See `_shared/work-queue.md` for full algorithm.
 
@@ -42,8 +43,8 @@ Executors → `_shared/executor-workflow.md`. Reviewers → `_shared/reviewer-wo
 
 ## 5) When done
 
-Mark skill `status: done`, `end: <now>`. Pull next eligible skill.
+Mark progress entry `status: done`, `end: <now>`. Pull next eligible skill.
 
 ## 6) When blocked
 
-Set skill `status: blocked` — kanban lead handles in scan cycle.
+Set progress entry `status: blocked` — kanban lead handles in scan cycle.

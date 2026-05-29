@@ -27,6 +27,8 @@ if str(_SCRIPT_DIR) not in sys.path:
 from delivery_model import (
     Ticket,
     load_board,
+    load_system_of_work,
+    get_stage_def,
     war_room_dir,
 )
 
@@ -42,6 +44,9 @@ def _parse_iso(s: str | None) -> datetime | None:
 
 def compute_metrics(workspace: Path) -> dict:
     board = load_board(workspace)
+    sow_name = board.get("system_of_work", "")
+    sow_map = load_system_of_work(workspace)
+    sow = sow_map.get(sow_name)
 
     all_tickets = []
     for lst in ("active", "done", "archived"):
@@ -61,7 +66,7 @@ def compute_metrics(workspace: Path) -> dict:
             stage_cycle_times[ticket.stage].append(hours)
             scope_cycle_times[ticket.scope_level].append(hours)
 
-        for skill_name, sp in ticket.skills.items():
+        for skill_name, sp in ticket.progress.items():
             start = _parse_iso(sp.start)
             end = _parse_iso(sp.end)
             if start and end:
@@ -75,9 +80,13 @@ def compute_metrics(workspace: Path) -> dict:
 
     for ticket in active_tickets:
         stage_wip[ticket.stage] += 1
-        for skill_name, sp in ticket.skills.items():
-            if sp.status == "to_do":
-                skill_wip[f"{ticket.stage}:{skill_name}"] += 1
+        if sow:
+            stage_def = get_stage_def(sow, ticket.stage)
+            if stage_def:
+                for skill_def in stage_def.skills:
+                    sp = ticket.progress.get(skill_def.skill)
+                    if sp is None or sp.status == "to_do":
+                        skill_wip[f"{ticket.stage}:{skill_def.skill}"] += 1
 
     if stage_wip:
         max_stage = max(stage_wip, key=stage_wip.get)

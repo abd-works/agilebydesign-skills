@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Sync delivery-war-room/board.json — ticket-based JIT Kanban model.
+"""Sync kanban board.json — ticket-based JIT Kanban model.
 
-Reads board.json, checks for stage completions, advances tickets or triggers
-scatter, updates metrics. Does NOT create planning artifacts.
+Reads board.json, checks for stage completions (using system-of-work.json as the
+skill authority), advances tickets or flags for scatter, updates metrics.
 
 Usage:
     python kanban/skills/abd-kanban/scripts/sync_kanban_board.py --workspace <path>
@@ -20,14 +20,14 @@ _SCRIPT_DIR = Path(__file__).resolve().parent
 if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
 
-from delivery_model import (  # noqa: E402
+from delivery_model import (
     Ticket,
+    advance_ticket_to_stage,
     append_metrics_log,
+    get_stage_def,
     load_board,
     load_system_of_work,
     next_stage,
-    get_stage_def,
-    populate_skills_for_stage,
     save_board,
     war_room_dir,
 )
@@ -40,11 +40,15 @@ def _advance_or_flag(
     workspace: Path,
 ) -> str:
     """Check if ticket stage is complete; advance or flag for scatter. Returns action taken."""
-    if not ticket.is_stage_complete():
-        return "no_change"
-
     sow = sow_map.get(sow_name)
     if not sow:
+        return "no_change"
+
+    current_def = get_stage_def(sow, ticket.stage)
+    if not current_def:
+        return "no_change"
+
+    if not ticket.is_stage_complete(current_def):
         return "no_change"
 
     nxt = next_stage(sow, ticket.stage)
@@ -58,8 +62,7 @@ def _advance_or_flag(
         })
         return "complete"
 
-    current_def = get_stage_def(sow, ticket.stage)
-    if current_def and nxt.scope != current_def.scope:
+    if nxt.scope != current_def.scope:
         ticket.completed_stage = datetime.now(timezone.utc).isoformat()
         append_metrics_log(workspace, {
             "event": "scatter_needed",
@@ -70,12 +73,13 @@ def _advance_or_flag(
         })
         return "scatter_needed"
 
-    populate_skills_for_stage(ticket, nxt)
+    old_stage = ticket.stage
+    advance_ticket_to_stage(ticket, nxt)
     append_metrics_log(workspace, {
         "event": "stage_advance",
         "ticket_id": ticket.ticket_id,
         "lineage": ticket.lineage,
-        "from_stage": ticket.stage,
+        "from_stage": old_stage,
         "to_stage": nxt.name,
     })
     return "advanced"
@@ -112,14 +116,9 @@ def sync_board(workspace: Path, dry_run: bool = False) -> dict:
     for ticket in done_tickets:
         new_done.append(ticket)
 
-    wip_limit = board.get("wip_policy", {}).get("max_active_tickets", 10)
+    wip_limit = board.get("wip_policy", {}).get("max_active", 10)
     while backlog_tickets and len(new_active) < wip_limit:
         ticket = backlog_tickets.pop(0)
-        sow = sow_map.get(sow_name)
-        if sow:
-            stage_def = get_stage_def(sow, ticket.stage)
-            if stage_def and not ticket.skills:
-                populate_skills_for_stage(ticket, stage_def)
         new_active.append(ticket)
 
     board["active"] = [t.to_dict() for t in new_active]
@@ -148,7 +147,8 @@ def main() -> int:
     if args.dry_run:
         print(json.dumps(board, indent=2))
     else:
-        print(f"Synced {workspace / 'docs/planning/delivery-war-room/board.json'}")
+        wr = war_room_dir(workspace)
+        print(f"Synced {wr / 'board.json'}")
     return 0
 
 

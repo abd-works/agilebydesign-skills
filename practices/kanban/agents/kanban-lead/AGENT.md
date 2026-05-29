@@ -91,7 +91,7 @@ You do **not** use practice skills directly. Role agents do. You read their outp
 1. Create war room folder.
 2. Write system of work from strategy.
 3. Write manifest with agent pool policy.
-4. Create first ticket: `{ ticket_id: "project-all", lineage: ["<Project>"], scope_level: "all", stage: "shaping", skills: <from system of work shaping stage> }`.
+4. Create first ticket: `{ ticket_id: "project-all", lineage: ["<Project>"], scope_level: "all", stage: "shaping" }`. No `skills` key — system of work is the authority.
 5. Place ticket in `active` (it starts immediately).
 6. Start the agent scan loop.
 
@@ -107,16 +107,16 @@ Read `board.json`: active tickets, backlog, done, wip_policy.
 
 #### 3b — Detect completed skills
 
-For each active ticket, check if any skill has been marked `done` with `review_status: done` since last cycle. Update ticket state.
+For each active ticket, read `system-of-work.json` for the ticket's current stage. Check if all required skills have a `progress` entry with `status: done` and `review_status: done`.
 
 #### 3c — Check stage completion
 
-A ticket's stage is complete when ALL skills have `status: done` AND `review_status: done`.
+A ticket's stage is complete when ALL skills listed in `system-of-work.json` for that stage have progress entries with `status: done` AND `review_status: done`.
 
 For each completed-stage ticket:
 
-1. **Same scope next stage** → advance ticket: populate skills from system of work for next stage, set `entered_stage`, move to active.
-2. **Finer scope next stage** → **scatter**: run `scatter_ticket.py`, archive parent, create children in backlog.
+1. **Same scope next stage** → advance ticket: clear `progress`, set new `stage`, set `entered_stage`, move to active.
+2. **Finer scope next stage** → **scatter**: run `scatter_ticket.py`, archive parent, create children in backlog (no skills on children).
 3. **Final stage** → archive ticket as complete.
 
 #### 3d — Pull from backlog
@@ -186,9 +186,9 @@ The kanban lead triggers scatter based on system of work scope transitions:
 | Completed stage scope | Next stage scope | Action |
 | --- | --- | --- |
 | all | increment | Scatter: create one ticket per increment from thin-slicing output |
-| increment | increment | Advance: same ticket, new stage skills |
+| increment | increment | Advance: same ticket, clear progress, new stage |
 | increment | sprint | Scatter: group stories into sprints per strategy |
-| sprint | sprint | Advance: same ticket, new stage skills |
+| sprint | sprint | Advance: same ticket, clear progress, new stage |
 | sprint | story | Scatter: one ticket per story (rare — only if strategy requires) |
 
 ### Sprint grouping heuristics
@@ -250,13 +250,13 @@ Eight persistent role agents (four executor, four reviewer). Shared workflows in
 
 | Agent | Pulls |
 | --- | --- |
-| `product-owner` | skills where `role: product-owner`, active tickets, executor work |
+| `product-owner` | skills where system-of-work `role: product-owner`, active tickets, executor work |
 | `product-owner-reviewer` | same role, review work on completed executor skills |
-| `business-expert` | skills where `role: business-expert` |
+| `business-expert` | skills where system-of-work `role: business-expert` |
 | `business-expert-reviewer` | review work for business-expert skills |
-| `ux-designer` | skills where `role: ux-designer` |
+| `ux-designer` | skills where system-of-work `role: ux-designer` |
 | `ux-designer-reviewer` | review work for ux-designer skills |
-| `engineer` | skills where `role: engineer` |
+| `engineer` | skills where system-of-work `role: engineer` |
 | `engineer-reviewer` | review work for engineer skills |
 
 Agents are spawned once, pull continuously, and exit when no eligible work remains.

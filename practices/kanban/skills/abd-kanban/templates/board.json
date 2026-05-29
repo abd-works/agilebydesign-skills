@@ -7,14 +7,10 @@
   "done": [],
   "archived": [],
   "wip_policy": {
+    "max_active": 3,
     "product-owner": { "executor": 1, "reviewer": 1 },
     "business-expert": { "executor": 1, "reviewer": 1 },
     "ux-designer": { "executor": 1, "reviewer": 1 },
     "engineer": { "executor": 1, "reviewer": 1 }
-  },
-  "metrics": {
-    "total_cycle_time": null,
-    "stage_cycle_times": {},
-    "bottlenecks": []
   }
 }
