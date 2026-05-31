@@ -376,14 +376,27 @@ def _bootcamp_abd_works_css_path(repo_root: Path) -> Path:
     )
 
 
+_CATALOG_FONT_IMPORT = (
+    "@import url('https://fonts.googleapis.com/css2?"
+    "family=Inter:wght@400;500;600;700;800&"
+    "family=JetBrains+Mono:wght@400;500;600;700&display=swap');"
+)
+
+
 def load_bootcamp_abd_works_css(repo_root: Path) -> str:
     """Full bootcamp abd-works.css — same stylesheet as index.html."""
     css_path = _bootcamp_abd_works_css_path(repo_root)
     if not css_path.is_file():
         return ""
+    raw = css_path.read_text(encoding="utf-8")
+    raw = re.sub(
+        r"@import\s+url\(['\"]?/commons/abd-fonts\.css['\"]?\)\s*;",
+        _CATALOG_FONT_IMPORT,
+        raw,
+    )
     return (
         "/* Bootcamp abd-works.css (synced from abd-ai-augmented-bootcamp/css/abd-works.css) */\n"
-        + css_path.read_text(encoding="utf-8")
+        + raw
     )
 
 
